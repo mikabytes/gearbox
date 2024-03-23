@@ -84,8 +84,9 @@ function makeSection(name, key, values, filters, set) {
   let selection = filters[key] || []
 
   function onClick(key, value, ctrlKey) {
-    if (selection.includes(value)) {
-      selection = selection.filter((v) => v !== value)
+    // note == enabled comparison with str and num
+    if (selection.some((val) => val == value)) {
+      selection = selection.filter((v) => v != value)
     } else {
       if (ctrlKey) {
         selection = [...selection, value]
