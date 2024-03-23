@@ -1,4 +1,4 @@
-import { useState, useEffect } from "component"
+import { useState, useEffect } from "./component.js"
 import Db from "./db.js"
 
 let incr = 0

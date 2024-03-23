@@ -3,27 +3,41 @@ import { css } from "../../component.js"
 export default css`
   :host {
     display: block;
-    color: var(--gray);
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  .container {
+    display: grid;
+    color: var(--darkgray);
+    grid-template-columns: 85px minmax(100px, 1fr) 80px 120px 70px 70px 100px;
+    overflow: auto;
+    width: 100%;
+    max-height: 100%;
   }
 
   .row {
-    display: flex;
-    align-items: center;
+    display: contents;
+  }
+
+  .row.selected > * {
+    background-color: var(--primary);
+    color: white;
   }
 
   .row > * {
     box-sizing: border-box;
     padding: 3px 6px;
-    overflow: hidden;
     white-space: nowrap;
     user-select: none;
   }
 
   .header {
-    background-color: #efefef;
+    background-color: var(--lightgray);
     font-weight: bold;
-    color: #999;
     cursor: pointer;
+    position: sticky;
+    top: 0;
   }
 
   .header.sorted.reverse:after {
@@ -35,28 +49,8 @@ export default css`
     font-size: 14px;
   }
 
-  .addedDate {
-    width: 120px;
-  }
   .name {
-    width: 100%;
-  }
-  .totalSize {
-    width: 80px;
-  }
-  .isSeeding {
-    width: 120px;
-  }
-  .peersGettingFromUs {
-    width: 100px;
-  }
-  .peersSendingToUs {
-    width: 100px;
-  }
-  .peersSendingToUs {
-    width: 100px;
-  }
-  .uploadRatio {
-    width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 `

@@ -1,4 +1,5 @@
 import express from "express"
+import ViteExpress from "vite-express"
 import bodyParser from "body-parser"
 import cookieParser from "cookie-parser"
 
@@ -13,7 +14,6 @@ export default function start({ stream, getAll }) {
   })
 
   app.use(express.static("public"))
-  app.listen(3000)
   app.use(bodyParser.json())
   app.use(cookieParser())
 
@@ -46,4 +46,6 @@ export default function start({ stream, getAll }) {
       clients.delete(write)
     })
   })
+
+  ViteExpress.listen(app, 3000)
 }

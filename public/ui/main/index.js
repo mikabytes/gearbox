@@ -1,7 +1,10 @@
+import "../sidebar/index.js"
 import "../torrents/index.js"
+import "../header/index.js"
 import styles from "./styles.js"
-import { component, html, useState, useMemo } from "component"
+import { component, html, useState, useMemo } from "../../component.js"
 import useTorrents from "../../useTorrents.js"
+import filterTorrents from "../../filterTorrents.js"
 
 let initialSort = null
 
@@ -13,7 +16,10 @@ component(`x-main`, styles, function Main() {
   const [sort, _setSort] = useState(
     initialSort || { key: `addedDate`, reverse: true }
   )
+  const [filters, _setFilters] = useState({})
   const [db] = useTorrents()
+
+  const torrents = db.values().filter(filterTorrents(filters))
 
   const setSort = useMemo(() => {
     const ret = ({ key, reverse }) => {
@@ -28,10 +34,10 @@ component(`x-main`, styles, function Main() {
 
         // secondary sort by name
         if (a.name > b.name) {
-          return reverse ? -1 : 1
+          return 1
         }
         if (a.name < b.name) {
-          return reverse ? 1 : -1
+          return -1
         }
         return 0
       })
@@ -42,14 +48,25 @@ component(`x-main`, styles, function Main() {
     return ret
   }, [_setSort])
 
+  const setFilters = (newFilters) => {
+    _setFilters({ ...filters, ...newFilters })
+  }
+
   return html`
-    <div id="header">Total: ${db.count()}</div>
+    <x-header .total=${torrents.length}></x-header>
+    <x-sidebar
+      .torrents=${torrents}
+      .filters=${filters}
+      .setFilters=${setFilters}
+    ></x-sidebar>
+    <div id="drag-hor"></div>
     <x-torrents
       .setSort=${setSort}
       .sort=${sort}
-      .torrents=${db.values()}
+      .torrents=${torrents}
+      .filters=${filters}
     ></x-torrents>
-    <div id="sidebar">sidebar</div>
+    <div id="drag-ver"></div>
     <div id="footer">footer</div>
   `
 })
