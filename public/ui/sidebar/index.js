@@ -105,7 +105,11 @@ function makeSection(name, key, values, filters, set) {
       ${values.map(
         ([k, { label, count }]) => html`
           <div
-            class="selectItem ${selection.includes(k) ? `selected` : ``}"
+            class="selectItem ${selection.some(
+              (s) => s == k /* note == enabled comparison with str and num */
+            )
+              ? `selected`
+              : ``}"
             @click=${(e) => onClick(key, k, e.ctrlKey)}
           >
             <div class="name">${label}</div>

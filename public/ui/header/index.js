@@ -13,10 +13,6 @@ component(`x-header`, styles, function Header({ filters, setFilters }) {
 
   console.log(filters)
 
-  useEffect(() => {
-    document.location.hash = this.generatedSearch
-  }, [this.generatedSearch])
-
   // we have to make a little workaround so that filters won't interrupt us writing
   const onInput = (e) => {
     const val = e.target.value
@@ -30,7 +26,6 @@ component(`x-header`, styles, function Header({ filters, setFilters }) {
   }
 
   return html`
-    <div></div>
     <input
       type="search"
       placeholder="Search Torrents"

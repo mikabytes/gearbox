@@ -1,10 +1,18 @@
+import "../header/index.js"
 import "../sidebar/index.js"
 import "../torrents/index.js"
-import "../header/index.js"
-import styles from "./styles.js"
-import { component, html, useState, useMemo } from "../../component.js"
-import useTorrents from "../../useTorrents.js"
+
+import {
+  component,
+  html,
+  useEffect,
+  useMemo,
+  useState,
+} from "../../component.js"
+import { filtersToStr, strToFilters } from "../../filterStrLib.js"
 import filterTorrents from "../../filterTorrents.js"
+import styles from "./styles.js"
+import useTorrents from "../../useTorrents.js"
 
 let initialSort = null
 
@@ -16,8 +24,14 @@ component(`x-main`, styles, function Main() {
   const [sort, _setSort] = useState(
     initialSort || { key: `addedDate`, reverse: true }
   )
-  const [filters, setFilters] = useState({})
+  const [filters, setFilters] = useState(
+    strToFilters(decodeURIComponent(document.location.hash.slice(1)))
+  )
   const [db] = useTorrents()
+
+  useEffect(() => {
+    document.location.hash = filtersToStr(filters)
+  }, [filters])
 
   const torrents = db.values().filter(filterTorrents(filters))
 
