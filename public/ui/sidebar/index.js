@@ -12,53 +12,76 @@ component(
     let byLabel = new Map()
 
     for (const t of torrents) {
-      byStatus.set(
-        enums.friendlyName(t.status),
-        (byStatus.get(enums.friendlyName(t.status)) || 0) + 1
-      )
-      byClient.set(t.clientId, (byClient.get(t.clientId) || 0) + 1)
+      // Status
+      let entry = byStatus.get(t.status)
+      if (!entry) {
+        entry = {
+          id: t.status,
+          label: enums.friendlyName(t.status),
+          count: 0,
+        }
+        byStatus.set(t.status, entry)
+      }
+      entry.count += 1
 
+      // Client
+      entry = byClient.get(t.clientId)
+      if (!entry) {
+        entry = {
+          id: t.clientId,
+          label: t.clientId[0].toUpperCase() + t.clientId.slice(1),
+          count: 0,
+        }
+        byClient.set(t.clientId, entry)
+      }
+      entry.count += 1
+
+      // Tracker
       for (const tracker of t.trackers) {
-        byTracker.set(
-          tracker.sitename,
-          (byTracker.get(tracker.sitename) || 0) + 1
-        )
+        entry = byTracker.get(tracker.sitename)
+        if (!entry) {
+          entry = {
+            id: tracker.sitename,
+            label:
+              tracker.sitename[0].toUpperCase() + tracker.sitename.slice(1),
+            count: 0,
+          }
+          byTracker.set(tracker.sitename, entry)
+        }
+        entry.count += 1
       }
 
       for (const label of t.labels) {
-        byLabel.set(label, (byLabel.get(label) || 0) + 1)
+        entry = byLabel.get(label)
+        if (!entry) {
+          entry = {
+            id: label,
+            label: label[0].toUpperCase() + label.slice(1),
+            count: 0,
+          }
+          byLabel.set(label, entry)
+        }
+        entry.count += 1
       }
     }
 
     return html`
-      ${makeSection(`Status`, `status`, byStatus, filters.status, setFilters)}
-      ${makeSection(
-        `Client`,
-        `clientId`,
-        byClient,
-        filters.clientId,
-        setFilters
-      )}
+      ${makeSection(`Status`, `status`, byStatus, filters, setFilters)}
+      ${makeSection(`Client`, `clientId`, byClient, filters, setFilters)}
       ${makeSection(
         `Tracker`,
         `trackers[].sitename`,
         byTracker,
-        filters[`trackers[].sitename`],
+        filters,
         setFilters
       )}
-      ${makeSection(
-        `Label`,
-        `labels[]`,
-        byLabel,
-        filters[`labels[]`],
-        setFilters
-      )}
+      ${makeSection(`Label`, `labels[]`, byLabel, filters, setFilters)}
     `
   }
 )
 
-function makeSection(name, key, values, selection, set) {
-  selection ||= []
+function makeSection(name, key, values, filters, set) {
+  let selection = filters[key] || []
 
   function onClick(key, value, ctrlKey) {
     if (selection.includes(value)) {
@@ -70,24 +93,24 @@ function makeSection(name, key, values, selection, set) {
         selection = [value]
       }
     }
-    set({ [key]: selection })
+    set({ ...filters, [key]: selection })
   }
 
   values = [...values.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .filter(([k, v]) => v)
+    .sort((a, b) => b[1].count - a[1].count)
+    .filter(([k, v]) => v.count)
   return html`
     <h1>${name}</h1>
     <section id=${key}>
       ${values.map(
-        ([k, v]) => html`
+        ([k, { label, count }]) => html`
           <div
             class="selectItem ${selection.includes(k) ? `selected` : ``}"
             @click=${(e) => onClick(key, k, e.ctrlKey)}
           >
-            <div class="name">${k[0].toUpperCase() + k.slice(1)}</div>
+            <div class="name">${label}</div>
             <div></div>
-            <div class="count">${v}</div>
+            <div class="count">${count}</div>
           </div>
         `
       )}

@@ -10,6 +10,7 @@ import {
   useRef,
   useState,
 } from "haunted"
+
 import { html, css } from "lit"
 
 import useStyles from "./haunted-styles.js"

@@ -23,9 +23,22 @@ async function onMessage({ id, isRemoved, changeSet }) {
 
   if (db.has(id)) {
     db.update(id, changeSet)
+    const item = db.get(id)
+    addSearch(item)
   } else {
+    addSearch(changeSet)
     db.set(id, changeSet)
   }
+}
+
+function addSearch(item) {
+  item.search = (
+    item.name +
+    ` ` +
+    item[`primary-mime-type`] +
+    ` ` +
+    item.files.map((it) => it.name).join(` `)
+  ).toLowerCase()
 }
 
 const source = new EventSource(`/stream`)

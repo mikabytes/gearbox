@@ -16,7 +16,7 @@ component(`x-main`, styles, function Main() {
   const [sort, _setSort] = useState(
     initialSort || { key: `addedDate`, reverse: true }
   )
-  const [filters, _setFilters] = useState({})
+  const [filters, setFilters] = useState({})
   const [db] = useTorrents()
 
   const torrents = db.values().filter(filterTorrents(filters))
@@ -48,12 +48,8 @@ component(`x-main`, styles, function Main() {
     return ret
   }, [_setSort])
 
-  const setFilters = (newFilters) => {
-    _setFilters({ ...filters, ...newFilters })
-  }
-
   return html`
-    <x-header .total=${torrents.length}></x-header>
+    <x-header .filters=${filters} .setFilters=${setFilters}></x-header>
     <x-sidebar
       .torrents=${torrents}
       .filters=${filters}

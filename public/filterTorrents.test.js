@@ -8,7 +8,7 @@ describe("filterTorrents", () => {
     assert.equal(
       filter,
       `const values = ["baz"];
-if (values.includes(obj.name)) {
+if (values.some(val => val == obj.name)) {
   return true
 }
 `
@@ -23,7 +23,7 @@ if (values.includes(obj.name)) {
       `const values = ["foo","bar"];
 for (let it of obj.trackers) {
   for (let it of it.sitenames) {
-    if (values.includes(it.name)) {
+    if (values.some(val => val == it.name)) {
       return true
     }
   }
@@ -43,11 +43,27 @@ for (let it of obj.trackers) {
       `const values = ["foo","bar"];
 for (let it of obj.arrayone) {
   for (let it of it.subkey.arraytwo) {
-    if (values.includes(it.name)) {
+    if (values.some(val => val == it.name)) {
       return true
     }
   }
 }
+`
+    )
+  })
+
+  it("should negate when key is prefixed with -", () => {
+    const filter = createFilter("-trackers[].sitename", ["sassytorrents"])
+
+    assert.equal(
+      filter,
+      `const values = ["sassytorrents"];
+for (let it of obj.trackers) {
+  if (values.some(val => val == it.sitename)) {
+    return false
+  }
+}
+return true
 `
     )
   })
