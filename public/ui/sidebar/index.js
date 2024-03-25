@@ -10,6 +10,7 @@ component(
     let byClient = new Map()
     let byTracker = new Map()
     let byLabel = new Map()
+    let byError = new Map()
 
     for (const t of torrents) {
       // Status
@@ -63,6 +64,18 @@ component(
         }
         entry.count += 1
       }
+
+      // Error
+      entry = byError.get(t.error)
+      if (!entry) {
+        entry = {
+          id: t.error,
+          label: enums.ERROR[t.error],
+          count: 0,
+        }
+        byError.set(t.error, entry)
+      }
+      entry.count += 1
     }
 
     return html`
@@ -76,25 +89,49 @@ component(
         setFilters
       )}
       ${makeSection(`Label`, `labels[]`, byLabel, filters, setFilters)}
+      ${makeSection(
+        `Error`,
+        `error`,
+        byError,
+        filters,
+        setFilters,
+        enums.ERROR
+      )}
     `
   }
 )
 
-function makeSection(name, key, values, filters, set) {
-  let selection = filters[key] || []
+function makeSection(name, key, values, filters, set, friendlyMap) {
+  let isNegated
+  let selection
 
-  function onClick(key, value, ctrlKey) {
+  if (filters[`-` + key]) {
+    selection = filters[`-` + key]
+    isNegated = true
+  } else {
+    selection = filters[key] || []
+  }
+
+  function onClick(key, value, e) {
+    const newFilters = { ...filters }
     // note == enabled comparison with str and num
     if (selection.some((val) => val == value)) {
       selection = selection.filter((v) => v != value)
+      newFilters[(isNegated ? `-` : ``) + key] = selection
     } else {
-      if (ctrlKey) {
+      if (e.ctrlKey) {
+        newFilters[(isNegated ? `-` : ``) + key] = [...selection, value]
+      } else if (e.shiftKey) {
+        // shift key is always negated
         selection = [...selection, value]
+        newFilters[`-` + key] = selection
       } else {
-        selection = [value]
+        newFilters[key] = [value]
+        newFilters[`-` + key] = null
+        // no shift or ctrl, let's destroy negated filters
       }
     }
-    set({ ...filters, [key]: selection })
+    set(newFilters)
   }
 
   values = [...values.entries()]
@@ -111,7 +148,7 @@ function makeSection(name, key, values, filters, set) {
             )
               ? `selected`
               : ``}"
-            @click=${(e) => onClick(key, k, e.ctrlKey)}
+            @click=${(e) => onClick(key, k, e)}
           >
             <div class="name">${label}</div>
             <div></div>
@@ -119,6 +156,18 @@ function makeSection(name, key, values, filters, set) {
           </div>
         `
       )}
+      ${!isNegated
+        ? ``
+        : html`<div
+            class="selectItem negated selected"
+            @click=${(e) => set({ ...filters, [`-` + key]: undefined })}
+          >
+            <div class="name">
+              - (${selection.map((s) => friendlyMap?.[s] || s).join(` `)})
+            </div>
+            <div></div>
+            <div class="count"></div>
+          </div>`}
     </section>
   `
 }

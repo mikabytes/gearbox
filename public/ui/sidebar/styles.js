@@ -5,6 +5,7 @@ export default css`
     display: flex;
     flex-direction: column;
     width: 200px;
+    overflow: auto;
   }
 
   section {

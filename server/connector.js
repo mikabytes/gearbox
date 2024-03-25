@@ -1,11 +1,7 @@
-import fields from "./torrentFields.js"
-import deepEqual from "./deepEqual.js"
+import * as guid from "./guid.js"
 import Requester from "./Requester.js"
-
-function guid({ clientId, torrentId }) {
-  const ret = `${clientId}-${torrentId}`
-  return ret
-}
+import deepEqual from "./deepEqual.js"
+import fields from "./torrentFields.js"
 
 function processTorrent(clientId, torrent) {
   return {
@@ -13,13 +9,25 @@ function processTorrent(clientId, torrent) {
     clientId,
     localId: torrent.id,
     // make id globally unique
-    id: guid({ clientId, torrentId: torrent.id }),
+    id: guid.encode({ clientId, torrentId: torrent.id }),
   }
 }
 
-export default async function Connector({ id, ip, port, changes: changesCb }) {
-  if (!ip || !port) {
-    throw new Error("ip and port are required")
+export default async function Connector({
+  id: clientId,
+  ip,
+  port,
+  changes: changesCb,
+}) {
+  if (!ip || !port || !clientId) {
+    throw new Error("ip, id and port are required")
+  }
+
+  // we allow only a-z and 0-9 in id
+  if (clientId.length > 6 || !clientId.match(/^[a-z0-9]+$/)) {
+    throw new Error(
+      `ID must be 1 to 6 characters long and contain only a-z and 0-9`
+    )
   }
 
   const request = Requester(`${ip}:${port}`)
@@ -27,9 +35,10 @@ export default async function Connector({ id, ip, port, changes: changesCb }) {
   const cache = new Map()
   let lastUpdateAt
   const ret = {
-    id,
+    id: clientId,
     ip,
     port,
+    request,
   }
 
   function old() {
@@ -50,7 +59,7 @@ export default async function Connector({ id, ip, port, changes: changesCb }) {
     cache.clear()
 
     for (let t of torrents) {
-      t = processTorrent(id, t)
+      t = processTorrent(clientId, t)
       cache.set(t.id, t)
     }
   }
@@ -80,7 +89,7 @@ export default async function Connector({ id, ip, port, changes: changesCb }) {
       }
     }
     changesCb?.({
-      id: existingTorrent.id,
+      id: torrent.id,
       changeSet,
     })
   }
@@ -98,12 +107,12 @@ export default async function Connector({ id, ip, port, changes: changesCb }) {
       }
 
       for (let torrentId of removedIds) {
-        id = guid({ clientId: id, torrentId })
+        const id = guid.encode({ clientId, torrentId })
         processDeletedTorrent(id)
       }
 
       for (let t of torrents) {
-        t = processTorrent(id, t)
+        t = processTorrent(clientId, t)
         processChangedTorrent(t)
       }
     } catch (e) {

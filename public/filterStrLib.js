@@ -38,7 +38,7 @@ function stringify(val) {
 export function strToFilters(str) {
   const filters = {}
 
-  const parts = str.matchAll(/([.a-zA-Z\[\]]+):(\(.*?\)|".*?"|[^\s]+)/g)
+  const parts = str.matchAll(/([-.a-zA-Z\[\]]+):(\(.*?\)|".*?"|[^\s]+)/g)
 
   for (const [all, key, value] of parts) {
     str = str.replaceAll(all, ``)

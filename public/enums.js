@@ -28,3 +28,18 @@ export function friendlyName(status) {
       return "Unknown"
   }
 }
+
+// from https://github.com/transmission/transmission/blob/main/libtransmission/transmission.h#L1407
+// this is mapped to torrent.error field
+
+export const ERROR = {
+  0: `Everything's fine`,
+  /* when we announced to the tracker, we got a warning in the response */
+  1: `Tracker warning`,
+
+  /* when we announced to the tracker, we got an error in the response */
+  2: `Tracker error`,
+
+  /* local trouble, such as disk full or permissions error */
+  3: `Local error`,
+}

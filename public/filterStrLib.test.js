@@ -47,5 +47,15 @@ describe("filterStrLib", () => {
 
       assert.deepEqual(strToFilters(input), expectedOutput)
     })
+
+    it("should handle negated keys", () => {
+      const input = `-error:0`
+
+      const expectedOutput = {
+        "-error": ["0"],
+      }
+
+      assert.deepEqual(strToFilters(input), expectedOutput)
+    })
   })
 })

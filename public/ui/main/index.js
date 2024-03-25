@@ -24,8 +24,20 @@ component(`x-main`, styles, function Main() {
   const [sort, _setSort] = useState(
     initialSort || { key: `addedDate`, reverse: true }
   )
-  const [filters, setFilters] = useState(
+  const [filters, _setFilters] = useState(
     strToFilters(decodeURIComponent(document.location.hash.slice(1)))
+  )
+  const setFilters = useMemo(
+    () => (filters) => {
+      for (const key of Object.keys(filters)) {
+        const val = filters[key]
+        if (!val?.length) {
+          delete filters[key]
+        }
+      }
+      _setFilters(filters)
+    },
+    [filters]
   )
   const [db] = useTorrents()
 

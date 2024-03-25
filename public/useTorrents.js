@@ -37,7 +37,7 @@ function addSearch(item) {
     ` ` +
     item[`primary-mime-type`] +
     ` ` +
-    item.files.map((it) => it.name).join(` `)
+    item.files?.map((it) => it.name).join(` `)
   ).toLowerCase()
 }
 
