@@ -83,6 +83,7 @@ component(`x-main`, styles, function Main() {
     ></x-sidebar>
     <div id="drag-hor"></div>
     <x-torrents
+      tabindex="3"
       .setSort=${setSort}
       .sort=${sort}
       .torrents=${torrents}

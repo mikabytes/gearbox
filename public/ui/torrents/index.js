@@ -48,6 +48,54 @@ component(
     const torrents = allTorrents.slice(0, showTorrentCount)
 
     useEffect(() => {
+      const keydown = (e) => {
+        if (e.key === `ArrowDown`) {
+          e.preventDefault()
+          // move selection down
+          for (let i = 0; i < torrents.length; i++) {
+            if (torrents[i].id === selections[selections.length - 1]) {
+              if (i + 1 < torrents.length) {
+                if (e.shiftKey) {
+                  setSelections([...selections, torrents[i + 1].id])
+                } else {
+                  setSelections([torrents[i + 1].id])
+                }
+              }
+            }
+          }
+        } else if (e.key === `ArrowUp`) {
+          e.preventDefault()
+          for (let i = 0; i < torrents.length; i++) {
+            if (torrents[i].id === selections[selections.length - 1]) {
+              if (i - 1 >= 0) {
+                if (e.shiftKey) {
+                  setSelections([...selections, torrents[i - 1].id])
+                } else {
+                  setSelections([torrents[i - 1].id])
+                }
+              }
+            }
+          }
+          return
+        }
+      }
+      this.addEventListener(`keydown`, keydown)
+      return () => {
+        this.removeEventListener(`keydown`, keydown)
+      }
+    }, [torrents, selections])
+
+    useEffect(() => {
+      const lastSelectedRow = this.shadowRoot.querySelector(
+        `.row[data-id="${selections[selections.length - 1]}"]`
+      )
+
+      console.log(lastSelectedRow)
+
+      lastSelectedRow?.scrollIntoView({ block: `start` })
+    }, [selections])
+
+    useEffect(() => {
       function removeContextMenu() {
         setContextMenu(false)
         setIsDeleting(false)
