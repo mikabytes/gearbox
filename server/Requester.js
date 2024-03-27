@@ -34,6 +34,6 @@ export default function Requester(host) {
       throw new Error(`Transmission error: ${json.result}`)
     }
 
-    return json.arguments
+    return json
   }
 }

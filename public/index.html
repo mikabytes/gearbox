@@ -29,5 +29,15 @@
     --lightgray: #efefef;
   }
 </style>
-<script type="module" src="public/index.js"></script>
+<script type="importmap">
+  {
+    "imports": {
+      "lit-html": "https://cdn.jsdelivr.net/npm/lit-html@3.1.2/lit-html.js",
+      "lit-html/": "https://cdn.jsdelivr.net/npm/lit-html@3.1.2/",
+      "lit-css": "https://cdn.jsdelivr.net/npm/lit-css@0.1.3/+esm",
+      "haunted": "https://cdn.jsdelivr.net/npm/haunted@5.0.0/+esm"
+    }
+  }
+</script>
+<script type="module" src="index.js"></script>
 <x-main></x-main>

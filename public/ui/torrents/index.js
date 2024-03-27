@@ -1,11 +1,11 @@
-import styles from "./styles.js"
-import { repeat } from "lit/directives/repeat.js"
+import { repeat } from "lit-html/directives/repeat.js"
 import {
   component,
   html,
   useMemo,
   useState,
   useEffect,
+  CssSubscriber,
 } from "../../component.js"
 import { friendlyName } from "../../enums.js"
 
@@ -36,9 +36,11 @@ const columns = [
   { key: `uploadRatio`, name: `Ratio`, format: (ratio) => ratio.toFixed(1) },
 ]
 
+const css = await CssSubscriber(import.meta.resolve(`./styles.css`))
+
 component(
   `x-torrents`,
-  styles,
+  css,
   function Torrents({ torrents: allTorrents, sort, setSort, filters }) {
     const [contextMenu, setContextMenu] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false)
@@ -89,8 +91,6 @@ component(
       const lastSelectedRow = this.shadowRoot.querySelector(
         `.row[data-id="${selections[selections.length - 1]}"]`
       )
-
-      console.log(lastSelectedRow)
 
       lastSelectedRow?.scrollIntoView({ block: `start` })
     }, [selections])
@@ -227,7 +227,9 @@ component(
             html`<div
               class="row ${selections.includes(torrent.id)
                 ? `selected`
-                : ``} ${torrent.errorString ? `error` : ``}"
+                : ``} ${torrent.errorString ? `error` : ``} ${torrent.isRemoving
+                ? `isRemoving`
+                : ``}"
               title=${torrent.errorString}
               data-id=${torrent.id}
               @click=${setSelection}

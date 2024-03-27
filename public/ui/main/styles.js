@@ -1,4 +1,4 @@
-import { css } from "../../component"
+import { css } from "../../component.js"
 
 export default css`
   :host {

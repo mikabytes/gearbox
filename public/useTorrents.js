@@ -17,7 +17,11 @@ db.sort((a, b) => {
 
 async function onMessage({ id, isRemoved, changeSet }) {
   if (isRemoved) {
-    db.remove(id)
+    try {
+      db.remove(id)
+    } catch (e) {
+      // ignore remove errors, they are definitely gone
+    }
     return
   }
 

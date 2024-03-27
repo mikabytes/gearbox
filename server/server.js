@@ -1,11 +1,12 @@
 import express from "express"
-import ViteExpress from "vite-express"
 import bodyParser from "body-parser"
 import cookieParser from "cookie-parser"
 import compression from "compression"
+import hotserve from "hotserve"
 
 export default function start({ stream, getAll, remove, request }) {
   const app = express()
+  hotserve({ dir: `.`, pattern: `*.{js,css,html}`, app })
   const clients = new Map()
 
   stream((event) => {
@@ -17,7 +18,7 @@ export default function start({ stream, getAll, remove, request }) {
   app.use(express.static("public"))
   app.use(bodyParser.json())
   app.use(cookieParser())
-  app.use(compression())
+  //app.use(compression())
 
   app.get(`/stream`, (req, res) => {
     res.setHeader("Cache-Control", "no-cache")
@@ -58,12 +59,18 @@ export default function start({ stream, getAll, remove, request }) {
     }
 
     try {
-      const [error, resultArgs] = await request(args)
+      const [error, resultArgs] = await request(method, args)
       if (error) {
         console.error(error)
         res.status(400).json({ result: error.message, tag })
         return
       }
+
+      clients.forEach((write) => {
+        args.ids.forEach((id) => {
+          write({ id, changeSet: { isRemoving: true } })
+        })
+      })
 
       res.status(200).send({ ...resultArgs, tag })
     } catch (e) {
@@ -72,5 +79,5 @@ export default function start({ stream, getAll, remove, request }) {
     }
   })
 
-  ViteExpress.listen(app, 3000)
+  app.listen(3000)
 }

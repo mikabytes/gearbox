@@ -5,13 +5,14 @@ import {
   useState,
   useMemo,
   useEffect,
+  CssSubscriber,
 } from "../../component.js"
 import { filtersToStr, strToFilters } from "../../filterStrLib.js"
 
-component(`x-header`, styles, function Header({ filters, setFilters }) {
-  this.generatedSearch = filtersToStr(filters)
+const css = await CssSubscriber(import.meta.resolve(`./styles.css`))
 
-  console.log(filters)
+component(`x-header`, css, function Header({ filters, setFilters }) {
+  this.generatedSearch = filtersToStr(filters)
 
   // we have to make a little workaround so that filters won't interrupt us writing
   const onInput = (e) => {

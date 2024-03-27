@@ -51,7 +51,9 @@ export default async function Connector({
   }
 
   async function reloadAll() {
-    const { torrents } = await request(`torrent-get`, {
+    const {
+      arguments: { torrents },
+    } = await request(`torrent-get`, {
       fields,
     })
     lastUpdateAt = Date.now()
@@ -96,7 +98,9 @@ export default async function Connector({
 
   async function streamingUpdates() {
     try {
-      const { torrents, removed: removedIds } = await request(`torrent-get`, {
+      const {
+        arguments: { torrents, removed: removedIds },
+      } = await request(`torrent-get`, {
         fields,
         ids: `recently-active`,
       })

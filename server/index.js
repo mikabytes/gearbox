@@ -40,18 +40,21 @@ start({
       yield* c.getAll()
     }
   },
-  async request(args) {
+  async request(method, args) {
     try {
       const split = byClient(args.ids)
       for (const clientId of Object.keys(split)) {
-        const resultArgs = await connectors
-          .get(clientId)
-          .request(`torrent-remove`, {
-            ids: split[clientId],
-            "delete-local-data": args[`delete-local-data`],
-          })
+        const resultArgs = await connectors.get(clientId).request(method, {
+          ids: split[clientId],
+          "delete-local-data": args[`delete-local-data`],
+        })
 
-        if (!resultArgs.result === `success`) {
+        console.log()
+        console.log(`Request to ${clientId}: ${JSON.stringify(args)}`)
+        console.log(`Response: ${JSON.stringify(resultArgs)}`)
+        console.log()
+
+        if (resultArgs.result !== `success`) {
           throw new Error(`${clientId} returned an error: ${resultArgs.result}`)
         }
       }
