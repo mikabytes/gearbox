@@ -1,4 +1,6 @@
-![](public/icon_96x96.png)
+<p align="center">
+  <img src="public/icon_512x512.png" width="512" height="512" alt="Gearbox icon" />
+</p>
 
 # Gearbox
 
