@@ -1,10 +1,9 @@
-import styles from "./styles.js"
-import { component, html, useState, useMemo } from "../../component.js"
+import { component, html, useState, useMemo, css } from "../../component.js"
 import * as enums from "../../enums.js"
 
 component(
   `x-sidebar`,
-  styles,
+  await css(import.meta.resolve(`./sidebar.css`)),
   function Sidebar({ torrents, filters, setFilters }) {
     let byStatus = new Map()
     let byClient = new Map()

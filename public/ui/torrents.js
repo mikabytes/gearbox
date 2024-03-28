@@ -5,46 +5,17 @@ import {
   useMemo,
   useState,
   useEffect,
-  CssSubscriber,
+  css,
 } from "../../component.js"
 import { friendlyName } from "../../enums.js"
 
-const columns = [
-  {
-    key: `addedDate`,
-    name: `Added`,
-    format: (date) => new Date(date * 1000).toISOString().split(`T`)[0],
-  },
-  { key: `name`, name: `Name`, format: (name) => name },
-  { key: `totalSize`, name: `Size`, format: (size) => formatSize(size) },
-  {
-    key: `status`,
-    name: `Progress`,
-    format: (status, torrent) =>
-      torrent.error ? torrent.errorString : friendlyName(status),
-  },
-  {
-    key: `peersGettingFromUs`,
-    name: `Seeds`,
-    format: (peers, torrent) => `${peers} (${torrent.peers.length})`,
-  },
-  {
-    key: `peersSendingToUs`,
-    name: `Peers`,
-    format: (peers, torrent) => `${peers} (${torrent.peers.length})`,
-  },
-  { key: `uploadRatio`, name: `Ratio`, format: (ratio) => ratio.toFixed(1) },
-]
-
-const css = await CssSubscriber(import.meta.resolve(`./styles.css`))
-
 component(
   `x-torrents`,
-  css,
+  await css(import.meta.resolve(`./torrents.css`)),
   function Torrents({ torrents: allTorrents, sort, setSort, filters }) {
     const [contextMenu, setContextMenu] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false)
-    const [showTorrentCount, setShowTorrentCount] = useState(100)
+    const [showTorrentCount, setShowTorrentCount] = useState(50)
     const [selections, setSelections] = useState([])
     const [progress, setProgress] = useState(false)
     const torrents = allTorrents.slice(0, showTorrentCount)
@@ -343,3 +314,30 @@ function formatSize(bytes) {
 
   return `${bytes} B`
 }
+
+const columns = [
+  {
+    key: `addedDate`,
+    name: `Added`,
+    format: (date) => new Date(date * 1000).toISOString().split(`T`)[0],
+  },
+  { key: `name`, name: `Name`, format: (name) => name },
+  { key: `totalSize`, name: `Size`, format: (size) => formatSize(size) },
+  {
+    key: `status`,
+    name: `Progress`,
+    format: (status, torrent) =>
+      torrent.error ? torrent.errorString : friendlyName(status),
+  },
+  {
+    key: `peersGettingFromUs`,
+    name: `Seeds`,
+    format: (peers, torrent) => `${peers} (${torrent.peers.length})`,
+  },
+  {
+    key: `peersSendingToUs`,
+    name: `Peers`,
+    format: (peers, torrent) => `${peers} (${torrent.peers.length})`,
+  },
+  { key: `uploadRatio`, name: `Ratio`, format: (ratio) => ratio.toFixed(1) },
+]

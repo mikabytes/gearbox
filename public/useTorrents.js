@@ -1,5 +1,6 @@
 import { useState, useEffect } from "./component.js"
 import Db from "./db.js"
+import forEachLine from "./forEachLine.js"
 
 let incr = 0
 
@@ -45,26 +46,87 @@ function addSearch(item) {
   ).toLowerCase()
 }
 
-const source = new EventSource(`/stream`)
-source.onmessage = (message) => {
-  const payload = JSON.parse(message.data)
+async function* start() {
+  const source = new EventSource(`/stream`)
+  let pauseMessages = []
 
-  if (payload.incr !== incr) {
-    // we have missed a message, must reload to get to a fresh state
-    document.location.reload()
+  source.onmessage = (message) => {
+    const payload = JSON.parse(message.data)
+
+    if (payload.incr !== incr) {
+      // we have missed a message, must reload to get to a fresh state
+      //document.location.reload()
+      console.log(`I would have liked to reload`)
+      return
+    }
+
+    incr++
+
+    if (pauseMessages) {
+      // while we do the initial loading, we need to wait for all messages to arrive
+      pauseMessages.push(payload)
+    } else {
+      onMessage(payload)
+    }
+  }
+  source.onerror = (err) => {
+    console.error("EventSource failed:", err)
+  }
+
+  const res = await fetch(`/all`)
+
+  if (!res.ok) {
+    alert(await res.text())
     return
   }
 
-  incr++
+  const iterator = forEachLine(res.body.getReader())
+  const firstLine = (await iterator.next()).value
 
-  onMessage(payload)
-}
-source.onerror = (err) => {
-  didErr = true
-  console.error("EventSource failed:", err)
+  const { keys, total } = JSON.parse(firstLine)
+  let finished = 0
+  yield { finished, total }
+
+  for await (const line of iterator) {
+    const torrent = {}
+    const values = JSON.parse(line)
+
+    for (let i = 0; i < keys.length; i++) {
+      torrent[keys[i]] = values[i]
+    }
+    addSearch(torrent)
+    db.set(torrent.id, torrent)
+    yield { finished: ++finished, total }
+  }
+
+  // now that we've transfered all the data, we can start streaming
+  while (pauseMessages.length) {
+    const payload = pauseMessages.shift()
+    onMessage(payload)
+  }
+  pauseMessages = null
 }
 
+let didStart = false
 export default function useTorrents() {
+  const [isLoading, setIsLoading] = useState({})
+  if (!didStart) {
+    ;(async function () {
+      didStart = true
+      let finished = 0
+      let total = 0
+      // update ui every 100ms
+      const timer = setInterval(() => {
+        setIsLoading({ finished, total })
+      }, 100)
+      for await (const update of start()) {
+        finished = update.finished
+        total = update.total
+      }
+      clearInterval(timer)
+      setIsLoading(false)
+    })()
+  }
   // just a dummy to force re-render
   let [_, setIncr] = useState(incr)
 
@@ -90,5 +152,5 @@ export default function useTorrents() {
     }
   }, [])
 
-  return [db]
+  return [db, isLoading]
 }

@@ -12,12 +12,11 @@ import {
 } from "https://cdn.jsdelivr.net/npm/haunted@5.0.0/+esm"
 
 import { html } from "lit-html"
-import { css } from "./vendor/css-tag.js"
 import hmr from "./haunted-hmr.js"
 
 window._modules ||= {}
 
-export async function CssSubscriber(path) {
+export async function css(path) {
   const absPath = path
 
   path = path.slice(document.location.origin.length + 1)
@@ -162,7 +161,6 @@ source.onmessage = async (message) => {
 export {
   component,
   html,
-  css,
   useCallback,
   useContext,
   useController,

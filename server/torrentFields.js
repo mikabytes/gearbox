@@ -1,7 +1,11 @@
+// all fields except:
+//
+// "availability",
+// "pieces",
+//
 export default [
         "activityDate",
         "addedDate",
-        "availability",
         "bandwidthPriority",
         "comment",
         "corruptEver",
@@ -45,7 +49,6 @@ export default [
         "peersSendingToUs",
         "percentComplete",
         "percentDone",
-        "pieces",
         "pieceCount",
         "pieceSize",
         "priorities",

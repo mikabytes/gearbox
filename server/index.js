@@ -40,6 +40,13 @@ start({
       yield* c.getAll()
     }
   },
+  count() {
+    let total = 0
+    for (let c of connectors.values()) {
+      total += c.count()
+    }
+    return total
+  },
   async request(method, args) {
     try {
       const split = byClient(args.ids)

@@ -130,6 +130,9 @@ export default async function Connector({
   streamingUpdates()
 
   Object.assign(ret, {
+    count() {
+      return cache.size
+    },
     get(id) {
       return cache.get(id)
     },
