@@ -2,7 +2,7 @@
   "name": "gearbox-torrent",
   "version": "0.6.0",
   "description": "A modern web UI for Transmission built to handle 300,000+ torrents.",
-  "main": "index.js",
+  "main": "server/index.js",
   "bin": {
     "gearbox": "server/index.js"
   },
@@ -11,7 +11,8 @@
     "start": "node server/index.js -w server",
     "test": "mocha **/*.test.js"
   },
-  "author": "",
+  "author": "mikabytes",
+  "homepage": "https://github.com/mikabytes/gearbox",
   "license": "ISC",
   "type": "module",
   "dependencies": {
