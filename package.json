@@ -1,10 +1,14 @@
 {
-  "name": "gearbox",
+  "name": "Gearbox",
   "version": "0.1.1",
-  "description": "",
+  "description": "A modern web UI for Transmission built to handle 300,000+ torrents.",
   "main": "index.js",
+  "bin": {
+    "gearbox": "server/index.js"
+  },
   "scripts": {
-    "start": "nodemon server/index.js -w server",
+    "watch": "nodemon server/index.js -w server",
+    "start": "node server/index.js -w server",
     "test": "mocha **/*.test.js"
   },
   "author": "",

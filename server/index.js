@@ -1,19 +1,46 @@
+#!/usr/bin/env node
+
 import Connector from "./connector.js"
 import start from "./server.js"
 import * as guid from "./guid.js"
+import fs from "fs/promises"
 
 let cb
 let initialized
 
+const configPath = process.cwd() + `/config.js`
+
+let exists
+try {
+  exists = await fs.stat(configPath)
+} catch (e) {
+  exists = false
+}
+
+if (!exists) {
+  await fs.writeFile(
+    configPath,
+    `export default {
+  backends: [
+    {
+      id: "main",
+      ip: "127.0.0.1",
+      port: 9091,
+    }
+  ],
+}`
+  )
+}
+
+const config = (await import(configPath)).default
+
 const connectors = new Map()
 
-await Promise.all([
-  Connector({ id: `mam`, ip: "10.0.100.14", port: 80, changes }),
-  Connector({ id: `sofa`, ip: "10.0.100.21", port: 80, changes }),
-  Connector({ id: `pam`, ip: "10.0.107.1", port: 80, changes }),
-  Connector({ id: `pt`, ip: "10.0.100.68", port: 80, changes }),
-  Connector({ id: `transm`, ip: "10.0.100.8", port: 80, changes }),
-]).then((_) => {
+await Promise.all(
+  config.backends.map(({ id, ip, port }) =>
+    Connector({ id, ip, port, changes })
+  )
+).then((_) => {
   for (let connector of _) {
     connectors.set(connector.id, connector)
   }

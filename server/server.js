@@ -112,5 +112,6 @@ export default function start({ stream, getAll, remove, request, count }) {
     }
   })
 
-  app.listen(3000)
+  app.listen(2112)
+  console.log(`Gearbox started on http://localhost:2112`)
 }
