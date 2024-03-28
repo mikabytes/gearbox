@@ -45,9 +45,26 @@ component(
     const [db, isLoading] = useTorrents()
 
     if (isLoading) {
+      const { finished, total } = isLoading
+      const progress = total ? finished / total : 0
+      const circumference = 200 * Math.PI
+
       return html`<div class="curtain">
-        <div class="message">
-          Loading... ${isLoading.finished} of ${isLoading.total}
+        <div class="progress-container">
+          <svg class="progress-ring" width="200" height="200">
+            <circle
+              class="progress-ring__circle"
+              stroke="var(--primary)"
+              stroke-width="4"
+              style="stroke-dasharray: ${circumference} ${circumference}; stroke-dashoffset: ${circumference -
+              progress * circumference}"
+              fill="transparent"
+              r="90"
+              cx="100"
+              cy="100"
+            />
+          </svg>
+          <div class="label">Loading</div>
         </div>
       </div>`
     }

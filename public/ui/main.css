@@ -55,3 +55,22 @@ x-header {
   background-color: white;
   padding: 20px;
 }
+
+.progress-container {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.label {
+    position: absolute;
+    text-align: center;
+    font-size: 1.5em;
+    color: darkslategray;
+}
+
+.progress-ring__circle {
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+}

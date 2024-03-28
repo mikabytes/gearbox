@@ -115,10 +115,10 @@ export default function useTorrents() {
       didStart = true
       let finished = 0
       let total = 0
-      // update ui every 100ms
+      // update ui every 10ms
       const timer = setInterval(() => {
         setIsLoading({ finished, total })
-      }, 100)
+      }, 10)
       for await (const update of start()) {
         finished = update.finished
         total = update.total
