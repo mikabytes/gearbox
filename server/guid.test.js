@@ -10,10 +10,13 @@ describe(`guid`, () => {
   })
 
   it(`should handle high limit`, () => {
-    assert.deepEqual(decode(encode({ clientId: `zzzzzz`, torrentId: 99999 })), {
-      clientId: `zzzzzz`,
-      torrentId: 99999,
-    })
+    assert.deepEqual(
+      decode(encode({ clientId: `zzzzzz`, torrentId: 899999 })),
+      {
+        clientId: `zzzzzz`,
+        torrentId: 899999,
+      }
+    )
   })
 
   it(`should test 10000 random combinations`, () => {

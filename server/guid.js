@@ -1,6 +1,8 @@
 // we are constrained to fit torrentId + clientId in a signed 32 bit integer
-// This algorithm reserves 100000 for torrentId, and the rest for clientId
+// This algorithm reserves low numbers for torrentId, and the rest for clientId
 // using Base 37 encoding. We only allow a-z and 0-9 in the clientId
+
+const highLimit = 900000
 
 export function encode({ clientId, torrentId }) {
   if (
@@ -21,12 +23,12 @@ export function encode({ clientId, torrentId }) {
     clientNum = clientNum * 37 + value
   }
 
-  return torrentId + clientNum * 100000
+  return torrentId + clientNum * highLimit
 }
 
 export function decode(guid) {
-  const torrentId = guid % 100000
-  let clientNum = (guid - torrentId) / 100000
+  const torrentId = guid % highLimit
+  let clientNum = (guid - torrentId) / highLimit
   let clientId = ""
 
   while (clientNum > 0) {

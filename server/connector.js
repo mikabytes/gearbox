@@ -60,6 +60,8 @@ export default async function Connector({
 
     cache.clear()
 
+    let fictionalId = 10000
+
     for (let t of torrents) {
       t = processTorrent(clientId, t)
       cache.set(t.id, t)
