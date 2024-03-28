@@ -17,7 +17,7 @@ A modern web UI for Transmission built to handle 300,000+ torrents.
 ### NPM
 
 ```
-npm add -g gearbox
+npm add -g gearbox-torrent
 gearbox
 ```
 
