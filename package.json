@@ -1,6 +1,6 @@
 {
   "name": "gearbox-torrent",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "description": "A modern web UI for Transmission built to handle 300,000+ torrents.",
   "main": "server/index.js",
   "bin": {
