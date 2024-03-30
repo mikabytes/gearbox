@@ -4,11 +4,17 @@ import Connector from "./connector.js"
 import start from "./server.js"
 import * as guid from "./guid.js"
 import fs from "fs/promises"
+import { relative } from "path"
+import { fileURLToPath } from "url"
 
 let cb
 let initialized
 
-const configPath = process.cwd() + `/config.js`
+const configPath = `config.js`
+const configPathRelative = relative(
+  fileURLToPath(import.meta.url) + `/..`,
+  process.cwd() + `/` + configPath
+)
 
 let exists
 try {
@@ -32,7 +38,7 @@ if (!exists) {
   )
 }
 
-const config = (await import(configPath)).default
+const config = (await import(configPathRelative)).default
 
 const connectors = new Map()
 

@@ -6,171 +6,40 @@ import {
   useState,
   useEffect,
   css,
-} from "../../component.js"
-import { friendlyName } from "../../enums.js"
+} from "../component.js"
+import { friendlyName } from "../enums.js"
+
+import KeyPress from "./torrents/KeyPress.js"
+import ScrollIntoView from "./torrents/ScrollIntoView.js"
+import ContextMenu from "./torrents/ContextMenu.js"
+import FilterSideEffects from "./torrents/FilterSideEffects.js"
+import Selections from "./torrents/Selections.js"
+import RemoveTorrent from "./torrents/RemoveTorrent.js"
 
 component(
   `x-torrents`,
   await css(import.meta.resolve(`./torrents.css`)),
   function Torrents({ torrents: allTorrents, sort, setSort, filters }) {
-    const [contextMenu, setContextMenu] = useState(false)
-    const [isDeleting, setIsDeleting] = useState(false)
-    const [showTorrentCount, setShowTorrentCount] = useState(50)
-    const [selections, setSelections] = useState([])
-    const [progress, setProgress] = useState(false)
+    const [showTorrentCount, setShowTorrentCount] = useState(100)
     const torrents = allTorrents.slice(0, showTorrentCount)
 
-    useEffect(() => {
-      const keydown = (e) => {
-        if (e.key === `ArrowDown`) {
-          e.preventDefault()
-          // move selection down
-          for (let i = 0; i < torrents.length; i++) {
-            if (torrents[i].id === selections[selections.length - 1]) {
-              if (i + 1 < torrents.length) {
-                if (e.shiftKey) {
-                  setSelections([...selections, torrents[i + 1].id])
-                } else {
-                  setSelections([torrents[i + 1].id])
-                }
-              }
-            }
-          }
-        } else if (e.key === `ArrowUp`) {
-          e.preventDefault()
-          for (let i = 0; i < torrents.length; i++) {
-            if (torrents[i].id === selections[selections.length - 1]) {
-              if (i - 1 >= 0) {
-                if (e.shiftKey) {
-                  setSelections([...selections, torrents[i - 1].id])
-                } else {
-                  setSelections([torrents[i - 1].id])
-                }
-              }
-            }
-          }
-          return
-        }
-      }
-      this.addEventListener(`keydown`, keydown)
-      return () => {
-        this.removeEventListener(`keydown`, keydown)
-      }
-    }, [torrents, selections])
-
-    useEffect(() => {
-      const lastSelectedRow = this.shadowRoot.querySelector(
-        `.row[data-id="${selections[selections.length - 1]}"]`
-      )
-
-      lastSelectedRow?.scrollIntoView({ block: `start` })
-    }, [selections])
-
-    useEffect(() => {
-      function removeContextMenu() {
-        setContextMenu(false)
-        setIsDeleting(false)
-      }
-      document.addEventListener(`click`, removeContextMenu)
-
-      return () => {
-        document.removeEventListener(`click`, removeContextMenu)
-      }
-    }, [contextMenu])
-
-    useEffect(() => {
-      if (contextMenu) {
-        this.shadowRoot.querySelector(`#context-menu`).focus()
-      }
-    }, [contextMenu])
-
-    useEffect(() => {
-      this.shadowRoot.querySelector(`.container`).scrollTop = 0
-      setShowTorrentCount(100)
-      setSelections([])
-    }, [filters])
-
-    useEffect(() => {
-      let div = this.shadowRoot.querySelector(`.container`)
-      const onScroll = () => {
-        if (div.scrollTop + div.offsetHeight >= div.scrollHeight - 100) {
-          if (showTorrentCount < this.torrents.length) {
-            setShowTorrentCount(
-              Math.min(this.torrents.length, showTorrentCount * 2)
-            )
-          }
-        }
-      }
-      div.addEventListener(`scroll`, onScroll)
-      return () => {
-        div.removeEventListener(`scroll`, onScroll)
-      }
-    }, [showTorrentCount])
-
-    function setSelection(e, _id) {
-      const id = _id || +this.dataset.id
-
-      if (!e.shiftKey && !e.ctrlKey) {
-        setSelections([id])
-        return
-      }
-
-      if (e.ctrlKey) {
-        if (selections.includes(id)) {
-          setSelections(selections.filter((k) => k !== id))
-        } else {
-          setSelections([...selections, id])
-        }
-        return
-      }
-
-      if (e.shiftKey) {
-        let startIndex = torrents.findIndex((t) => t.id === id)
-        let stopIndex = torrents.findIndex(
-          (t) => t.id === selections[selections.length - 1]
-        )
-
-        if (startIndex > stopIndex) {
-          ;[startIndex, stopIndex] = [stopIndex, startIndex]
-        }
-
-        setSelections([
-          ...new Set(
-            selections.concat(
-              torrents.slice(startIndex, stopIndex + 1).map((t) => t.id)
-            )
-          ),
-        ])
-      }
-    }
-
-    async function removeTorrents(deleteLocalFiles = false) {
-      setProgress(true)
-      const res = await fetch(`/transmission/rpc`, {
-        method: `POST`,
-        headers: {
-          "Content-Type": `application/json`,
-        },
-        body: JSON.stringify({
-          method: `torrent-remove`,
-          arguments: {
-            ids: selections,
-            "delete-local-data": deleteLocalFiles,
-          },
-        }),
-      })
-
-      if (!res.ok) {
-        const error = await res.text()
-        console.error(error)
-        alert(error)
-        return
-      }
-
-      setProgress(false)
-      setSelections([])
-      setIsDeleting(false)
-    }
+    const selections = Selections.call(this, {
+      torrents,
+      allTorrents,
+    })
+    const removeTorrent = RemoveTorrent.call(this, { selections })
+    const contextMenu = ContextMenu.call(this, {
+      selections,
+      removeTorrent,
+    })
+    KeyPress.call(this, { selections, torrents })
+    ScrollIntoView.call(this, { selections })
+    FilterSideEffects.call(this, {
+      filters,
+      showTorrentCount,
+      setShowTorrentCount,
+      selections,
+    })
 
     return html` <div class="container">
         <div class="row headers">
@@ -203,18 +72,18 @@ component(
                 : ``}"
               title=${torrent.errorString}
               data-id=${torrent.id}
-              @click=${setSelection}
+              @click=${selections.onClickRow}
               @contextmenu=${(e) => {
                 if (!selections.includes(torrent.id)) {
-                  setSelections([torrent.id])
+                  selections.set([torrent.id])
                 }
                 e.preventDefault()
-                setContextMenu([e.pageX, e.pageY])
+                contextMenu.show(e.pageX, e.pageY)
               }}
               @touchstart=${(e) => {
                 e.preventDefault()
                 this.longPressTimer = setTimeout(
-                  () => setContextMenu([0, 0]),
+                  () => contextMenu.show(0, 0),
                   500
                 )
               }}
@@ -231,67 +100,7 @@ component(
             </div>`
         )}
       </div>
-      ${!contextMenu
-        ? html``
-        : html`
-            <div
-              id="context-menu"
-              tabindex="-1"
-              @click=${(e) => e.stopPropagation()}
-              style="left: ${contextMenu[0]}px; top: ${contextMenu[1]}px;"
-            >
-              <button
-                @mousedown=${() => {
-                  setContextMenu(false)
-                  setIsDeleting(true)
-                }}
-              >
-                Remove
-              </button>
-            </div>
-          `}
-      ${!isDeleting
-        ? html``
-        : html` <div class="grayout">
-            <div
-              id="delete-confirm"
-              tabindex="-1"
-              @click=${(e) => e.stopPropagation()}
-              @keydown=${(e) => {
-                if (e.key === `Escape`) {
-                  setIsDeleting(false)
-                }
-              }}
-            >
-              <div>
-                Are you sure you want to remove
-                <b>${selections.length}</b> torrents?
-              </div>
-
-              <label>
-                <input type="checkbox" id="delete-with-data" ?checked=${true} />
-                Also delete local files
-              </label>
-
-              <div class="options">
-                <button
-                  ?disabled=${progress}
-                  @click=${() => setIsDeleting(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  ?disabled=${progress}
-                  @click=${() =>
-                    removeTorrents(
-                      this.shadowRoot.querySelector(`#delete-with-data`).checked
-                    )}
-                >
-                  Remove
-                </button>
-              </div>
-            </div>
-          </div>`}`
+      ${contextMenu.html} ${removeTorrent.html}`
   }
 )
 

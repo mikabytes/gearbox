@@ -39,6 +39,8 @@ cd gearbox
 npm start
 ```
 
+For active development, you may run `pnpm watch` for auto-reloading.
+
 ## Configuration
 
 Gearbox searches for a `config.js` file in the current directory. If it doesn't find one, it will create one automatically. Here's an example:
