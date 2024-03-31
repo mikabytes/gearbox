@@ -13,7 +13,9 @@ const __dirname = path.dirname(__filename)
 
 export default function start({ stream, getAll, remove, request, count }) {
   const app = express()
-  hotserve({ dir: `.`, pattern: `*.{js,css,html}`, app })
+  if (process.env.NODE_ENV === `development`) {
+    hotserve({ dir: `.`, pattern: `*.{js,css,html}`, app })
+  }
   const clients = new Map()
 
   stream((event) => {

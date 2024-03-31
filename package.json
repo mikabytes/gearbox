@@ -7,7 +7,7 @@
     "gearbox": "server/index.js"
   },
   "scripts": {
-    "watch": "nodemon server/index.js -w server",
+    "watch": "export NODE_ENV=development && nodemon server/index.js -w server",
     "start": "node server/index.js -w server",
     "test": "mocha **/*.test.js"
   },
