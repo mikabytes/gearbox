@@ -4,17 +4,26 @@ import Connector from "./connector.js"
 import start from "./server.js"
 import * as guid from "./guid.js"
 import fs from "fs/promises"
-import { relative } from "path"
-import { fileURLToPath } from "url"
+import { join, relative } from "path"
+import { pathToFileURL, fileURLToPath } from "url"
 
 let cb
 let initialized
 
+// The path to the config file
 const configPath = `config.js`
+
+// Generating a relative path from the current file to the config file
 const configPathRelative = relative(
-  fileURLToPath(import.meta.url) + `/..`,
-  process.cwd() + `/` + configPath
+  join(fileURLToPath(import.meta.url), `/..`),
+  join(process.cwd(), configPath)
 )
+
+// Convert the relative path to an absolute path
+const configAbsolutePath = join(process.cwd(), configPath)
+
+// Convert the absolute path to a file URL (necessary for Windows compatibility)
+const configFileURL = pathToFileURL(configAbsolutePath).href
 
 let exists
 try {
@@ -38,7 +47,7 @@ if (!exists) {
   )
 }
 
-const config = (await import(configPathRelative)).default
+const config = (await import(configFileURL)).default
 
 const connectors = new Map()
 
