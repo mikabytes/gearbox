@@ -50,7 +50,13 @@ export default {
   backends: [
     { id: `torr1`, ip: "192.168.0.1", port: 9091 },
     { id: `torr2`, ip: "127.0.0.1", port: 9091 },
-    { id: `torr3`, ip: "10.0.107.1", port: 80 },
+    {
+      id: `torr3`,
+      ip: "10.0.107.1",
+      port: 80,
+      user: "admin",
+      password: "supersecret",
+    },
   ],
 }
 ```
@@ -64,6 +70,8 @@ _Note:_ In the rare case of needing to integrate with a third-party application 
 **ip**: Specifies the address of a Transmission daemon with Web-UI enabled. This can be a local or remote IP address or a DNS name.
 
 **port**: Designates the port for a Transmission daemon with Web-UI enabled, typically 9091.
+
+**user** / **password**: Authentication that you want to use with Transmission.
 
 ## Usage
 

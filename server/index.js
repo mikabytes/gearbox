@@ -43,6 +43,8 @@ if (!exists) {
       id: "main",
       ip: "127.0.0.1",
       port: 9091,
+      user: ``,
+      password: ``,
     }
   ],
 }`
@@ -54,9 +56,7 @@ const config = (await import(configFileURL)).default
 const connectors = new Map()
 
 await Promise.all(
-  config.backends.map(({ id, ip, port }) =>
-    Connector({ id, ip, port, changes })
-  )
+  config.backends.map((args) => Connector({ ...args, changes }))
 ).then((_) => {
   for (let connector of _) {
     connectors.set(connector.id, connector)

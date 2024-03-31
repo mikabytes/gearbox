@@ -1,5 +1,6 @@
-export default function Requester(host) {
+export default function Requester(host, { user, password } = {}) {
   let header = ``
+  const base64Credentials = btoa(`${user}:${password}`)
 
   return async function request(method, args) {
     const url = `http://${host}/transmission/rpc`
@@ -10,6 +11,7 @@ export default function Requester(host) {
       method: "POST",
       headers: {
         "Content-Type": `application/json`,
+        Authorization: `Basic ${base64Credentials}`,
         "X-Transmission-Session-Id": header,
       },
       body: JSON.stringify(body),

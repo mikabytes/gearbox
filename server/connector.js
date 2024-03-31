@@ -17,6 +17,8 @@ export default async function Connector({
   id: clientId,
   ip,
   port,
+  user,
+  password,
   changes: changesCb,
 }) {
   if (!ip || !port || !clientId) {
@@ -30,7 +32,7 @@ export default async function Connector({
     )
   }
 
-  const request = Requester(`${ip}:${port}`)
+  const request = Requester(`${ip}:${port}`, { user, password })
 
   const cache = new Map()
   let lastUpdateAt
