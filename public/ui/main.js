@@ -24,6 +24,7 @@ component(
   `x-main`,
   await css(import.meta.resolve(`./main.css`)),
   function Main() {
+    const [showTorrentCount, setShowTorrentCount] = useState(100)
     const [sort, _setSort] = useState(
       initialSort || { key: `addedDate`, reverse: true }
     )
@@ -73,7 +74,9 @@ component(
       document.location.hash = filtersToStr(filters)
     }, [filters])
 
-    const torrents = db.values().filter(filterTorrents(filters))
+    const allTorrents = db.values().filter(filterTorrents(filters))
+    const torrents = memoSlicer(allTorrents, showTorrentCount)
+    const totalTorrents = allTorrents.length
 
     const setSort = useMemo(() => {
       const ret = ({ key, reverse }) => {
@@ -105,15 +108,18 @@ component(
     return html`
       <x-header .filters=${filters} .setFilters=${setFilters}></x-header>
       <x-sidebar
-        .torrents=${torrents}
+        .torrents=${allTorrents}
         .filters=${filters}
         .setFilters=${setFilters}
       ></x-sidebar>
       <div id="drag-hor"></div>
       <x-torrents
         tabindex="3"
+        .showTorrentCount=${showTorrentCount}
+        .setShowTorrentCount=${setShowTorrentCount}
         .setSort=${setSort}
         .sort=${sort}
+        .totalTorrents=${totalTorrents}
         .torrents=${torrents}
         .filters=${filters}
       ></x-torrents>
@@ -122,3 +128,24 @@ component(
     `
   }
 )
+
+let memoSlicerMemory = null
+function memoSlicer(array, sliceLength) {
+  const subset = array.slice(0, sliceLength)
+
+  if (memoSlicerMemory && memoSlicerMemory.length === subset.length) {
+    // compare each object to see if they have changed
+    for (let i = 0; i < subset.length; i++) {
+      if (subset[i] !== memoSlicerMemory[i]) {
+        memoSlicerMemory = subset
+        return subset
+      }
+    }
+
+    // all objects are the same, return memory
+    return memoSlicerMemory
+  }
+
+  memoSlicerMemory = subset
+  return subset
+}

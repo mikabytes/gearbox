@@ -19,13 +19,17 @@ import RemoveTorrent from "./torrents/RemoveTorrent.js"
 component(
   `x-torrents`,
   await css(import.meta.resolve(`./torrents.css`)),
-  function Torrents({ torrents: allTorrents, sort, setSort, filters }) {
-    const [showTorrentCount, setShowTorrentCount] = useState(100)
-    const torrents = allTorrents.slice(0, showTorrentCount)
-
+  function Torrents({
+    totalTorrents,
+    torrents,
+    sort,
+    setSort,
+    filters,
+    showTorrentCount,
+    setShowTorrentCount,
+  }) {
     const selections = Selections.call(this, {
       torrents,
-      allTorrents,
     })
     const removeTorrent = RemoveTorrent.call(this, { selections })
     const contextMenu = ContextMenu.call(this, {
@@ -39,6 +43,7 @@ component(
       showTorrentCount,
       setShowTorrentCount,
       selections,
+      totalTorrents,
     })
 
     return html` <div class="container">

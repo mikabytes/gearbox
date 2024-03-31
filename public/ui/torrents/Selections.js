@@ -1,6 +1,6 @@
 import { useMemo, useState } from "../../component.js"
 
-export default function selectionManager({ torrents, allTorrents }) {
+export default function selectionManager({ torrents }) {
   const [selections, setSelections] = useState([])
 
   function onClickRow(e, _id) {

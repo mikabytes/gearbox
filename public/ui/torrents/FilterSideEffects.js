@@ -5,6 +5,7 @@ export default function filterSideEffects({
   selections,
   showTorrentCount,
   setShowTorrentCount,
+  totalTorrents,
 }) {
   // When filters change, reset selections, scroll up, and show less
   useEffect(() => {
@@ -18,10 +19,8 @@ export default function filterSideEffects({
     let div = this.shadowRoot.querySelector(`.container`)
     const onScroll = () => {
       if (div.scrollTop + div.offsetHeight >= div.scrollHeight - 100) {
-        if (showTorrentCount < this.torrents.length) {
-          setShowTorrentCount(
-            Math.min(this.torrents.length, showTorrentCount * 2)
-          )
+        if (showTorrentCount < totalTorrents) {
+          setShowTorrentCount(Math.min(totalTorrents, showTorrentCount * 2))
         }
       }
     }

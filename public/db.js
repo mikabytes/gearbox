@@ -50,7 +50,7 @@ export default function Db() {
     return index
   }
 
-  return {
+  const ret = {
     has,
     count() {
       return sorted.length
@@ -77,23 +77,16 @@ export default function Db() {
       return db.get(key)
     },
     update(key, changeSet) {
-      const item = db.get(key)
-
-      // take it out of sorted
-      const index = indexOf(item)
-      if (index === -1) {
-        throw new Error("torrent not found")
-      }
-      sorted.splice(index, 1)
+      const item = ret.get(key)
+      ret.remove(key)
 
       // update
-      Object.assign(item, changeSet)
+      const newItem = { ...item, ...changeSet }
 
       // put it back in
-      const newIndex = sortedIndex(item)
-      sorted.splice(newIndex, 0, item)
+      ret.set(key, newItem)
 
-      return item
+      return newItem
     },
     remove(key) {
       if (!has(key)) {
@@ -111,4 +104,6 @@ export default function Db() {
       return sorted
     },
   }
+
+  return ret
 }
