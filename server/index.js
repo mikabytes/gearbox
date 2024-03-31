@@ -11,7 +11,7 @@ let cb
 let initialized
 
 // The path to the config file
-const configPath = `config.js`
+const configPath = `config.mjs`
 
 // Generating a relative path from the current file to the config file
 const configPathRelative = relative(
@@ -21,6 +21,8 @@ const configPathRelative = relative(
 
 // Convert the relative path to an absolute path
 const configAbsolutePath = join(process.cwd(), configPath)
+
+console.log(`Using configuration file at ${configAbsolutePath}`)
 
 // Convert the absolute path to a file URL (necessary for Windows compatibility)
 const configFileURL = pathToFileURL(configAbsolutePath).href

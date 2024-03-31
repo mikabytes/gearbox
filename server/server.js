@@ -3,6 +3,13 @@ import bodyParser from "body-parser"
 import cookieParser from "cookie-parser"
 import compression from "compression"
 import hotserve from "hotserve"
+import path from "path"
+import { fileURLToPath } from "url"
+
+// Convert the URL of the current module to a file path
+const __filename = fileURLToPath(import.meta.url)
+// Get the directory name of the current module
+const __dirname = path.dirname(__filename)
 
 export default function start({ stream, getAll, remove, request, count }) {
   const app = express()
@@ -15,12 +22,12 @@ export default function start({ stream, getAll, remove, request, count }) {
     })
   })
 
-  app.use(express.static("public"))
+  app.use(express.static(path.join(__dirname, `..`, `public`)))
   app.use(bodyParser.json())
   app.use(cookieParser())
 
   app.get(`/all`, compression(), (req, res) => {
-    res.setHeader("Content-Type", "text/json+lines")
+    res.setHeader(`Content-Type`, `text/json+lines`)
 
     const iterator = getAll()
     const firstItem = iterator.next().value

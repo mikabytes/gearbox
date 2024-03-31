@@ -43,7 +43,7 @@ For active development, you may run `pnpm watch` for auto-reloading.
 
 ## Configuration
 
-Gearbox searches for a `config.js` file in the current directory. If it doesn't find one, it will create one automatically. Here's an example:
+Gearbox searches for a `config.mjs` file in the current directory. If it doesn't find one, it will create one automatically. Here's an example:
 
 ```js
 export default {
