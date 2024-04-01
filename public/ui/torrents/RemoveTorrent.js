@@ -23,8 +23,9 @@ export default function RemoveTorrent({ selections }) {
               tabindex="-1"
               @click=${(e) => e.stopPropagation()}
               @keydown=${(e) => {
+                console.log(e)
                 if (e.key === `Escape`) {
-                  setIsDeleting(false)
+                  reset()
                 }
               }}
             >
@@ -39,12 +40,7 @@ export default function RemoveTorrent({ selections }) {
               </label>
 
               <div class="options">
-                <button
-                  ?disabled=${progress}
-                  @click=${() => setIsDeleting(false)}
-                >
-                  Cancel
-                </button>
+                <button ?disabled=${progress} @click=${reset}>Cancel</button>
                 <button
                   ?disabled=${progress}
                   @click=${() =>

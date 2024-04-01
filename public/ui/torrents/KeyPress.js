@@ -1,6 +1,6 @@
 import { useEffect } from "../../component.js"
 
-export default function useKeyPress({ selections, torrents }) {
+export default function useKeyPress({ selections, torrents, removeTorrent }) {
   useEffect(() => {
     const keydown = (e) => {
       if (e.key === `ArrowDown`) {
@@ -35,6 +35,14 @@ export default function useKeyPress({ selections, torrents }) {
           }
         }
         return
+      } else if (
+        e.key === "Delete" ||
+        e.key === "Backspace" ||
+        e.key === "x" ||
+        e.key === "-"
+      ) {
+        e.preventDefault()
+        removeTorrent.remove(selections.getIds())
       }
     }
     this.addEventListener(`keydown`, keydown)

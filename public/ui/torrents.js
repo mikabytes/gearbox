@@ -40,7 +40,7 @@ component(
       removeTorrent,
       setShowDetails,
     })
-    KeyPress.call(this, { selections, torrents })
+    KeyPress.call(this, { selections, torrents, removeTorrent })
     ScrollIntoView.call(this, { selections })
     FilterSideEffects.call(this, {
       filters,

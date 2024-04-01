@@ -96,6 +96,12 @@ Gearbox was tested for memory use at 7,000 torrents, showing 90MB of memory use 
 
 It was also stress-tested at 370,000 torrents on an average PC. While it took a good moment to start, and used 1.7GB of memory, it was still very fast after that. The real limit is not known, it may be in the millions depending on hardware.
 
+### Keyboard shortcuts
+
+| Key                          | Action |
+| :--------------------------- | :----- |
+| `x`, `-`, `DEL`, `Backspace` | Delete |
+
 ## Roadmap
 
 Currently Gearbox does a good job to give you insight into where your torrents are and what they're doing. You can also delete them by right-clicking on them. There are many more features planned, check out the Issues tab!
