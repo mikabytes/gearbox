@@ -28,7 +28,7 @@ gearbox
 ### Docker
 
 ```
-docker run -p 2112:2112 -it ghcr.io/mikabytes/gearbox:latest
+docker run -p 2112:2112 -it -e GEARBOX_CONFIG=/config -v $PWD:/config ghcr.io/mikabytes/gearbox:latest
 ```
 
 ### Source
@@ -39,11 +39,13 @@ cd gearbox
 npm start
 ```
 
-For active development, you may run `pnpm watch` for auto-reloading.
+For active development, you may run `pnpm watch` for a setup where server restarts automatically on file changes. It also enables live reloading in the browser.
 
 ## Configuration
 
-Gearbox searches for a `config.mjs` file in the current directory. If it doesn't find one, it will create one automatically. Here's an example:
+By default, Gearbox automatically searches for a `config.mjs` file within the current directory. Should it fail to locate one, Gearbox will proceed to generate a new `config.mjs` file automatically. Additionally, users have the option to direct Gearbox to a specific folder for the `config.mjs` file by setting the `GEARBOX_CONFIG` environment variable.
+
+Example `config.mjs`:
 
 ```js
 export default {
