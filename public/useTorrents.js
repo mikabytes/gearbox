@@ -55,8 +55,7 @@ async function* start() {
 
     if (payload.incr !== incr) {
       // we have missed a message, must reload to get to a fresh state
-      //document.location.reload()
-      console.log(`I would have liked to reload`)
+      document.location.reload()
       return
     }
 
