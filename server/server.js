@@ -93,9 +93,11 @@ export default function start({ stream, getAll, remove, request, count }) {
     })
   })
 
+  const supportedMethods = [`torrent-remove`, `torrent-verify`]
+
   app.all(`/transmission/rpc`, async (req, res) => {
     const { method, arguments: args, tag } = req.body
-    if (![`torrent-remove`].includes(method)) {
+    if (!supportedMethods.includes(method)) {
       res.status(501).json({ result: `Not implemented.`, tag })
       return
     }

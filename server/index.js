@@ -96,12 +96,12 @@ start({
       const split = byClient(args.ids)
       for (const clientId of Object.keys(split)) {
         const resultArgs = await connectors.get(clientId).request(method, {
+          ...args,
           ids: split[clientId],
-          "delete-local-data": args[`delete-local-data`],
         })
 
         console.log()
-        console.log(`Request to ${clientId}: ${JSON.stringify(args)}`)
+        console.log(`Request to ${clientId}: ${method} ${JSON.stringify(args)}`)
         console.log(`Response: ${JSON.stringify(resultArgs)}`)
         console.log()
 
@@ -126,6 +126,5 @@ function byClient(ids) {
     byClient[clientId] ||= []
     byClient[clientId].push(torrentId)
   }
-  console.log(byClient)
   return byClient
 }

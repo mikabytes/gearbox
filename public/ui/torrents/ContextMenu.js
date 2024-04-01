@@ -29,6 +29,33 @@ export default function ContextMenu({ selections, removeTorrent }) {
     setPosition(false)
   }
 
+  async function verify() {
+    const res = await fetch(`/transmission/rpc`, {
+      method: `POST`,
+      headers: {
+        "Content-Type": `application/json`,
+      },
+      body: JSON.stringify({
+        method: `torrent-verify`,
+        arguments: {
+          ids: selections.getIds(),
+        },
+      }),
+    })
+
+    if (!res.ok) {
+      console.error(res.status)
+      alert(`Unexpected response: ${res.status}`)
+      return
+    }
+
+    const json = await res.json()
+    if (!json.result === `success`) {
+      console.error(json.result)
+      alert(json.result)
+    }
+  }
+
   return {
     show,
     hide,
@@ -42,7 +69,15 @@ export default function ContextMenu({ selections, removeTorrent }) {
             style="left: ${position[0]}px; top: ${position[1]}px;"
           >
             <button
-              @mousedown=${() => {
+              @click=${() => {
+                setPosition(false)
+                verify(selections.getIds())
+              }}
+            >
+              Verify
+            </button>
+            <button
+              @click=${() => {
                 setPosition(false)
                 removeTorrent.remove(selections.getIds())
               }}
