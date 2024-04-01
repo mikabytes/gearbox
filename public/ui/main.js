@@ -1,6 +1,7 @@
 import "./header.js"
 import "./sidebar.js"
 import "./torrents.js"
+import "./objectExplorer.js"
 
 import {
   component,
@@ -24,7 +25,9 @@ component(
   `x-main`,
   await css(import.meta.resolve(`./main.css`)),
   function Main() {
+    const [selectedId, setSelectedId] = useState(null)
     const [showTorrentCount, setShowTorrentCount] = useState(100)
+    const [_showDetails, setShowDetails] = useState(false)
     const [sort, _setSort] = useState(
       initialSort || { key: `addedDate`, reverse: true }
     )
@@ -44,6 +47,7 @@ component(
       [filters]
     )
     const [db, isLoading] = useTorrents()
+    const showDetails = _showDetails && db.has(selectedId)
 
     if (isLoading) {
       const { finished, total } = isLoading
@@ -122,9 +126,18 @@ component(
         .totalTorrents=${totalTorrents}
         .torrents=${torrents}
         .filters=${filters}
+        .setShowDetails=${setShowDetails}
+        .setSelectedId=${setSelectedId}
       ></x-torrents>
       <div id="drag-ver"></div>
-      <div id="footer">footer</div>
+      <div id="footer" class="${showDetails ? `show` : `hide`}">
+        ${!showDetails
+          ? ``
+          : html`<x-object-explorer
+              .obj=${db.get(selectedId)}
+            ></x-object-explorer>`}
+        <button @click=${() => setShowDetails(false)}>✕</button>
+      </div>
     `
   }
 )

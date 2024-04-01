@@ -1,10 +1,13 @@
 import { useMemo, useState } from "../../component.js"
 
-export default function selectionManager({ torrents }) {
+export default function selectionManager({ torrents, setSelectedId }) {
   const [selections, setSelections] = useState([])
 
   function onClickRow(e, _id) {
     const id = _id || +this.dataset.id
+
+    // just to notify x-main so that it can show details if necessary
+    setSelectedId(id)
 
     if (!e.shiftKey && !e.ctrlKey) {
       setSelections([id])

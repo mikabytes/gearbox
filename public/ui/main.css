@@ -4,7 +4,7 @@
     "header header header" 50px
     "sidebar drag-hor torrents" auto
     "drag-ver drag-ver drag-ver" 3px
-    "footer footer footer" min-content;
+    "footer footer footer" auto;
   grid-template-columns: auto 3px 1fr;
   height: 100%;
   width: 100%;
@@ -24,7 +24,25 @@ x-header {
 
 #footer {
   grid-area: footer;
-  height: 50px;
+  max-height: 300px;
+  overflow: auto;
+  position: relative;
+}
+
+#footer.hide {
+  display: none;
+}
+#footer > button {
+  position: absolute;
+  top: 10px;
+  right: 30px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background-color: transparent;
+  color: var(--darkgray);
+  cursor: pointer;
+  font-size: 18px;
 }
 
 #drag-ver {
@@ -74,3 +92,4 @@ x-header {
     transform: rotate(-90deg);
     transform-origin: 50% 50%;
 }
+

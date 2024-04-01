@@ -1,6 +1,10 @@
 import { useEffect, useState, html } from "../../component.js"
 
-export default function ContextMenu({ selections, removeTorrent }) {
+export default function ContextMenu({
+  selections,
+  removeTorrent,
+  setShowDetails,
+}) {
   const [position, setPosition] = useState(false)
 
   useEffect(() => {
@@ -68,6 +72,14 @@ export default function ContextMenu({ selections, removeTorrent }) {
             @click=${(e) => e.stopPropagation()}
             style="left: ${position[0]}px; top: ${position[1]}px;"
           >
+            <button
+              @click=${() => {
+                setPosition(false)
+                setShowDetails(true)
+              }}
+            >
+              Details
+            </button>
             <button
               @click=${() => {
                 setPosition(false)

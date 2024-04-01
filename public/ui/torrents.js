@@ -27,14 +27,18 @@ component(
     filters,
     showTorrentCount,
     setShowTorrentCount,
+    setShowDetails,
+    setSelectedId,
   }) {
     const selections = Selections.call(this, {
       torrents,
+      setSelectedId,
     })
     const removeTorrent = RemoveTorrent.call(this, { selections })
     const contextMenu = ContextMenu.call(this, {
       selections,
       removeTorrent,
+      setShowDetails,
     })
     KeyPress.call(this, { selections, torrents })
     ScrollIntoView.call(this, { selections })
