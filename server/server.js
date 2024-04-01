@@ -51,7 +51,7 @@ export default function start({ stream, getAll, remove, request, count }) {
     res.write(`\n`)
 
     // ...then each line is only values, without keys
-    // all objects have the same keys, so we save half 60% bandwidth
+    // all objects have the same keys, so we save 60% bandwidth
     writeLine(firstItem)
 
     let ids = new Set()
@@ -93,13 +93,26 @@ export default function start({ stream, getAll, remove, request, count }) {
     })
   })
 
-  const supportedMethods = [`torrent-remove`, `torrent-verify`]
+  const supportedMethods = [
+    `torrent-remove`,
+    `torrent-verify`,
+    `torrent-start`,
+    `torrent-stop`,
+  ]
 
   app.all(`/transmission/rpc`, async (req, res) => {
     const { method, arguments: args, tag } = req.body
     if (!supportedMethods.includes(method)) {
       res.status(501).json({ result: `Not implemented.`, tag })
       return
+    }
+
+    if (method === `torrent-remove`) {
+      clients.forEach((write) => {
+        args.ids.forEach((id) => {
+          write({ id, changeSet: { isRemoving: true } })
+        })
+      })
     }
 
     try {
@@ -110,14 +123,15 @@ export default function start({ stream, getAll, remove, request, count }) {
         return
       }
 
-      //clients.forEach((write) => {
-      //  args.ids.forEach((id) => {
-      //    write({ id, changeSet: { isRemoving: true } })
-      //  })
-      //})
-
       res.status(200).send({ ...resultArgs, tag })
     } catch (e) {
+      if (method === `torrent-remove`) {
+        clients.forEach((write) => {
+          args.ids.forEach((id) => {
+            write({ id, changeSet: { isRemoving: false } })
+          })
+        })
+      }
       console.error(e)
       res.status(500).json({ result: `${e.message}`, tag })
     }

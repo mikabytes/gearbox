@@ -1,7 +1,7 @@
 import { useState, html } from "../../component.js"
+import * as torrentActions from "../../torrentActions.js"
 
 export default function RemoveTorrent({ selections }) {
-  const [progress, setProgress] = useState(false)
   const [ids, setIds] = useState(false)
   const isDeleting = !!ids
 
@@ -40,9 +40,8 @@ export default function RemoveTorrent({ selections }) {
               </label>
 
               <div class="options">
-                <button ?disabled=${progress} @click=${reset}>Cancel</button>
+                <button @click=${reset}>Cancel</button>
                 <button
-                  ?disabled=${progress}
                   @click=${() =>
                     execute(
                       this.shadowRoot.querySelector(`#delete-with-data`).checked
@@ -57,29 +56,7 @@ export default function RemoveTorrent({ selections }) {
   `
 
   async function execute(deleteLocalFiles = false) {
-    setProgress(true)
-    const res = await fetch(`/transmission/rpc`, {
-      method: `POST`,
-      headers: {
-        "Content-Type": `application/json`,
-      },
-      body: JSON.stringify({
-        method: `torrent-remove`,
-        arguments: {
-          ids: selections.getIds(),
-          "delete-local-data": deleteLocalFiles,
-        },
-      }),
-    })
-
-    if (!res.ok) {
-      const error = await res.text()
-      console.error(error)
-      alert(error)
-      return
-    }
-
-    setProgress(false)
+    torrentActions.remove(selections.getIds(), deleteLocalFiles)
     selections.reset()
     reset()
   }

@@ -1,9 +1,11 @@
-import { useEffect, useState, html } from "../../component.js"
+import { useEffect, useState, useMemo, html } from "../../component.js"
+import * as torrentActions from "../../torrentActions.js"
 
 export default function ContextMenu({
   selections,
   removeTorrent,
   setShowDetails,
+  torrents,
 }) {
   const [position, setPosition] = useState(false)
 
@@ -33,31 +35,22 @@ export default function ContextMenu({
     setPosition(false)
   }
 
-  async function verify() {
-    const res = await fetch(`/transmission/rpc`, {
-      method: `POST`,
-      headers: {
-        "Content-Type": `application/json`,
-      },
-      body: JSON.stringify({
-        method: `torrent-verify`,
-        arguments: {
-          ids: selections.getIds(),
-        },
-      }),
-    })
+  function verify() {
+    torrentActions.verify(selections.getIds())
+  }
 
-    if (!res.ok) {
-      console.error(res.status)
-      alert(`Unexpected response: ${res.status}`)
-      return
-    }
+  let selectedTorrents = useMemo(() => {
+    return torrents.filter((torrent) => selections.includes(torrent.id))
+  }, [selections, torrents])
 
-    const json = await res.json()
-    if (!json.result === `success`) {
-      console.error(json.result)
-      alert(json.result)
-    }
+  function pause() {
+    const notPaused = selectedTorrents.filter((t) => t.status !== 0)
+    torrentActions.pause(notPaused.map((t) => t.id))
+  }
+
+  function resume() {
+    const paused = selectedTorrents.filter((t) => t.status === 0)
+    torrentActions.resume(paused.map((t) => t.id))
   }
 
   return {
@@ -75,6 +68,23 @@ export default function ContextMenu({
             <button
               @click=${() => {
                 setPosition(false)
+                pause()
+              }}
+            >
+              Pause
+            </button>
+            <button
+              @click=${() => {
+                setPosition(false)
+                resume()
+              }}
+            >
+              Resume
+            </button>
+            <div class="divider"></div>
+            <button
+              @click=${() => {
+                setPosition(false)
                 setShowDetails(true)
               }}
             >
@@ -88,6 +98,7 @@ export default function ContextMenu({
             >
               Verify
             </button>
+            <div class="divider"></div>
             <button
               @click=${() => {
                 setPosition(false)

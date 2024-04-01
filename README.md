@@ -98,9 +98,10 @@ It was also stress-tested at 370,000 torrents on an average PC. While it took a 
 
 ### Keyboard shortcuts
 
-| Key                          | Action |
-| :--------------------------- | :----- |
-| `x`, `-`, `DEL`, `Backspace` | Delete |
+| Key                          | Action                                              |
+| :--------------------------- | :-------------------------------------------------- |
+| `x`, `-`, `DEL`, `Backspace` | Delete                                              |
+| `Space`                      | If all selected are paused, then resume, else pause |
 
 ## Roadmap
 

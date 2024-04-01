@@ -78,12 +78,17 @@
 }
 
 #context-menu button {
+  text-align: left;
   display: block;
   list-style: none;
   padding: 6px 20px;
   margin: 0;
   cursor: default;
   border: none;
+}
+
+#context-menu .divider {
+  border-top: 1px solid var(--lightergray);
 }
 
 #context-menu button:hover {

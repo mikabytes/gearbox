@@ -39,6 +39,7 @@ component(
       selections,
       removeTorrent,
       setShowDetails,
+      torrents,
     })
     KeyPress.call(this, { selections, torrents, removeTorrent })
     ScrollIntoView.call(this, { selections })

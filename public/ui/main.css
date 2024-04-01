@@ -4,7 +4,7 @@
     "header header header" 50px
     "sidebar drag-hor torrents" auto
     "drag-ver drag-ver drag-ver" 3px
-    "footer footer footer" auto;
+    "footer footer footer" min-content;
   grid-template-columns: auto 3px 1fr;
   height: 100%;
   width: 100%;

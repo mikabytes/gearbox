@@ -43,6 +43,21 @@ export default function useKeyPress({ selections, torrents, removeTorrent }) {
       ) {
         e.preventDefault()
         removeTorrent.remove(selections.getIds())
+      } else if (e.key === ` `) {
+        const selectedTorrents = torrents.filter((t) =>
+          selections.includes(t.id)
+        )
+        const allPaused = selectedTorrents.every((t) => t.status === STOPPED)
+
+        if (allPaused) {
+          torrentActions.resume(selectedTorrents.map((t) => t.id))
+        } else {
+          torrentActions.pause(
+            selectedTorrents
+              .filter((t) => t.status !== STOPPED)
+              .map((t) => t.id)
+          )
+        }
       }
     }
     this.addEventListener(`keydown`, keydown)
