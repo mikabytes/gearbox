@@ -2,6 +2,7 @@
 
 - Adjusted column sizes for better fit
 - Fix issue with Seeds/Leechs tabs showing wrong number of total peers
+- Fix issue with progress header not being visible after scroll
 
 # 0.10.0
 
