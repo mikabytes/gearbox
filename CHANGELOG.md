@@ -1,3 +1,7 @@
+# 0.9.1
+
+- Fix issue with trackers that reports multiple instances with same sitename causing duplicates
+
 # 0.9.0
 
 - App will reload when data becomes out of sync

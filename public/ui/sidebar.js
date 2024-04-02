@@ -37,16 +37,16 @@ component(
       entry.count += 1
 
       // Tracker
-      for (const tracker of t.trackers) {
-        entry = byTracker.get(tracker.sitename)
+      const sitenames = new Set(t.trackers.map((t) => t.sitename))
+      for (const sitename of sitenames) {
+        entry = byTracker.get(sitename)
         if (!entry) {
           entry = {
-            id: tracker.sitename,
-            label:
-              tracker.sitename[0].toUpperCase() + tracker.sitename.slice(1),
+            id: sitename,
+            label: sitename[0].toUpperCase() + sitename.slice(1),
             count: 0,
           }
-          byTracker.set(tracker.sitename, entry)
+          byTracker.set(sitename, entry)
         }
         entry.count += 1
       }
