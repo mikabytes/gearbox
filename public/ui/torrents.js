@@ -86,6 +86,7 @@ component(
               @contextmenu=${(e) => {
                 if (!selections.includes(torrent.id)) {
                   selections.set([torrent.id])
+                  setSelectedId(torrent.id) // notify parent that we have a new primary selected
                 }
                 e.preventDefault()
                 contextMenu.show(e.pageX, e.pageY)
@@ -150,15 +151,15 @@ const columns = [
   },
   {
     key: `peersGettingFromUs`,
-    name: `Leechs`,
+    name: `Leech`,
     format: (peers, torrent) =>
-      `${peers} (${torrent.trackerStats.map((it) => it.leecherCount).reduce((a, b) => Math.max(a, 0) + Math.max(b, 0))})`,
+      `${peers} (${torrent.trackerStats.map((it) => it.leecherCount).reduce((a, b) => Math.max(a, 0) + Math.max(b, 0), 0)})`,
   },
   {
     key: `peersSendingToUs`,
     name: `Seeds`,
     format: (peers, torrent) =>
-      `${peers} (${torrent.trackerStats.map((it) => it.seederCount).reduce((a, b) => Math.max(a, 0) + Math.max(b, 0))})`,
+      `${peers} (${torrent.trackerStats.map((it) => it.seederCount).reduce((a, b) => Math.max(a, 0) + Math.max(b, 0), 0)})`,
   },
   { key: `uploadRatio`, name: `Ratio`, format: (ratio) => ratio.toFixed(1) },
 ]
@@ -170,6 +171,13 @@ function makeProgress(torrent) {
     case enums.SEED:
       progress = 100
       text = enums.friendlyName(torrent.status)
+      const speed = torrent.peers
+        .map((peer) => peer.rateToPeer)
+        .reduce((a, b) => a + b, 0)
+      if (speed > 0) {
+        text += ` ${formatSize(speed)}/s`
+      }
+
       break
     case enums.DOWNLOAD:
       progress = Math.round(
