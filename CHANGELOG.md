@@ -1,3 +1,8 @@
+# NEXT
+
+- Adjusted column sizes for better fit
+- Fix issue with Seeds/Leechs tabs showing wrong number of total peers
+
 # 0.10.0
 
 - Added styling and indicators for download and verifying torrents

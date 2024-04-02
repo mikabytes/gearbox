@@ -150,13 +150,15 @@ const columns = [
   },
   {
     key: `peersGettingFromUs`,
-    name: `Seeds`,
-    format: (peers, torrent) => `${peers} (${torrent.peers.length})`,
+    name: `Leechs`,
+    format: (peers, torrent) =>
+      `${peers} (${torrent.trackerStats.map((it) => it.leecherCount).reduce((a, b) => Math.max(a, 0) + Math.max(b, 0))})`,
   },
   {
     key: `peersSendingToUs`,
-    name: `Peers`,
-    format: (peers, torrent) => `${peers} (${torrent.peers.length})`,
+    name: `Seeds`,
+    format: (peers, torrent) =>
+      `${peers} (${torrent.trackerStats.map((it) => it.seederCount).reduce((a, b) => Math.max(a, 0) + Math.max(b, 0))})`,
   },
   { key: `uploadRatio`, name: `Ratio`, format: (ratio) => ratio.toFixed(1) },
 ]

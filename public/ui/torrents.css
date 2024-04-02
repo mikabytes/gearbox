@@ -9,7 +9,7 @@
 .container {
   display: grid;
   color: var(--darkgray);
-  grid-template-columns: 85px minmax(100px, 1fr) 80px 120px 70px 70px 100px;
+  grid-template-columns: 85px minmax(200px, 1fr) 80px 130px 60px 60px 47px;
   overflow: auto;
   width: 100%;
   max-height: 100%;
