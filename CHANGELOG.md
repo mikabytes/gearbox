@@ -1,8 +1,9 @@
-# NEXT
+# 0.10.1
 
 - Adjusted column sizes for better fit
 - Fix issue with Seeds/Leechs tabs showing wrong number of total peers
 - Fix issue with progress header not being visible after scroll
+- Fix a bug where right-clicking a torrent wouldn't show it in details. Adjusted grid to show asc/desc icon
 
 # 0.10.0
 
