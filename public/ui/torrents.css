@@ -46,7 +46,8 @@
   background-color: var(--lightgray);
   font-weight: bold;
   cursor: pointer;
-  position: sticky;
+  position: sticky !important;
+  z-index: 2;
   top: 0;
 }
 
