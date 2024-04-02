@@ -7,7 +7,7 @@ import {
   useEffect,
   css,
 } from "../component.js"
-import { friendlyName } from "../enums.js"
+import * as enums from "../enums.js"
 
 import KeyPress from "./torrents/KeyPress.js"
 import ScrollIntoView from "./torrents/ScrollIntoView.js"
@@ -146,7 +146,7 @@ const columns = [
     key: `status`,
     name: `Progress`,
     format: (status, torrent) =>
-      torrent.error ? torrent.errorString : friendlyName(status),
+      torrent.error ? torrent.errorString : makeProgress(torrent),
   },
   {
     key: `peersGettingFromUs`,
@@ -160,3 +160,46 @@ const columns = [
   },
   { key: `uploadRatio`, name: `Ratio`, format: (ratio) => ratio.toFixed(1) },
 ]
+
+function makeProgress(torrent) {
+  let progress = 0
+  let text
+  switch (torrent.status) {
+    case enums.SEED:
+      progress = 100
+      text = enums.friendlyName(torrent.status)
+      break
+    case enums.DOWNLOAD:
+      progress = Math.round(
+        (torrent.files.map((it) => it.bytesCompleted).reduce((a, b) => a + b) /
+          torrent.files.map((it) => it.length).reduce((a, b) => a + b)) *
+          100
+      )
+      text = `Downloading ${progress}%`
+      break
+    case enums.CHECK:
+      progress = Math.round(torrent.recheckProgress * 100)
+      text = `Verifying ${progress}%`
+      break
+    default:
+      text = enums.friendlyName(torrent.status)
+      progress = 0
+      break
+  }
+
+  return html`
+    <div
+      class="progress status-${enums
+        .friendlyName(torrent.status)
+        .toLowerCase()}"
+    >
+      <div class="layer">${text}</div>
+      <div class="layer">
+        <div class="loadbar" style="width: ${progress}%"></div>
+      </div>
+      <div class="layer" style="clip-path: inset(0 ${100 - progress}% 0 0)">
+        ${text}
+      </div>
+    </div>
+  `
+}

@@ -122,3 +122,50 @@
 #delete-confirm button {
   padding: 6px;
 }
+
+.status {
+  padding: 3px;
+  position: relative;
+  margin-bottom: 1px;
+}
+
+.layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.layer:nth-child(1) {
+  color: black;
+}
+
+.layer:nth-child(3) {
+  color: white;
+}
+
+.progress .loadbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background-color: var(--color);
+}
+
+.status-downloading {
+  --color: blue;
+}
+
+.status-seeding {
+  --color: orange;
+}
+
+.status-checking {
+  --color: darkgray;
+}
+}

@@ -1,3 +1,7 @@
+# 0.10.0
+
+- Added styling and indicators for download and verifying torrents
+
 # 0.9.1
 
 - Fix issue with trackers that reports multiple instances with same sitename causing duplicates
