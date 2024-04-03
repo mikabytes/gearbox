@@ -1,3 +1,7 @@
+# 0.10.2
+
+- Fix white color on status when selected. Fix cursor:pointer on firefox
+
 # 0.10.1
 
 - Adjusted column sizes for better fit
