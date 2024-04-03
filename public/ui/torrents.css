@@ -33,6 +33,13 @@
   color: white;
 }
 
+/* we have quite a mix of colors for the status/progress item,
+ * with this much specificity we ensure it remains white when
+ * selected */
+.row.selected > .status > .progress > .layer:first-child {
+  color: white;
+}
+
 .row > * {
   box-sizing: border-box;
   padding: 3px 6px;

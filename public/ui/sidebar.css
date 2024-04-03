@@ -16,6 +16,11 @@ section {
   user-select: none;
 }
 
+/* for Firefox */
+.selectItem * {
+  user-select: none;
+}
+
 .selectItem > * {
   padding: 3px 6px;
 }
