@@ -28,7 +28,7 @@ gearbox
 ### Docker
 
 ```
-docker run -p 2112:2112 -it -e GEARBOX_CONFIG=/config -v $PWD:/config ghcr.io/mikabytes/gearbox:latest
+docker run -p 2112:2112 -it -e GEARBOX_PATH=/config -v $PWD:/config ghcr.io/mikabytes/gearbox:latest
 ```
 
 ### Source
@@ -43,7 +43,7 @@ For active development, you may run `pnpm watch` for a setup where server restar
 
 ## Configuration
 
-By default, Gearbox automatically searches for a `config.mjs` file within the current directory. Should it fail to locate one, Gearbox will proceed to generate a new `config.mjs` file automatically. Additionally, users have the option to direct Gearbox to a specific folder for the `config.mjs` file by setting the `GEARBOX_CONFIG` environment variable.
+By default, Gearbox automatically searches for a `config.mjs` file within the current directory. Should it fail to locate one, Gearbox will proceed to generate a new `config.mjs` file automatically. Additionally, users have the option to direct Gearbox to a specific folder for the `config.mjs` file by setting the `GEARBOX_PATH` environment variable.
 
 Example `config.mjs`:
 
