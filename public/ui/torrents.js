@@ -179,14 +179,23 @@ function makeProgress(torrent) {
       }
 
       break
-    case enums.DOWNLOAD:
+    case enums.DOWNLOAD: {
       progress = Math.round(
         (torrent.files.map((it) => it.bytesCompleted).reduce((a, b) => a + b) /
           torrent.files.map((it) => it.length).reduce((a, b) => a + b)) *
           100
       )
-      text = `Downloading ${progress}%`
+
+      const speed =
+        formatSize(
+          torrent.peers
+            .map((peer) => peer.rateToClient)
+            .reduce((a, b) => a + b, 0)
+        ) + `/s`
+
+      text = `DL ${progress}% ${speed}`
       break
+    }
     case enums.CHECK:
       progress = Math.round(torrent.recheckProgress * 100)
       text = `Verifying ${progress}%`
