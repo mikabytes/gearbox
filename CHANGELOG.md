@@ -1,6 +1,10 @@
-# 0.10.3
+# 0.10.4
 
 - Fix client showing download speed
+
+# ~0.10.3~
+
+- ~Fix client showing download speed~
 
 # 0.10.2
 
