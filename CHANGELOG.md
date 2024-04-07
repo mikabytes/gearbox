@@ -1,3 +1,7 @@
+# 0.10.3
+
+- Fix client showing download speed
+
 # 0.10.2
 
 - Fix white color on status when selected. Fix cursor:pointer on firefox
