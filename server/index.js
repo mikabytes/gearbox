@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import Connector from "./connector.js"
+import clients from "./clients/index.js"
 import start from "./server.js"
 import * as guid from "./guid.js"
 import fs from "fs/promises"
@@ -58,7 +58,9 @@ const config = (await import(configFileURL)).default
 const connectors = new Map()
 
 await Promise.all(
-  config.backends.map((args) => Connector({ ...args, changes }))
+  config.backends.map((args) =>
+    clients[args.type || "transmission"]({ ...args, changes })
+  )
 ).then((_) => {
   for (let connector of _) {
     connectors.set(connector.id, connector)

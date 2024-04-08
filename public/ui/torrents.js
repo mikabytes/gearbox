@@ -180,11 +180,7 @@ function makeProgress(torrent) {
 
       break
     case enums.DOWNLOAD: {
-      progress = Math.round(
-        (torrent.files.map((it) => it.bytesCompleted).reduce((a, b) => a + b) /
-          torrent.files.map((it) => it.length).reduce((a, b) => a + b)) *
-          100
-      )
+      progress = Math.floor(torrent.percentDone)
 
       const speed =
         formatSize(

@@ -35,7 +35,7 @@ export default function start({ stream, getAll, remove, request, count }) {
     const firstItem = iterator.next().value
 
     if (!firstItem) {
-      res.write(`[]\n\n`)
+      res.write(`{"keys": [], "total": 0}\n`)
       res.end()
       return
     }

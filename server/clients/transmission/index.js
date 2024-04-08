@@ -1,7 +1,7 @@
-import * as guid from "./guid.js"
-import Requester from "./Requester.js"
-import deepEqual from "./deepEqual.js"
-import fields from "./torrentFields.js"
+import * as guid from "../../guid.js"
+import Requester from "../../Requester.js"
+import deepEqual from "../../deepEqual.js"
+import fields from "./fields.js"
 
 function processTorrent(clientId, torrent) {
   return {
@@ -13,7 +13,7 @@ function processTorrent(clientId, torrent) {
   }
 }
 
-export default async function Connector({
+export default async function Transmission({
   id: clientId,
   ip,
   port,
