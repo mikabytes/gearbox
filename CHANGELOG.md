@@ -1,3 +1,7 @@
+# 0.12.1
+
+- Fix issue with download % showing 0 until finished
+
 # 0.12.0
 
 - Details view now show total stats for multiple selections
