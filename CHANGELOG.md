@@ -1,3 +1,8 @@
+# 0.11.0
+
+- Added ctrl+a to select all torrents
+- Added a 'demo' connector for showcasing Gearbox
+
 # 0.10.5
 
 - Fix client showing download speed

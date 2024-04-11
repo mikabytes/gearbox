@@ -103,6 +103,7 @@ It was also stress-tested at 370,000 torrents on an average PC. While it took a 
 | :--------------------------- | :-------------------------------------------------- |
 | `x`, `-`, `DEL`, `Backspace` | Delete                                              |
 | `Space`                      | If all selected are paused, then resume, else pause |
+| `ctrl+a`                     | Select all                                          |
 
 ## Roadmap
 

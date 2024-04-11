@@ -60,6 +60,8 @@ export default function useKeyPress({ selections, torrents, removeTorrent }) {
               .map((t) => t.id)
           )
         }
+      } else if (e.key === `a` && e.ctrlKey) {
+        selections.set(torrents.map((t) => t.id))
       }
     }
     this.addEventListener(`keydown`, keydown)
