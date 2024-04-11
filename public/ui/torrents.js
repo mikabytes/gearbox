@@ -15,6 +15,7 @@ import ContextMenu from "./torrents/ContextMenu.js"
 import FilterSideEffects from "./torrents/FilterSideEffects.js"
 import Selections from "./torrents/Selections.js"
 import RemoveTorrent from "./torrents/RemoveTorrent.js"
+import formatSize from "../formatSize.js"
 
 component(
   `x-torrents`,
@@ -28,11 +29,13 @@ component(
     showTorrentCount,
     setShowTorrentCount,
     setShowDetails,
-    setSelectedId,
+    selections: _selections,
+    setSelections,
   }) {
     const selections = Selections.call(this, {
       torrents,
-      setSelectedId,
+      selections: _selections,
+      setSelections,
     })
     const removeTorrent = RemoveTorrent.call(this, { selections })
     const contextMenu = ContextMenu.call(this, {
@@ -86,7 +89,6 @@ component(
               @contextmenu=${(e) => {
                 if (!selections.includes(torrent.id)) {
                   selections.set([torrent.id])
-                  setSelectedId(torrent.id) // notify parent that we have a new primary selected
                 }
                 e.preventDefault()
                 contextMenu.show(e.pageX, e.pageY)
@@ -114,26 +116,6 @@ component(
       ${contextMenu.html} ${removeTorrent.html}`
   }
 )
-
-function formatSize(bytes) {
-  if (bytes >= 1024 * 1024 * 1024 * 1024) {
-    return `${(bytes / 1024 / 1024 / 1024 / 1024).toFixed(1)} T`
-  }
-
-  if (bytes >= 1024 * 1024 * 1024) {
-    return `${(bytes / 1024 / 1024 / 1024).toFixed(1)} G`
-  }
-
-  if (bytes >= 1024 * 1024) {
-    return `${(bytes / 1024 / 1024).toFixed(1)} M`
-  }
-
-  if (bytes >= 1024) {
-    return `${(bytes / 1024).toFixed(1)} K`
-  }
-
-  return `${bytes} B`
-}
 
 const columns = [
   {

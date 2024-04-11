@@ -24,7 +24,7 @@ x-header {
 
 #footer {
   grid-area: footer;
-  max-height: 300px;
+  height: 300px;
   overflow: auto;
   position: relative;
 }

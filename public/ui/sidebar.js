@@ -4,7 +4,7 @@ import * as enums from "../../enums.js"
 component(
   `x-sidebar`,
   await css(import.meta.resolve(`./sidebar.css`)),
-  function Sidebar({ torrents, filters, setFilters }) {
+  function Sidebar({ torrents, filters, setFilters, selectedTorrents }) {
     let byStatus = new Map()
     let byClient = new Map()
     let byTracker = new Map()
@@ -77,6 +77,18 @@ component(
       entry.count += 1
     }
 
+    for (const torrent of selectedTorrents) {
+      byClient.get(torrent.clientId).torrentSelected = true
+
+      for (const tracker of torrent.trackers) {
+        byTracker.get(tracker.sitename).torrentSelected = true
+      }
+
+      for (const label of torrent.labels) {
+        byLabel.get(label).torrentSelected = true
+      }
+    }
+
     return html`
       ${makeSection(`Status`, `status`, byStatus, filters, setFilters)}
       ${makeSection(`Client`, `clientId`, byClient, filters, setFilters)}
@@ -140,13 +152,16 @@ function makeSection(name, key, values, filters, set, friendlyMap) {
     <h1>${name}</h1>
     <section id=${key}>
       ${values.map(
-        ([k, { label, count }]) => html`
+        ([k, { label, count, torrentSelected }]) => html`
           <div
             class="selectItem ${selection.some(
               (s) => s == k /* note == enabled comparison with str and num */
             )
               ? `selected`
-              : ``}"
+              : ``}
+
+            ${torrentSelected ? `torrentSelected` : ``}
+            "
             @click=${(e) => onClick(key, k, e)}
           >
             <div class="name">${label}</div>

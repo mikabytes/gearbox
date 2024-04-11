@@ -1,3 +1,8 @@
+# 0.12.0
+
+- Details view now show total stats for multiple selections
+- Sidebar now indicates selected torrents
+
 # 0.11.0
 
 - Added ctrl+a to select all torrents

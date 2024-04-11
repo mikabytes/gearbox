@@ -25,12 +25,13 @@ component(
   `x-main`,
   await css(import.meta.resolve(`./main.css`)),
   function Main() {
-    const [selectedId, setSelectedId] = useState(null)
     const [showTorrentCount, setShowTorrentCount] = useState(100)
-    const [_showDetails, setShowDetails] = useState(false)
+    const [showDetails, setShowDetails] = useState(false)
     const [sort, _setSort] = useState(
       initialSort || { key: `addedDate`, reverse: true }
     )
+    const [selections, setSelections] = useState([])
+
     const [filters, _setFilters] = useState(
       strToFilters(decodeURIComponent(document.location.hash.slice(1)))
     )
@@ -47,7 +48,6 @@ component(
       [filters]
     )
     const [db, isLoading] = useTorrents()
-    const showDetails = _showDetails && db.has(selectedId)
 
     if (isLoading) {
       const { finished, total } = isLoading
@@ -80,6 +80,9 @@ component(
 
     const allTorrents = db.values().filter(filterTorrents(filters))
     const torrents = memoSlicer(allTorrents, showTorrentCount)
+    const selectedTorrents = useMemo(() => {
+      return torrents.filter((t) => selections.includes(t.id))
+    }, [torrents, selections])
     const totalTorrents = allTorrents.length
 
     const setSort = useMemo(() => {
@@ -110,11 +113,16 @@ component(
     }, [_setSort])
 
     return html`
-      <x-header .filters=${filters} .setFilters=${setFilters}></x-header>
+      <x-header
+        .filters=${filters}
+        .setFilters=${setFilters}
+        .selectedTorrents=${selectedTorrents}
+      ></x-header>
       <x-sidebar
         .torrents=${allTorrents}
         .filters=${filters}
         .setFilters=${setFilters}
+        .selectedTorrents=${selectedTorrents}
       ></x-sidebar>
       <div id="drag-hor"></div>
       <x-torrents
@@ -127,14 +135,15 @@ component(
         .torrents=${torrents}
         .filters=${filters}
         .setShowDetails=${setShowDetails}
-        .setSelectedId=${setSelectedId}
+        .selections=${selections}
+        .setSelections=${setSelections}
       ></x-torrents>
       <div id="drag-ver"></div>
       <div id="footer" class="${showDetails ? `show` : `hide`}">
         ${!showDetails
           ? ``
           : html`<x-object-explorer
-              .obj=${db.get(selectedId)}
+              .selectedTorrents=${selectedTorrents}
             ></x-object-explorer>`}
         <button @click=${() => setShowDetails(false)}>✕</button>
       </div>

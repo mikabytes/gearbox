@@ -30,6 +30,21 @@ section {
   color: white;
 }
 
+.torrentSelected > .name::before {
+  content: " ";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  margin-left: -6px;
+  background-color: var(--primary);
+}
+
+.name {
+  position: relative;
+  margin-left: 1px;
+}
+
 h1 {
   grid-area: header;
   display: block;
