@@ -83,9 +83,9 @@ export default function DemoAdapter({ id: clientId, changes: _changes }) {
 
     const changeSet = {}
 
-    const progressRate = Math.random() * 3 + 1 // Random progress rate between 0.05 and 0.15
-    if (torrent.percentDone < 100) {
-      changeSet.percentDone = Math.min(torrent.percentDone + progressRate, 100)
+    const progressRate = Math.random() * 0.03 + 0.01 // Random progress rate between 0.05 and 0.15
+    if (torrent.percentDone < 1.0) {
+      changeSet.percentDone = Math.min(torrent.percentDone + progressRate, 1.0)
       const seederCount = Math.floor(Math.random() * 10)
       changeSet.peers = [
         {
