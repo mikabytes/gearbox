@@ -6,6 +6,8 @@
 
 Gearbox is a modern web UI for Transmission, designed to efficiently manage over 300,000 torrents.
 
+[Try live demo - no installation required](https://demo-gearbox.xod.se)
+
 ## Features
 
 - 🤗 **Federated operation**: Offers a unified UI across multiple backends.
