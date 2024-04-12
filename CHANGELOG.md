@@ -1,3 +1,7 @@
+# 0.12.2
+
+- Rename KeyPress to Shortcuts, hopefully avoiding some overzelous adblockers
+
 # 0.12.1
 
 - Fix issue with download % showing 0 until finished
