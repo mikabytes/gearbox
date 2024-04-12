@@ -9,7 +9,7 @@ import {
 } from "../component.js"
 import * as enums from "../enums.js"
 
-import KeyPress from "./torrents/KeyPress.js"
+import Shortcuts from "./torrents/Shortcuts.js"
 import ScrollIntoView from "./torrents/ScrollIntoView.js"
 import ContextMenu from "./torrents/ContextMenu.js"
 import FilterSideEffects from "./torrents/FilterSideEffects.js"
@@ -44,7 +44,7 @@ component(
       setShowDetails,
       torrents,
     })
-    KeyPress.call(this, { selections, torrents, removeTorrent })
+    Shortcuts.call(this, { selections, torrents, removeTorrent })
     ScrollIntoView.call(this, { selections })
     FilterSideEffects.call(this, {
       filters,

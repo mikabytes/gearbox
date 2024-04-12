@@ -2,7 +2,7 @@ import { useEffect } from "../../component.js"
 import * as torrentActions from "../../torrentActions.js"
 import { STOPPED } from "../../enums.js"
 
-export default function useKeyPress({ selections, torrents, removeTorrent }) {
+export default function useShortcuts({ selections, torrents, removeTorrent }) {
   useEffect(() => {
     const keydown = (e) => {
       if (e.key === `ArrowDown`) {
