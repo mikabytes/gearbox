@@ -98,6 +98,7 @@ export default function start({ stream, getAll, remove, request, count }) {
     `torrent-verify`,
     `torrent-start`,
     `torrent-stop`,
+    `torrent-add`,
   ]
 
   app.all(`/transmission/rpc`, async (req, res) => {

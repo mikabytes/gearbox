@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 
-import clients from "./clients/index.js"
-import start from "./server.js"
-import * as guid from "./guid.js"
-import fs from "fs/promises"
 import { join, relative } from "path"
 import { pathToFileURL, fileURLToPath } from "url"
+import fs from "fs/promises"
+
+import RequestHandler from "./RequestHandler.js"
+import clients from "./clients/index.js"
+import start from "./server.js"
 
 let cb
 let initialized
@@ -95,40 +96,5 @@ start({
     }
     return total
   },
-  async request(method, args) {
-    try {
-      const split = byClient(args.ids)
-      for (const clientId of Object.keys(split)) {
-        const resultArgs = await connectors.get(clientId).request(method, {
-          ...args,
-          ids: split[clientId],
-        })
-
-        console.log()
-        console.log(`Request to ${clientId}: ${method} ${JSON.stringify(args)}`)
-        console.log(`Response: ${JSON.stringify(resultArgs)}`)
-        console.log()
-
-        if (resultArgs.result !== `success`) {
-          throw new Error(`${clientId} returned an error: ${resultArgs.result}`)
-        }
-      }
-
-      return [null, { result: `success` }]
-    } catch (e) {
-      console.error(e)
-      return [e]
-    }
-  },
+  request: RequestHandler({ connectors }),
 })
-
-function byClient(ids) {
-  let byClient = {}
-
-  for (let id of ids) {
-    const { clientId, torrentId } = guid.decode(id)
-    byClient[clientId] ||= []
-    byClient[clientId].push(torrentId)
-  }
-  return byClient
-}
