@@ -56,6 +56,20 @@ if (!exists) {
 
 const config = (await import(configFileURL)).default
 
+if (!config.addTorrentStrategy) {
+  config.addTorrentStrategy = `least-count`
+}
+
+if (
+  ![`least-count`, `round-robin`, `first-found`].includes(
+    config.addTorrentStrategy
+  )
+) {
+  throw new Error(
+    `Invalid 'addTorrentStrategy', got ${config.addTorrentStrategy} but should be one of "least-count", "round-robin", or "first-found"`
+  )
+}
+
 const connectors = new Map()
 
 await Promise.all(
@@ -64,6 +78,14 @@ await Promise.all(
   )
 ).then((_) => {
   for (let connector of _) {
+    // set defaults
+    if (
+      connector.maxCount === undefined ||
+      connector.maxCount === null ||
+      connector.maxCount < 0
+    ) {
+      connector.maxCount = -1
+    }
     connectors.set(connector.id, connector)
   }
 })
@@ -96,5 +118,6 @@ start({
     }
     return total
   },
-  request: RequestHandler({ connectors }),
+  request: RequestHandler({ connectors, config }),
+  config,
 })

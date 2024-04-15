@@ -61,10 +61,16 @@ export default {
       user: "admin",
       password: "supersecret",
       type: "transmission",
+      maxCount: 5000,
     },
   ],
+  addTorrentStrategy: "least-count", // or "round-robin", "first-found"
 }
 ```
+
+### Backends
+
+A list of clients to connect to.
 
 **id**: Should be at least one character long and no more than six characters. Can only include lowercase letters (a-z) and numbers (0-9).
 
@@ -74,9 +80,23 @@ _Note:_ In the rare case of needing to integrate with a third-party application 
 
 **port**: Designates the port for a Transmission daemon with Web-UI enabled, typically 9091.
 
-**user** / **password**: Authentication that you want to use with Transmission.
+**user** / **password**: Authentication that you want to use with Transmission. Optional
 
 **type**: The type of torrent client. Defaults to `transmission`. Currently, only `transmission` is supported.
+
+**maxCount**: A client is qualified to accept new torrents only if it has less than this number of existing torrents. Useful not to overload any individual client. I.e, Transmission usually can't handle more than 5-10 thousand torrents. This rule is discarded if omitted or negative. If it is set to zero, it always disqualifies this client from receiving new torrents.
+
+### addTorrentStrategy
+
+The configuration for adding new torrents. Deciding which client gets the new torrent is decided here. Client `maxCount` is respected. If no client was found that matches configuration, an error will be thrown.
+
+**strategy**: The strategy for adding new torrents. Defaults to `least-count`.
+
+| **Strategy**  | **Description**                                                      |
+| :------------ | :------------------------------------------------------------------- |
+| `least-count` | Add it to the client that has the least number of torrents.          |
+| `round-robin` | Spread new torrents evenly across all clients.                       |
+| `first-found` | Add it to the first client available client (in order of `backends`) |
 
 ## Usage
 
@@ -87,7 +107,7 @@ _Note:_ In the rare case of needing to integrate with a third-party application 
 - Click on it again to remove it.
 - Shift-click to to pick the inverse of a filter. For example, if you shift-click on "Everything's fine", all torrents that are **not** fine will be shown.
 
-_Advanced usage:_ [Any field](https://github.com/transmission/transmission/blob/main/libtransmission/transmission.h#L1420) sent from Transmission can be used in the search bar. For example, if you want to list all torrents that haven't downloaded anything, you could type `percentDone:0`. You also have the option to create a `"OR"` filter by putting arguments in parenthesis. Example: `clientId:(trans1 trans2)` will show you any torrents from Transmission backend `trans1` OR `trans2`.
+_Advanced usage:_ [Any field](https://github.com/transmission/transmission/blob/main/libtransmission/transmission.h#L1420) sent from Transmission can be used in the search bar. For example, if you want to list all torrents that haven't downloaded anything, you could type `percentDone:0`. You also have the option to create a `"OR"` filter by putting arguments in parenthesis. Example: `clientId:(trans1 trans2)` will show you any torrents from backends `trans1` OR `trans2`.
 
 ### Sorting
 

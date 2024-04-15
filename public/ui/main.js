@@ -2,6 +2,8 @@ import "./header.js"
 import "./sidebar.js"
 import "./torrents.js"
 import "./objectExplorer.js"
+import "./addTorrents.js"
+import fileToTorrent from "../fileToTorrent.js"
 
 import {
   component,
@@ -31,6 +33,7 @@ component(
       initialSort || { key: `addedDate`, reverse: true }
     )
     const [selections, setSelections] = useState([])
+    const [torrentsToAdd, setTorrentsToAdd] = useState(null)
 
     const [filters, _setFilters] = useState(
       strToFilters(decodeURIComponent(document.location.hash.slice(1)))
@@ -112,6 +115,64 @@ component(
       return ret
     }, [_setSort])
 
+    // drag and drop .torrent files
+    const [dragging, setDragging] = useState(false)
+    useEffect(() => {
+      this.addEventListener(
+        `dragenter`,
+        (e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          setDragging(true)
+        },
+        false
+      )
+      this.addEventListener(
+        `dragover`,
+        (e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          setDragging(true)
+        },
+        false
+      )
+      this.addEventListener(
+        `dragleave`,
+        (e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          setDragging(false)
+        },
+        false
+      )
+      this.addEventListener(
+        `drop`,
+        (e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          setDragging(false)
+          let files = []
+          for (const file of e.dataTransfer.files) {
+            if (file.type === `application/x-bittorrent`) {
+              files.push(file)
+            }
+          }
+
+          if (files.length) {
+            const promise = Promise.all(files.map(fileToTorrent))
+            promise.then((all) => {
+              setTorrentsToAdd(all)
+            })
+            promise.catch((err) => {
+              console.error(err)
+              alert(err.message)
+            })
+          }
+        },
+        false
+      )
+    }, [])
+
     return html`
       <x-header
         .filters=${filters}
@@ -147,6 +208,19 @@ component(
             ></x-object-explorer>`}
         <button @click=${() => setShowDetails(false)}>✕</button>
       </div>
+      ${!dragging
+        ? ``
+        : html`<div id="dragging"><div>Drop files here</div></div>`}
+      ${!torrentsToAdd
+        ? ``
+        : html`
+            <div id="addTorrents">
+              <x-add-torrents
+                .torrentsToAdd=${torrentsToAdd}
+                .setTorrentsToAdd=${setTorrentsToAdd}
+              ></x-add-torrents>
+            </div>
+          `}
     `
   }
 )

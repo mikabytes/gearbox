@@ -11,7 +11,14 @@ const __filename = fileURLToPath(import.meta.url)
 // Get the directory name of the current module
 const __dirname = path.dirname(__filename)
 
-export default function start({ stream, getAll, remove, request, count }) {
+export default function start({
+  stream,
+  getAll,
+  remove,
+  request,
+  count,
+  config,
+}) {
   const app = express()
   if (process.env.NODE_ENV === `development`) {
     hotserve({ dir: `.`, pattern: `*.{js,css,html}`, app })
@@ -27,6 +34,10 @@ export default function start({ stream, getAll, remove, request, count }) {
   app.use(express.static(path.join(__dirname, `..`, `public`)))
   app.use(bodyParser.json())
   app.use(cookieParser())
+
+  app.get(`/config`, (req, res) => {
+    res.json(config)
+  })
 
   app.get(`/all`, compression(), (req, res) => {
     res.setHeader(`Content-Type`, `text/json+lines`)
