@@ -1,3 +1,10 @@
+# 0.13.0
+
+- Added support for adding torrents (you can drag and drop them from your computer)
+- Added support for adding torrents (via file-picker, use the big + sign)
+- Added API rate-limiting
+- Added demo-config.mjs for those who want to experiment with Gearbox (same as demo-gearbox.xod.se)
+
 # 0.12.2
 
 - Rename KeyPress to Shortcuts, hopefully avoiding some overzelous adblockers
