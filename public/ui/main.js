@@ -178,6 +178,7 @@ component(
         .filters=${filters}
         .setFilters=${setFilters}
         .selectedTorrents=${selectedTorrents}
+        .setTorrentsToAdd=${setTorrentsToAdd}
       ></x-header>
       <x-sidebar
         .torrents=${allTorrents}
@@ -216,7 +217,7 @@ component(
         : html`
             <div id="addTorrents" @click=${() => setTorrentsToAdd(null)}>
               <x-add-torrents
-                .abort=${() => setTorrentsToAdd(null)}
+                .done=${() => setTorrentsToAdd(null)}
                 .torrentsToAdd=${torrentsToAdd}
                 .setTorrentsToAdd=${setTorrentsToAdd}
               ></x-add-torrents>

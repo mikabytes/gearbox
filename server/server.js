@@ -32,7 +32,7 @@ export default function start({
   })
 
   app.use(express.static(path.join(__dirname, `..`, `public`)))
-  app.use(bodyParser.json())
+  app.use(bodyParser.json({ limit: `10mb` }))
   app.use(cookieParser())
 
   app.get(`/config`, (req, res) => {

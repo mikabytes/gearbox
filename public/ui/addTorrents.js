@@ -5,7 +5,7 @@ import * as torrentActions from "../torrentActions.js"
 component(
   `x-add-torrents`,
   await css(import.meta.resolve(`./addTorrents.css`)),
-  function AddTorrents({ torrentsToAdd, setTorrentsToAdd, abort }) {
+  function AddTorrents({ torrentsToAdd, setTorrentsToAdd, done }) {
     const [config, setConfig] = useState(null)
     const [uploadText, setUploadText] = useState(null)
     const [fileSelection, setFileSelection] = useState(
@@ -140,6 +140,7 @@ component(
             `${torrentsToAdd.indexOf(torrent) + 1} of ${torrentsToAdd.length}`
           )
         }
+        done()
       } catch (e) {
         console.error(e)
         alert(e.message)
@@ -168,7 +169,7 @@ component(
         >
           ${uploadText ? uploadText : `Upload`}
         </button>
-        <button id="abort" @click=${() => abort()} ?disabled=${!!uploadText}>
+        <button id="abort" @click=${() => done()} ?disabled=${!!uploadText}>
           ✕
         </button>
       </div>

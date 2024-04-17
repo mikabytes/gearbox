@@ -19,3 +19,15 @@ input {
   outline: none;
   font-weight: bold;
 }
+
+button {
+  padding: 16px;
+  cursor: pointer;
+  margin: 0;
+  background-color: transparent;
+  border: none;
+}
+
+input[type="file"] {
+  display: none;
+}
