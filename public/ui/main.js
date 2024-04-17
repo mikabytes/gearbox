@@ -214,8 +214,9 @@ component(
       ${!torrentsToAdd
         ? ``
         : html`
-            <div id="addTorrents">
+            <div id="addTorrents" @click=${() => setTorrentsToAdd(null)}>
               <x-add-torrents
+                .abort=${() => setTorrentsToAdd(null)}
                 .torrentsToAdd=${torrentsToAdd}
                 .setTorrentsToAdd=${setTorrentsToAdd}
               ></x-add-torrents>

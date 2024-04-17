@@ -35,9 +35,9 @@ export default function RequestHandler({ connectors, config }) {
       }
     }
 
-    let available = connectors
-      .values()
-      .filter((c) => c.count() < strategy.addTorrents.maxCount)
+    let available = [...connectors.values()].filter(
+      (c) => c.maxCount === -1 || c.count() < c.maxCount
+    )
 
     if (!available.length) {
       throw new Error(`No suitable clients available`)

@@ -20,6 +20,8 @@ export default function fileToTorrent(file) {
         const binaryString = reader.result
         const decodedData = bencode.decode(binaryString)
 
+        console.log(decodedData)
+
         if (!decodedData.info) {
           console.log(decodedData)
           reject(new Error("Invalid torrent info"))

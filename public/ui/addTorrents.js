@@ -1,11 +1,16 @@
 import { component, css, html, useState, useEffect } from "../component.js"
 import formatSize from "../formatSize.js"
+import * as torrentActions from "../torrentActions.js"
 
 component(
   `x-add-torrents`,
   await css(import.meta.resolve(`./addTorrents.css`)),
-  function AddTorrents({ torrentsToAdd, setTorrentsToAdd }) {
+  function AddTorrents({ torrentsToAdd, setTorrentsToAdd, abort }) {
     const [config, setConfig] = useState(null)
+    const [uploadText, setUploadText] = useState(null)
+    const [fileSelection, setFileSelection] = useState(
+      torrentsToAdd.map((it, index) => Array(it.files.length).fill(true))
+    )
 
     useEffect(() => {
       async function updateConfig() {
@@ -23,14 +28,30 @@ component(
         }
       }
       updateConfig()
+
+      this.addEventListener(
+        `click`,
+        (e) => {
+          // we must be able to click within the form
+          e.stopPropagation()
+        },
+        []
+      )
     }, [])
 
-    function renderTorrent(total, { folders, files, indices }) {
-      const [selectedIndices, setSelectedIndices] = useState(
-        Array(total).fill(true)
-      )
+    function renderTorrent(
+      index,
+      fileSelection,
+      setFileSelection,
+      { folders, files, indices }
+    ) {
+      const selectedIndices = fileSelection[index]
 
-      console.log(selectedIndices)
+      function setSelectedIndices(newSelection) {
+        const newFileSelection = [...fileSelection]
+        newFileSelection[index] = newSelection
+        setFileSelection(newFileSelection)
+      }
 
       function checkFolder(indices, root, checked) {
         for (const folder of root.folders) {
@@ -87,7 +108,8 @@ component(
                     e.preventDefault()
                   }}
                 />
-                ${name} (${formatSize(size)})
+                <div class="name">${name}</div>
+                <div class="size">${formatSize(size)}</div>
               </div>
             `
           )}
@@ -97,11 +119,40 @@ component(
       return renderPaths({ folders, files })
     }
 
+    async function upload() {
+      setUploadText(`0 of ${torrentsToAdd.length}`)
+
+      const clientId = this.shadowRoot.querySelector(`select`).value
+
+      try {
+        for (const [index, torrent] of torrentsToAdd.entries()) {
+          const args = {
+            metainfo: torrent.data,
+            filesWanted: fileSelection[index]
+              .map((it, i) => (it ? i : -1))
+              .filter((it) => it !== -1),
+          }
+          if (clientId) {
+            args.clientId = clientId
+          }
+          await torrentActions.add(args)
+          setUploadText(
+            `${torrentsToAdd.indexOf(torrent) + 1} of ${torrentsToAdd.length}`
+          )
+        }
+      } catch (e) {
+        console.error(e)
+        alert(e.message)
+        return
+      } finally {
+        setUploadText(null)
+      }
+    }
+
     return html`
       <div id="header">
-        <h1>Add torrents</h1>
+        <h1>Add</h1>
         <label>
-          Client:
           <select>
             <option value="">Auto</option>
             ${(config?.backends || []).map(
@@ -110,12 +161,26 @@ component(
             )}
           </select>
         </label>
-        <button>Add</button>
+        <button
+          id="add"
+          @click=${() => upload.call(this)}
+          ?disabled=${!!uploadText}
+        >
+          ${uploadText ? uploadText : `Upload`}
+        </button>
+        <button id="abort" @click=${() => abort()} ?disabled=${!!uploadText}>
+          ✕
+        </button>
       </div>
       ${torrentsToAdd.map(
-        (it) => html`
+        (it, index) => html`
           <h2>${it.name}</h2>
-          ${renderTorrent(it.files.length, buildDirectoryStructure(it.files))}
+          ${renderTorrent(
+            index,
+            fileSelection,
+            setFileSelection,
+            buildDirectoryStructure(it.files)
+          )}
         `
       )}
     `

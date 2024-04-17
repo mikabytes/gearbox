@@ -1,6 +1,7 @@
 // Import the necessary modules
 import torrentName from "./torrentNames.js"
 import * as guid from "../../guid.js"
+import * as bencode from "../../../public/bencode.js"
 
 export const STOPPED = 0
 export const CHECK_WAIT = 1
@@ -53,7 +54,6 @@ export default function DemoAdapter({ id: clientId, changes: _changes }) {
     const name = torrentName()
     const localId = ++torrentIdCounter
     return {
-      ...torrent,
       id: guid.encode({ clientId, torrentId: localId }),
       localId,
       clientId,
@@ -74,6 +74,7 @@ export default function DemoAdapter({ id: clientId, changes: _changes }) {
       totalSize: Math.floor(Math.random() * 10000000),
       peersGettingFromUs: 0,
       peersSendingToUs: 0,
+      ...torrent,
     }
   }
 
@@ -114,8 +115,8 @@ export default function DemoAdapter({ id: clientId, changes: _changes }) {
     })
   }
 
-  function addTorrent() {
-    const newTorrent = processTorrent({})
+  function addTorrent(args = {}) {
+    const newTorrent = processTorrent(args)
     torrents.set(newTorrent.localId, newTorrent)
     schedule(
       newTorrent.localId,
@@ -142,7 +143,19 @@ export default function DemoAdapter({ id: clientId, changes: _changes }) {
   }
 
   // Emulate the request interface
-  function request(method, { ids }) {
+  function request(method, args) {
+    if (method === `torrent-add`) {
+      const data = bencode.decode(atob(args.metainfo))
+      addTorrent({
+        name: data.info.name,
+        totalSize:
+          data.info.length || data.info.files.reduce((a, b) => a + b.length, 0),
+      })
+      return
+    }
+
+    const { ids } = args
+
     for (const id of ids) {
       const torrent = torrents.get(id)
       if (!torrent) {
