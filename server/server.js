@@ -5,11 +5,19 @@ import compression from "compression"
 import hotserve from "hotserve"
 import path from "path"
 import { fileURLToPath } from "url"
+import { rateLimit } from "express-rate-limit"
 
 // Convert the URL of the current module to a file path
 const __filename = fileURLToPath(import.meta.url)
 // Get the directory name of the current module
 const __dirname = path.dirname(__filename)
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
+  standardHeaders: "draft-7", // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
+})
 
 export default function start({
   stream,
@@ -31,6 +39,7 @@ export default function start({
     })
   })
 
+  app.use(limiter)
   app.use(express.static(path.join(__dirname, `..`, `public`)))
   app.use(bodyParser.json({ limit: `10mb` }))
   app.use(cookieParser())
