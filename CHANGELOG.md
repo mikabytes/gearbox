@@ -1,3 +1,7 @@
+# 0.13.1
+
+- Fixed issue where slashes and backslashes wasn't recognized in filter values (thanks @Gaidouraki)
+
 # 0.13.0
 
 - Added support for adding torrents (you can drag and drop them from your computer)

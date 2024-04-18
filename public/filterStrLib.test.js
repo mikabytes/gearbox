@@ -57,5 +57,25 @@ describe("filterStrLib", () => {
 
       assert.deepEqual(strToFilters(input), expectedOutput)
     })
+
+    it("should handle slash linux style paths in value", () => {
+      const input = `downloadDir:/fun`
+
+      const expectedOutput = {
+        downloadDir: [`/fun`],
+      }
+
+      assert.deepEqual(strToFilters(input), expectedOutput)
+    })
+
+    it("should handle windows style paths in value", () => {
+      const input = `downloadDir:C:\\fun`
+
+      const expectedOutput = {
+        downloadDir: [`C:\\fun`],
+      }
+
+      assert.deepEqual(strToFilters(input), expectedOutput)
+    })
   })
 })

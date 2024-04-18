@@ -40,27 +40,23 @@ export function strToFilters(str) {
 
   const parts = str.matchAll(/([-.a-zA-Z\[\]]+):(\(.*?\)|".*?"|[^\s]+)/g)
 
-  for (const [all, key, value] of parts) {
+  for (let [all, key, value] of parts) {
     str = str.replaceAll(all, ``)
-    filters[key] = [...value.matchAll(/(".+?"|\w+)/g)].map(([val]) =>
-      unquote(val)
+    if (value.startsWith(`(`) && value.endsWith(`)`)) {
+      value = value.slice(1, -1)
+    }
+    filters[key] = [...value.matchAll(/"(.*?)"|([^\s]+)/g)].map(
+      ([_, quoted, naked]) => quoted || naked
     )
   }
 
   str = str.trim()
 
   if (str) {
-    filters._text = [...str.matchAll(/(".+?"|\w+)/g)]
-      .map(([val]) => unquote(val))
+    filters._text = [...str.matchAll(/"(.+?)"|(\w+)/g)]
+      .map(([_, quoted, naked]) => quoted || naked)
       .filter((it) => !!it)
   }
 
   return filters
-}
-
-function unquote(val) {
-  if (val.startsWith(`"`) && val.endsWith(`"`)) {
-    return val.slice(1, -1)
-  }
-  return val
 }
