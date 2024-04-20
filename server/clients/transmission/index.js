@@ -1,7 +1,7 @@
-import * as guid from "../../guid.js"
-import Requester from "../../Requester.js"
+import Requester from "./Requester.js"
 import deepEqual from "../../deepEqual.js"
 import fields from "./fields.js"
+import * as guid from "../../guid.js"
 
 function processTorrent(clientId, torrent) {
   return {
@@ -15,14 +15,14 @@ function processTorrent(clientId, torrent) {
 
 export default async function Transmission({
   id: clientId,
-  ip,
+  host,
   port,
   user,
   password,
   changes: changesCb,
 }) {
-  if (!ip || !port || !clientId) {
-    throw new Error("ip, id and port are required")
+  if (!host || !port || !clientId) {
+    throw new Error("host, id and port are required")
   }
 
   // we allow only a-z and 0-9 in id
@@ -32,13 +32,13 @@ export default async function Transmission({
     )
   }
 
-  const request = Requester(`${ip}:${port}`, { user, password })
+  const request = Requester(`${host}:${port}`, { user, password })
 
   const cache = new Map()
   let lastUpdateAt
   const ret = {
     id: clientId,
-    ip,
+    host,
     port,
     request,
   }
@@ -55,9 +55,13 @@ export default async function Transmission({
   async function reloadAll() {
     const {
       arguments: { torrents },
-    } = await request(`torrent-get`, {
-      fields,
-    })
+    } = await request(
+      `torrent-get`,
+      {
+        fields,
+      },
+      false
+    )
     lastUpdateAt = Date.now()
 
     cache.clear()
@@ -104,10 +108,14 @@ export default async function Transmission({
     try {
       const {
         arguments: { torrents, removed: removedIds },
-      } = await request(`torrent-get`, {
-        fields,
-        ids: `recently-active`,
-      })
+      } = await request(
+        `torrent-get`,
+        {
+          fields,
+          ids: `recently-active`,
+        },
+        false
+      )
 
       if (old()) {
         await reloadAll()

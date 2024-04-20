@@ -19,14 +19,7 @@ const limiter = rateLimit({
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
 })
 
-export default function start({
-  stream,
-  getAll,
-  remove,
-  request,
-  count,
-  config,
-}) {
+export default function start({ stream, getAll, request, count, config }) {
   const app = express()
   if (process.env.NODE_ENV === `development`) {
     hotserve({ dir: `.`, pattern: `*.{js,css,html}`, app })
@@ -48,6 +41,10 @@ export default function start({
     res.json(config)
   })
 
+  // Does something similar to torrent-get Transmission RPC call,
+  // but places each torrent on its own line and includes the total
+  // torrent count so that we may parse torrents as they are received
+  // and animate the startup screen
   app.get(`/all`, compression(), (req, res) => {
     res.setHeader(`Content-Type`, `text/json+lines`)
 
@@ -87,6 +84,7 @@ export default function start({
     res.end()
   })
 
+  // stream changed fields in realtime. This endpoint does not send whole objects
   app.get(`/stream`, (req, res) => {
     res.setHeader("Cache-Control", "no-cache")
     res.setHeader("Content-Type", "text/event-stream")
@@ -113,21 +111,9 @@ export default function start({
     })
   })
 
-  const supportedMethods = [
-    `torrent-remove`,
-    `torrent-verify`,
-    `torrent-start`,
-    `torrent-stop`,
-    `torrent-add`,
-  ]
-
-  app.all(`/transmission/rpc`, async (req, res) => {
+  app.all(`/transmission/rpc`, compression(), async (req, res) => {
     const { method, arguments: args, tag } = req.body
-    if (!supportedMethods.includes(method)) {
-      res.status(501).json({ result: `Not implemented.`, tag })
-      return
-    }
-
+    // strikethrough while they're being removed
     if (method === `torrent-remove`) {
       clients.forEach((write) => {
         args.ids.forEach((id) => {
@@ -137,15 +123,11 @@ export default function start({
     }
 
     try {
-      const [error, resultArgs] = await request(method, args)
-      if (error) {
-        console.error(error)
-        res.status(400).json({ result: error.message, tag })
-        return
-      }
+      const returnArgs = await request(method, args)
 
-      res.status(200).send({ ...resultArgs, tag })
+      res.json({ result: `success`, arguments: returnArgs, tag })
     } catch (e) {
+      // revert strikethrough
       if (method === `torrent-remove`) {
         clients.forEach((write) => {
           args.ids.forEach((id) => {
@@ -154,7 +136,7 @@ export default function start({
         })
       }
       console.error(e)
-      res.status(500).json({ result: `${e.message}`, tag })
+      res.status(400).json({ result: `${e.message}`, tag })
     }
   })
 

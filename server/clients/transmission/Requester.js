@@ -2,7 +2,7 @@ export default function Requester(host, { user, password } = {}) {
   let header = ``
   const base64Credentials = btoa(`${user}:${password}`)
 
-  return async function request(method, args) {
+  return async function request(method, args, log = true) {
     const url = `http://${host}/transmission/rpc`
 
     const body = { method, arguments: args }
@@ -26,14 +26,24 @@ export default function Requester(host, { user, password } = {}) {
       return request(method, args)
     }
 
+    if (log) {
+      console.log()
+      console.log(`${method} ${JSON.stringify(args)}`)
+    }
+
     if (!response.ok) {
-      throw new Error(`HTTP error ${response.status}: ${await response.text()}`)
+      const errMsg = `HTTP error ${response.status}: ${await response.text()}`
+      throw new Error(errMsg)
     }
 
     const json = await response.json()
 
     if (!json.result === `success`) {
       throw new Error(`Transmission error: ${json.result}`)
+    }
+
+    if (log) {
+      console.log(json)
     }
 
     return json

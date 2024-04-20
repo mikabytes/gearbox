@@ -51,12 +51,12 @@ Example `config.mjs`:
 
 ```js
 export default {
-  backends: [
+  clients: [
     { id: `torr1`, ip: "192.168.0.1", port: 9091, type: "transmission" },
     { id: `torr2`, ip: "127.0.0.1", port: 9091, type: "transmission" },
     {
       id: `torr3`,
-      ip: "10.0.107.1",
+      host: "10.0.107.1",
       port: 80,
       user: "admin",
       password: "supersecret",
@@ -68,15 +68,17 @@ export default {
 }
 ```
 
-### Backends
+### Clients
 
-A list of clients to connect to.
+_Formerly called "backends"_
+
+A list of Transmission torrent clients to connect to.
 
 **id**: Should be at least one character long and no more than six characters. Can only include lowercase letters (a-z) and numbers (0-9).
 
 _Note:_ In the rare case of needing to integrate with a third-party application that only supports 32-bit numbers, the id must be restricted to two characters.
 
-**ip**: Specifies the address of a Transmission daemon with Web-UI enabled. This can be a local or remote IP address or a DNS name.
+**host**: Specifies the address of a Transmission daemon with Web-UI enabled. This can be a local or remote IP address or a DNS name. _Formerly called ip_
 
 **port**: Designates the port for a Transmission daemon with Web-UI enabled, typically 9091.
 
