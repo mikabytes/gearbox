@@ -223,13 +223,11 @@ component(
       ${!torrentsToAdd
         ? ``
         : html`
-            <div id="addTorrents" @click=${() => setTorrentsToAdd(null)}>
-              <x-add-torrents
-                .done=${() => setTorrentsToAdd(null)}
-                .torrentsToAdd=${torrentsToAdd}
-                .setTorrentsToAdd=${setTorrentsToAdd}
-              ></x-add-torrents>
-            </div>
+            <x-add-torrents
+              .done=${() => setTorrentsToAdd(null)}
+              .torrentsToAdd=${torrentsToAdd}
+              .setTorrentsToAdd=${setTorrentsToAdd}
+            ></x-add-torrents>
           `}
     `
   }

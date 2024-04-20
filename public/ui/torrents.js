@@ -1,20 +1,15 @@
-import { repeat } from "lit-html/directives/repeat.js"
-import {
-  component,
-  html,
-  useMemo,
-  useState,
-  useEffect,
-  css,
-} from "../component.js"
-import * as enums from "../enums.js"
+import "./setLocation.js"
 
-import Shortcuts from "./torrents/Shortcuts.js"
-import ScrollIntoView from "./torrents/ScrollIntoView.js"
+import { repeat } from "lit-html/directives/repeat.js"
+
+import { component, html, useState, css } from "../component.js"
 import ContextMenu from "./torrents/ContextMenu.js"
 import FilterSideEffects from "./torrents/FilterSideEffects.js"
-import Selections from "./torrents/Selections.js"
 import RemoveTorrent from "./torrents/RemoveTorrent.js"
+import ScrollIntoView from "./torrents/ScrollIntoView.js"
+import Selections from "./torrents/Selections.js"
+import Shortcuts from "./torrents/Shortcuts.js"
+import * as enums from "../enums.js"
 import formatSize from "../formatSize.js"
 
 component(
@@ -32,6 +27,7 @@ component(
     selections: _selections,
     setSelections,
   }) {
+    const [changeLocation, setChangeLocation] = useState(false)
     const selections = Selections.call(this, {
       torrents,
       selections: _selections,
@@ -43,6 +39,7 @@ component(
       removeTorrent,
       setShowDetails,
       torrents,
+      setChangeLocation,
     })
     Shortcuts.call(this, { selections, torrents, removeTorrent })
     ScrollIntoView.call(this, { selections })
@@ -54,7 +51,8 @@ component(
       totalTorrents,
     })
 
-    return html` <div class="container">
+    return html`
+      <div class="container">
         <div class="row headers">
           ${columns.map(
             ({ key, name }) => html`
@@ -114,7 +112,20 @@ component(
             </div>`
         )}
       </div>
-      ${contextMenu.html} ${removeTorrent.html}`
+      ${contextMenu.html} ${removeTorrent.html}
+      ${!changeLocation
+        ? ``
+        : html`
+            <x-set-location
+              .title="Set Location"
+              .torrents=${changeLocation.map((id) =>
+                torrents.find((t) => t.id === id)
+              )}
+              .onDone=${() => setChangeLocation(false)}
+            >
+            </x-set-location>
+          `}
+    `
   }
 )
 

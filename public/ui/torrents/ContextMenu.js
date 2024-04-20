@@ -6,6 +6,7 @@ export default function ContextMenu({
   removeTorrent,
   setShowDetails,
   torrents,
+  setChangeLocation,
 }) {
   const [position, setPosition] = useState(false)
 
@@ -85,18 +86,18 @@ export default function ContextMenu({
             <button
               @click=${() => {
                 setPosition(false)
-                setShowDetails(true)
-              }}
-            >
-              Details
-            </button>
-            <button
-              @click=${() => {
-                setPosition(false)
                 verify(selections.getIds())
               }}
             >
               Verify
+            </button>
+            <button
+              @click=${() => {
+                setPosition(false)
+                setChangeLocation(selections.getIds())
+              }}
+            >
+              Set location
             </button>
             <div class="divider"></div>
             <button
@@ -106,6 +107,15 @@ export default function ContextMenu({
               }}
             >
               Remove
+            </button>
+            <div class="divider"></div>
+            <button
+              @click=${() => {
+                setPosition(false)
+                setShowDetails(true)
+              }}
+            >
+              Details
             </button>
           </div>
         `,

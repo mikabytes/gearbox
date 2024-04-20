@@ -1,0 +1,61 @@
+:host {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 2;
+}
+
+section {
+  display: block;
+  position: relative;
+  max-height: 80%;
+  max-width: 800px;
+  background-color: white;
+  border: 1px solid var(--gray);
+  box-shadow: 0px 0px 10px 0px var(--gray);
+  border-radius: 5px;
+  padding: 16px;
+  overflow: auto;
+}
+
+#header {
+  display: flex;
+  align-items: center;
+  margin-top: 0;
+  font-size: 18px;
+  border-bottom: 1px solid var(--gray);
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+
+#header > h1 {
+  padding: 0;
+  margin: 0;
+  margin-right: auto;
+}
+
+#header > label {
+  margin: 0 8px;
+}
+
+button, ::slotted(button), ::slotted(select) {
+  height: 32px;
+  padding: 0 32px;
+  border: none;
+  cursor: pointer;
+  margin: 0 8px;
+  white-space: nowrap;
+}
+
+#abort {
+  background-color: var(--lightgray);
+  color: var(--gray);
+  padding: 8px;
+}
+

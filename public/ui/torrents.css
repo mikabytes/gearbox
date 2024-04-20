@@ -97,6 +97,8 @@
 
 #context-menu .divider {
   border-top: 1px solid var(--lightergray);
+  margin-top: 3px;
+  padding-bottom: 3px;
 }
 
 #context-menu button:hover {
@@ -116,7 +118,7 @@
   z-index: 2;
 }
 
-#delete-confirm {
+#delete-confirm, #change-location {
   font-size: 16px;
   background-color: #efefef;
   border: 1px solid var(--gray);

@@ -1,0 +1,12 @@
+
+button {
+  background-color: var(--secondary);
+  color: #efefef;
+  font-weight: bold;
+}
+
+input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 8px;
+}

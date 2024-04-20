@@ -1,6 +1,7 @@
 import { component, css, html, useState, useEffect } from "../component.js"
 import formatSize from "../formatSize.js"
 import * as torrentActions from "../torrentActions.js"
+import "./popup.js"
 
 component(
   `x-add-torrents`,
@@ -151,39 +152,38 @@ component(
     }
 
     return html`
-      <div id="header">
-        <h1>Add</h1>
-        <label>
-          <select>
-            <option value="">Auto</option>
-            ${(config?.backends || []).map(
-              (client) =>
-                html` <option value="${client.id}">${client.id}</option>`
-            )}
-          </select>
-        </label>
+      <x-popup
+        .title=${`Add`}
+        .onDone=${() => done()}
+        .disabled=${!!uploadText}
+      >
+        <select slot="buttons">
+          <option value="">Auto</option>
+          ${(config?.backends || []).map(
+            (client) =>
+              html` <option value="${client.id}">${client.id}</option>`
+          )}
+        </select>
         <button
           id="add"
           @click=${() => upload.call(this)}
           ?disabled=${!!uploadText}
+          slot="buttons"
         >
           ${uploadText ? uploadText : `Upload`}
         </button>
-        <button id="abort" @click=${() => done()} ?disabled=${!!uploadText}>
-          ✕
-        </button>
-      </div>
-      ${torrentsToAdd.map(
-        (it, index) => html`
-          <h2>${it.name}</h2>
-          ${renderTorrent(
-            index,
-            fileSelection,
-            setFileSelection,
-            buildDirectoryStructure(it.files)
-          )}
-        `
-      )}
+        ${torrentsToAdd.map(
+          (it, index) => html`
+            <h2>${it.name}</h2>
+            ${renderTorrent(
+              index,
+              fileSelection,
+              setFileSelection,
+              buildDirectoryStructure(it.files)
+            )}
+          `
+        )}
+      </x-popup>
     `
   }
 )
