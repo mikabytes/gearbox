@@ -1,0 +1,32 @@
+
+:host {
+  display: flex;
+  background-color: var(--primary);
+  color: var(--lightgray);
+  font-weight: bold;
+  font-size: 16px;
+  user-select: none;
+  align-items: center;
+}
+
+button {
+  background-color: transparent;
+  color: var(--lightgray);
+  font-weight: bold;
+  font-size: 16px;
+  padding: 8px;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  margin-left: auto;
+}
+
+div:last-child {
+  width: 16px;
+}
+
+div:first-child {
+  flex: 1 1 auto;
+  text-align: center;
+  padding: 8px;
+}

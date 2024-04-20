@@ -3,6 +3,7 @@ import "./sidebar.js"
 import "./torrents.js"
 import "./objectExplorer.js"
 import "./addTorrents.js"
+import "./announcer.js"
 import fileToTorrent from "../fileToTorrent.js"
 
 import {
@@ -182,6 +183,7 @@ component(
     }, [])
 
     return html`
+      <x-announcer></x-announcer>
       <x-header
         .filters=${filters}
         .setFilters=${setFilters}

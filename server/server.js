@@ -37,6 +37,10 @@ export default function start({ stream, getAll, request, count, config }) {
   app.use(bodyParser.json({ limit: `10mb` }))
   app.use(cookieParser())
 
+  app.get(`/version`, (req, res) => {
+    res.json({ version: process.env.npm_package_version })
+  })
+
   app.get(`/config`, (req, res) => {
     res.json(config)
   })
