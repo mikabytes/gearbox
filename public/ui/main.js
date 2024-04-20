@@ -153,7 +153,15 @@ component(
           setDragging(false)
           let files = []
           for (const file of e.dataTransfer.files) {
-            if (file.type === `application/x-bittorrent`) {
+            let isTorrent = false
+
+            if (file.type) {
+              isTorrent = file.type === `application/x-bittorrent`
+            } else {
+              // on windows, no browser is filling in the type, so we fallback to checking the name
+              isTorrent = file.name.endsWith(`.torrent`)
+            }
+            if (isTorrent) {
               files.push(file)
             }
           }
