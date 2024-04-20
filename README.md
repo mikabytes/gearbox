@@ -29,6 +29,8 @@ gearbox
 
 ### Docker
 
+_Note:_ after running it once to create the `config.mjs` file, you will have to change `ip` to `0.0.0.0`. The default does not allow access outside local machine.
+
 ```
 docker run -p 2112:2112 -it -e GEARBOX_PATH=/config -v $PWD:/config ghcr.io/mikabytes/gearbox:latest
 ```
