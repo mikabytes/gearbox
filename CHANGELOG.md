@@ -1,3 +1,11 @@
+# 0.14.0
+
+- Added torrent-get, torrent-set, torrent-set-location Transmission RPC API methods. We are getting closer to having a complete RPC API.
+- Add option to select ip and port to listen to #20
+- Bugfix: Drag-drop on Windows #21
+- Double-click to show details of torrent
+- Add Set Location feature. Fixes #19
+
 # 0.13.1
 
 - Fixed issue where slashes and backslashes wasn't recognized in filter values (thanks @Gaidouraki)
