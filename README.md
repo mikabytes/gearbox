@@ -108,6 +108,8 @@ The configuration for adding new torrents. Deciding which client gets the new to
 
 This specifies the IP and port on which the Gearbox server will listen. Defaults to `127.0.0.1` and `2112` respectively.
 
+If you want to be able to access Gearbox from outside the local machine, you should set `ip` to `0.0.0.0`.
+
 ## Usage
 
 ### Filters & Search
