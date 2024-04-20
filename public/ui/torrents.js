@@ -86,6 +86,7 @@ component(
               title=${torrent.errorString}
               data-id=${torrent.id}
               @click=${selections.onClickRow}
+              @dblclick=${() => setShowDetails(true)}
               @contextmenu=${(e) => {
                 if (!selections.includes(torrent.id)) {
                   selections.set([torrent.id])
