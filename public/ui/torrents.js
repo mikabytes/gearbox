@@ -41,7 +41,12 @@ component(
       torrents,
       setChangeLocation,
     })
-    Shortcuts.call(this, { selections, torrents, removeTorrent })
+    Shortcuts.call(this, {
+      selections,
+      torrents,
+      removeTorrent,
+      setChangeLocation,
+    })
     ScrollIntoView.call(this, { selections })
     FilterSideEffects.call(this, {
       filters,

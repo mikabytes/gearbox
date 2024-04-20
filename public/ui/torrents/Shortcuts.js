@@ -2,7 +2,12 @@ import { useEffect } from "../../component.js"
 import * as torrentActions from "../../torrentActions.js"
 import { STOPPED } from "../../enums.js"
 
-export default function useShortcuts({ selections, torrents, removeTorrent }) {
+export default function useShortcuts({
+  selections,
+  torrents,
+  removeTorrent,
+  setChangeLocation,
+}) {
   useEffect(() => {
     const keydown = (e) => {
       if (e.key === `ArrowDown`) {
@@ -62,6 +67,9 @@ export default function useShortcuts({ selections, torrents, removeTorrent }) {
         }
       } else if (e.key === `a` && e.ctrlKey) {
         selections.set(torrents.map((t) => t.id))
+      } else if (e.key === `l` && e.ctrlKey) {
+        e.preventDefault()
+        setChangeLocation(selections.getIds())
       }
     }
     this.addEventListener(`keydown`, keydown)
