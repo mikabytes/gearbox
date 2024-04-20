@@ -35,7 +35,8 @@ component(
     }, [])
 
     const hasNewVersion = version !== latestVersion
-    const shouldShow = localStorage.seen !== latestVersion
+    const shouldShow =
+      version && latestVersion && localStorage.seen !== latestVersion
 
     if (!hasNewVersion || !shouldShow) {
       return html``
@@ -47,7 +48,7 @@ component(
     }
 
     return html`
-      <div>Version ${latestVersion} of Gearbox is now available!</div>
+      <div>Version ${latestVersion} is now available!</div>
       <button @click=${dismiss}>✕</button>
     `
   }
