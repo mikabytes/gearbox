@@ -29,6 +29,9 @@ export async function loadConfig(configFileUrl, absolutePath) {
       password: "",
     }
   ],
+  ip: "127.0.0.1",
+  port: 2112,
+  addTorrentStrategy: "least-count",
 }`
     )
   }
@@ -68,6 +71,14 @@ export async function loadConfig(configFileUrl, absolutePath) {
     throw new Error(
       `Invalid 'addTorrentStrategy', got ${config.addTorrentStrategy} but should be one of "least-count", "round-robin", or "first-found"`
     )
+  }
+
+  if (!config.ip) {
+    config.ip = `127.0.0.1`
+  }
+
+  if (!config.port) {
+    config.port = 2112
   }
 
   return config

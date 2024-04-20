@@ -140,6 +140,6 @@ export default function start({ stream, getAll, request, count, config }) {
     }
   })
 
-  app.listen(2112)
-  console.log(`Gearbox started on http://localhost:2112`)
+  app.listen(config.port, config.ip)
+  console.log(`Gearbox started on http://${config.ip}:${config.port}`)
 }

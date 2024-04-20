@@ -64,7 +64,9 @@ export default {
       maxCount: 5000,
     },
   ],
-  addTorrentStrategy: "least-count", // or "round-robin", "first-found"
+  addTorrentStrategy: "least-count", // or "round-robin", "first-found",
+  ip: "127.0.0.1",
+  port: 2112,
 }
 ```
 
@@ -99,6 +101,10 @@ The configuration for adding new torrents. Deciding which client gets the new to
 | `least-count` | Add it to the client that has the least number of torrents.          |
 | `round-robin` | Spread new torrents evenly across all clients.                       |
 | `first-found` | Add it to the first client available client (in order of `backends`) |
+
+### ip / port
+
+This specifies the IP and port on which the Gearbox server will listen. Defaults to `127.0.0.1` and `2112` respectively.
 
 ## Usage
 
