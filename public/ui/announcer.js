@@ -1,4 +1,5 @@
 import { component, css, html, useEffect, useState } from "../component.js"
+import semverGreater from "https://cdn.jsdelivr.net/npm/semver@7.6.0/functions/gt.js/+esm"
 
 component(
   `x-announcer`,
@@ -38,7 +39,7 @@ component(
       version && latestVersion && localStorage.seen !== latestVersion
 
     // sometimes, github caches things and so it seems latest version is actually smaller than the current version
-    if (!shouldShow || latestVersion <= version) {
+    if (!shouldShow || !semverGreater(latestVersion, version)) {
       return html``
     }
 
