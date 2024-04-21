@@ -31,14 +31,14 @@ component(
     useEffect(() => {
       checkVersion()
 
-      setInterval(checkVersion, 600 * 1000)
+      setInterval(checkVersion, 15 * 60 * 1000)
     }, [])
 
-    const hasNewVersion = version !== latestVersion
     const shouldShow =
       version && latestVersion && localStorage.seen !== latestVersion
 
-    if (!hasNewVersion || !shouldShow) {
+    // sometimes, github caches things and so it seems latest version is actually smaller than the current version
+    if (!shouldShow || latestVersion <= version) {
       return html``
     }
 
