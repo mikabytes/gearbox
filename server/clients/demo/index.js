@@ -117,12 +117,8 @@ export default function DemoAdapter({ id: clientId, changes: _changes }) {
 
   function addTorrent(args = {}) {
     const newTorrent = processTorrent(args)
-    torrents.set(newTorrent.localId, newTorrent)
-    schedule(
-      newTorrent.localId,
-      () => simulateTorrentProgress(newTorrent.localId),
-      1000
-    )
+    torrents.set(newTorrent.id, newTorrent)
+    schedule(newTorrent.id, () => simulateTorrentProgress(newTorrent.id), 1000)
     changes?.({ id: newTorrent.id, changeSet: newTorrent })
   }
 
@@ -155,17 +151,20 @@ export default function DemoAdapter({ id: clientId, changes: _changes }) {
     }
 
     const { ids } = args
+    const byLocalId = new Map()
+    for (const torrent of torrents.values()) {
+      byLocalId.set(torrent.localId, torrent)
+    }
 
     for (const id of ids) {
-      const torrent = torrents.get(id)
+      const torrent = byLocalId.get(id)
       if (!torrent) {
         throw new Error(`Torrent ${JSON.stringify(id)} not found`)
       }
       switch (method) {
         case "torrent-remove":
-          console.log(`${clientId}: Deleting ${id}`)
-          torrents.delete(id)
-          clearSchedule(id)
+          torrents.delete(torrent.id)
+          clearSchedule(torrent.id)
           setTimeout(() => {
             changes?.({ id: torrent.id, isRemoved: true })
           }, 700)
@@ -179,7 +178,7 @@ export default function DemoAdapter({ id: clientId, changes: _changes }) {
           })
           // Emulate recheck progress similarly to download progress
           schedule(
-            id,
+            torrent.id,
             () => {
               torrent.recheckProgress = Math.min(
                 torrent.recheckProgress + Math.random() * 0.1 + 0.05,
@@ -202,7 +201,11 @@ export default function DemoAdapter({ id: clientId, changes: _changes }) {
           if (torrent.percentDone < 100) {
             torrent.status = DOWNLOAD
             changes?.({ id: torrent.id, changeSet: { status: DOWNLOAD } })
-            schedule(id, () => simulateTorrentProgress(id), 1000)
+            schedule(
+              torrent.id,
+              () => simulateTorrentProgress(torrent.id),
+              1000
+            )
             console.log(`resuming`)
           } else {
             console.log(`seeding`)
