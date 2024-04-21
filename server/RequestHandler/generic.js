@@ -1,7 +1,8 @@
-// kind of catch-all for simple methods that pass an ids array
 import lookup from "../lookup.js"
 
-export default async function genericIds(clients, method, args) {
+export default async function generic(clients, args, method) {
+  const ret = {}
+
   for (const [client, torrents] of lookup(clients, args.ids)) {
     const resultArgs = await client.request(method, {
       ...args,
@@ -11,7 +12,9 @@ export default async function genericIds(clients, method, args) {
     if (resultArgs.result !== `success`) {
       throw new Error(`${clientId} returned an error: ${resultArgs.result}`)
     }
+
+    Object.assign(ret, resultArgs.arguments)
   }
 
-  return {}
+  return ret
 }

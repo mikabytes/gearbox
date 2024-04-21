@@ -18,6 +18,8 @@ Gearbox is a modern web UI for Transmission, designed to efficiently manage over
 
 Torrent clients typically have a limit on the number of torrents they can handle. The conventional solution upon reaching this limit is to launch additional instances. This workaround might suffice for managing two or three instances, but it becomes cumbersome with more. Gearbox was developed to provide a singular interface for controlling multiple instances seamlessly. Beyond that, we recognized deficiencies in the Transmission default web interface. Our goal was to incorporate Deluge-like filters and introduce a superior search functionality unmatched by any other.
 
+Gearbox is Transmission RPC compatible. Any software that can communicate with Transmission can also communicate with Gearbox.
+
 ## Installation
 
 ### NPM
@@ -139,6 +141,14 @@ It was also stress-tested at 370,000 torrents on an average PC. While it took a 
 | `Space`                      | If all selected are paused, then resume, else pause |
 | `Ctrl+A`                     | Select all                                          |
 | `Ctrl+L`                     | Change location                                     |
+
+## Protocol
+
+Gearbox implements the [Transmission RPC protocol](https://github.com/transmission/transmission/blob/main/docs/rpc-spec.md). Anywhere you can use Transmission RPC, you can use Gearbox, including \*Arrs, autodl-irssi, etc.
+
+There are a few differences. When adding torrents you can specify which torrent client should receive the new torrent using the non-standard `clientId` field. If this field is omitted, the `addTorrentStrategy` together with `maxCount` will be used to pick a client.
+
+When using `session-get`, a reasonable hard-coded default is returned, along with a version that corresponds to Gearbox. `session-set` is not supported.
 
 ## Roadmap
 
