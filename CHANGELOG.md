@@ -1,3 +1,7 @@
+# 0.15.0
+
+- Added session-get, session-set Transmission RPC API methods. We should now be API compatible.
+
 # 0.14.0
 
 - Added torrent-get, torrent-set, torrent-set-location Transmission RPC API methods. We are getting closer to having a complete RPC API.
