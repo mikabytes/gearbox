@@ -11,11 +11,11 @@ All notable changes to this project will be documented in this file. See [commit
 * **rpc:** arguments field is optional. Fixes Autobrr ([4e66090](https://github.com/mikabytes/gearbox/commit/4e660901dca2960ea15620dc7b8028a6e5283563))
 * When github caches, it would announce old version instead of new ([57ec886](https://github.com/mikabytes/gearbox/commit/57ec88610e238db24c06dd107f85476f5dc51d00))
 
-# 0.15.0
+## 0.15.0
 
 - Added session-get, session-set Transmission RPC API methods. We should now be API compatible.
 
-# 0.14.0
+## 0.14.0
 
 - Added torrent-get, torrent-set, torrent-set-location Transmission RPC API methods. We are getting closer to having a complete RPC API.
 - Add option to select ip and port to listen to #20
@@ -23,59 +23,59 @@ All notable changes to this project will be documented in this file. See [commit
 - Double-click to show details of torrent
 - Add Set Location feature. Fixes #19
 
-# 0.13.1
+## 0.13.1
 
 - Fixed issue where slashes and backslashes wasn't recognized in filter values (thanks @Gaidouraki)
 
-# 0.13.0
+## 0.13.0
 
 - Added support for adding torrents (you can drag and drop them from your computer)
 - Added support for adding torrents (via file-picker, use the big + sign)
 - Added API rate-limiting
 - Added demo-config.mjs for those who want to experiment with Gearbox (same as demo-gearbox.xod.se)
 
-# 0.12.2
+## 0.12.2
 
 - Rename KeyPress to Shortcuts, hopefully avoiding some overzelous adblockers
 
-# 0.12.1
+## 0.12.1
 
 - Fix issue with download % showing 0 until finished
 
-# 0.12.0
+## 0.12.0
 
 - Details view now show total stats for multiple selections
 - Sidebar now indicates selected torrents
 
-# 0.11.0
+## 0.11.0
 
 - Added ctrl+a to select all torrents
 - Added a 'demo' connector for showcasing Gearbox
 
-# 0.10.5
+## 0.10.5
 
 - Fix client showing download speed
 
-# 0.10.2
+## 0.10.2
 
 - Fix white color on status when selected. Fix cursor:pointer on firefox
 
-# 0.10.1
+## 0.10.1
 
 - Adjusted column sizes for better fit
 - Fix issue with Seeds/Leechs tabs showing wrong number of total peers
 - Fix issue with progress header not being visible after scroll
 - Fix a bug where right-clicking a torrent wouldn't show it in details. Adjusted grid to show asc/desc icon
 
-# 0.10.0
+## 0.10.0
 
 - Added styling and indicators for download and verifying torrents
 
-# 0.9.1
+## 0.9.1
 
 - Fix issue with trackers that reports multiple instances with same sitename causing duplicates
 
-# 0.9.0
+## 0.9.0
 
 - App will reload when data becomes out of sync
 - When deleting files, UI will now show them with strike-through, instead of forcing user to wait for the messagebox to close
