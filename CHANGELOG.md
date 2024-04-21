@@ -1,3 +1,16 @@
+# Changelog
+
+All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
+
+## [0.15.1](https://github.com/mikabytes/gearbox/compare/v0.15.0...v0.15.1) (2024-04-21)
+
+
+### Bug Fixes
+
+* proper handle semver ([fc613c6](https://github.com/mikabytes/gearbox/commit/fc613c68a257ea15a516c04876c6b41ed9ebfb91))
+* **rpc:** arguments field is optional. Fixes Autobrr ([4e66090](https://github.com/mikabytes/gearbox/commit/4e660901dca2960ea15620dc7b8028a6e5283563))
+* When github caches, it would announce old version instead of new ([57ec886](https://github.com/mikabytes/gearbox/commit/57ec88610e238db24c06dd107f85476f5dc51d00))
+
 # 0.15.0
 
 - Added session-get, session-set Transmission RPC API methods. We should now be API compatible.
