@@ -22,7 +22,7 @@ const mapper = {
 }
 
 export default function RequestHandler({ clients, config }) {
-  async function request(method, args) {
+  async function request(method, args = {}) {
     if (mapper[method]) {
       return mapper[method](clients, args, method)
     } else {
