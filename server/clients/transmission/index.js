@@ -43,6 +43,13 @@ export default async function Transmission({
     request,
   }
 
+  // recently changed objects, key is guid, value is date
+  const recent = new Map()
+
+  function updateRecent(id) {
+    recent.set(id, Date.now())
+  }
+
   function old() {
     // more than 50 seconds has passed since last successful update. Transmission only saves changes up to 60 seconds (hardcoded) we have to request all torrents anew
     return Date.now - lastUpdateAt > 50000
@@ -55,13 +62,7 @@ export default async function Transmission({
   async function reloadAll() {
     const {
       arguments: { torrents },
-    } = await request(
-      `torrent-get`,
-      {
-        fields,
-      },
-      false
-    )
+    } = await request(`torrent-get`, { fields }, false)
     lastUpdateAt = Date.now()
 
     cache.clear()
@@ -76,6 +77,7 @@ export default async function Transmission({
 
   function processDeletedTorrent(id) {
     cache.delete(id)
+    updateRecent(id)
     changesCb?.({
       id,
       isRemoved: true,
@@ -98,6 +100,7 @@ export default async function Transmission({
         }
       }
     }
+    updateRecent(torrent.id)
     changesCb?.({
       id: torrent.id,
       changeSet,
@@ -118,6 +121,7 @@ export default async function Transmission({
       )
 
       if (old()) {
+        console.log(`Reloading all torrents`)
         await reloadAll()
         return
       }
@@ -153,6 +157,23 @@ export default async function Transmission({
     },
     stream(cb) {
       cbs.add(cb)
+    },
+    *getRecent() {
+      const now = Date.now()
+      for (const id of recent.keys()) {
+        // delete items that are older than 60 seconds
+        const date = recent.get(id)
+        if (now - date > 60000) {
+          recent.delete(id)
+          continue
+        }
+
+        if (cache.has(id)) {
+          yield cache.get(id)
+        } else {
+          yield { id, isRemoved: true }
+        }
+      }
     },
   })
 

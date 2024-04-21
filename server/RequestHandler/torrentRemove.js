@@ -1,17 +1,14 @@
-import byClient from "../byClient.js"
+import lookup from "../lookup.js"
 
 export default async function torrentRemove(clients, args) {
   if (!Array.isArray(args.ids) || !args.ids.length) {
     throw new Error(`'ids' must be an array of at least one id to remove`)
   }
 
-  const split = byClient(clients, args.ids)
-
-  for (const clientId of Object.keys(split)) {
-    const client = clients.get(clientId)
+  for (const [client, torrents] of lookup(clients, args.ids)) {
     const resultArgs = await client.request(`torrent-remove`, {
       "delete-local-data": args["delete-local-data"],
-      ids: split[clientId].map((id) => client.get(id).localId),
+      ids: [...torrents.map((t) => t.localId)],
     })
 
     if (resultArgs.result !== `success`) {

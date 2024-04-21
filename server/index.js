@@ -9,6 +9,8 @@ import start from "./server.js"
 
 import { loadConfig } from "./config.js"
 
+import "es-iterator-helpers/auto"
+
 let cb
 let initialized
 

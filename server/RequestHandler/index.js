@@ -1,4 +1,3 @@
-import byClient from "../byClient.js"
 import torrentGet from "./torrentGet.js"
 import torrentAdd from "./torrentAdd.js"
 import torrentRemove from "./torrentRemove.js"

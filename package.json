@@ -19,6 +19,7 @@
     "body-parser": "^1.20.2",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
+    "es-iterator-helpers": "^1.0.18",
     "express": "^4.19.1",
     "express-rate-limit": "^7.2.0",
     "hotserve": "2.0.0-alpha.1"

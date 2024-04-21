@@ -23,7 +23,7 @@ export default function Requester(host, { user, password } = {}) {
       await new Promise((resolve) => setTimeout(resolve, 100))
       header = response.headers.get(`X-Transmission-Session-Id`)
 
-      return request(method, args)
+      return request(method, args, log)
     }
 
     if (log) {

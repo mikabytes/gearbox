@@ -1,12 +1,11 @@
-import byClient from "../byClient.js"
-
 // kind of catch-all for simple methods that pass an ids array
+import lookup from "../lookup.js"
+
 export default async function genericIds(clients, method, args) {
-  const split = byClient(clients, args.ids)
-  for (const clientId of Object.keys(split)) {
-    const resultArgs = await clients.get(clientId).request(method, {
+  for (const [client, torrents] of lookup(clients, args.ids)) {
+    const resultArgs = await client.request(method, {
       ...args,
-      ids: split[clientId].map((id) => clients.get(clientId).get(id).localId),
+      ids: [...torrents.map((t) => t.localId)],
     })
 
     if (resultArgs.result !== `success`) {

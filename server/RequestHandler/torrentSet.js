@@ -1,13 +1,10 @@
-import byClient from "../byClient.js"
+import lookup from "../lookup.js"
 
 export default async function torrentSet(clients, args) {
-  const split = byClient(clients, args.ids)
-
-  for (const clientId of Object.keys(split)) {
-    const client = clients.get(clientId)
+  for (const [client, torrents] of lookup(clients, args.ids)) {
     const resultArgs = await client.request(`torrent-set`, {
       ...args,
-      ids: split[clientId].map((id) => client.get(id).localId),
+      ids: [...torrents.map((t) => t.localId)],
     })
 
     if (resultArgs.result !== `success`) {
