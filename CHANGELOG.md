@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.15.2](https://github.com/mikabytes/gearbox/compare/v0.15.1...v0.15.2) (2024-04-22)
+
+
+### Features
+
+* Refactor API, add logging levels ([37df4d5](https://github.com/mikabytes/gearbox/commit/37df4d581f66f473cb160ca776b14743ef3e02c3))
+
+
+### Bug Fixes
+
+* **#24:** Change GUID strategy to use much less bits. Sonarr is happy now ([0312c96](https://github.com/mikabytes/gearbox/commit/0312c96c26ebad7ab191e219a83c76cab2d65b69)), closes [#24](https://github.com/mikabytes/gearbox/issues/24)
+* Disabled ratelimiter. Fixes [#22](https://github.com/mikabytes/gearbox/issues/22) ([35ba8da](https://github.com/mikabytes/gearbox/commit/35ba8daf601cf0a46b6e7f1c7c3e643191c42c9e))
+* its now possible to pick client when adding torrent. Fixes [#23](https://github.com/mikabytes/gearbox/issues/23) ([b8324bb](https://github.com/mikabytes/gearbox/commit/b8324bba9467bf1e989cd40b0dceb4ffb1faf248))
+
 ## [0.15.1](https://github.com/mikabytes/gearbox/compare/v0.15.0...v0.15.1) (2024-04-21)
 
 
