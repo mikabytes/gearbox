@@ -1,3 +1,5 @@
+import logger from './logger.js'
+
 export function isId(thing) {
   const isNumber = typeof thing === "number"
   const isInteger = Number.isInteger(thing)

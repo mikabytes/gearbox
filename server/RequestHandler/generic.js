@@ -1,3 +1,4 @@
+import logger from '../logger.js'
 import lookup from "../lookup.js"
 
 export default async function generic(clients, args, method) {

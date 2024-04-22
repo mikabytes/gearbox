@@ -1,5 +1,6 @@
 import { decode } from "./guid.js"
 import { isId, isSHA1Hash } from "./validators.js"
+import logger from './logger.js'
 
 // returns an iterator over clients, which in turn returns an iterator over their torrents matching the ids
 //
@@ -45,6 +46,7 @@ function* getTorrents(client, ids) {
   outer: for (const id of ids) {
     if (isId(id)) {
       const { clientId, torrentId } = decode(id)
+
       if (clientId !== client.id) {
         continue
       }

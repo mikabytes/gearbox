@@ -10,6 +10,7 @@ import RequestHandler from "./RequestHandler/index.js"
 import clientImplementations from "./clients/index.js"
 import { setLevels as loggerSetLevels } from "./logger.js"
 import start from "./server.js"
+import { load as loadState } from "./state.js"
 
 let cb
 let initialized
@@ -25,6 +26,7 @@ const configAbsolutePath = join(workdir, configPath)
 const configFileURL = pathToFileURL(configAbsolutePath).href
 
 const config = await loadConfig(configFileURL, configAbsolutePath)
+loadState(join(workdir, `state.json`))
 loggerSetLevels(config.logLevel)
 
 const clients = new Map()

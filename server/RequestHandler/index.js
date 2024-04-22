@@ -13,8 +13,8 @@ const mapper = {
   "torrent-set-location": generic,
   "torrent-start": generic,
   "torrent-start-now": generic,
-  "torrent-start-stop": generic,
-  "torrent-start-verify": generic,
+  "torrent-stop": generic,
+  "torrent-verify": generic,
   "torrent-reannounce": generic,
   "torrent-set": generic,
   "torrent-rename-path": generic,
@@ -26,7 +26,6 @@ export default function RequestHandler({ clients, config }) {
   async function request(method, args = {}) {
     if (mapper[method]) {
       const ret = await mapper[method](clients, args, method)
-
       return ret
     } else {
       throw new Error(`Invalid method: ${method}`)

@@ -3,6 +3,7 @@ export async function add(args) {
     method: `POST`,
     headers: {
       "Content-Type": `application/json`,
+      "X-Transmission-Session-Id": `GEARBOX`,
     },
     body: JSON.stringify({
       method: `torrent-add`,
@@ -29,6 +30,7 @@ export async function verify(ids) {
     method: `POST`,
     headers: {
       "Content-Type": `application/json`,
+      "X-Transmission-Session-Id": `GEARBOX`,
     },
     body: JSON.stringify({
       method: `torrent-verify`,
@@ -59,6 +61,7 @@ export async function set(ids, fields) {
     method: `POST`,
     headers: {
       "Content-Type": `application/json`,
+      "X-Transmission-Session-Id": `GEARBOX`,
     },
     body: JSON.stringify({
       method: `torrent-set`,
@@ -85,6 +88,7 @@ export async function setLocation(ids, path) {
     method: `POST`,
     headers: {
       "Content-Type": `application/json`,
+      "X-Transmission-Session-Id": `GEARBOX`,
     },
     body: JSON.stringify({
       method: `torrent-set-location`,
@@ -111,6 +115,7 @@ export async function pause(ids) {
     method: `POST`,
     headers: {
       "Content-Type": `application/json`,
+      "X-Transmission-Session-Id": `GEARBOX`,
     },
     body: JSON.stringify({
       method: `torrent-stop`,
@@ -137,6 +142,7 @@ export async function resume(ids) {
     method: `POST`,
     headers: {
       "Content-Type": `application/json`,
+      "X-Transmission-Session-Id": `GEARBOX`,
     },
     body: JSON.stringify({
       method: `torrent-start`,
@@ -163,6 +169,7 @@ export async function remove(ids, deleteLocalFiles = false) {
     method: `POST`,
     headers: {
       "Content-Type": `application/json`,
+      "X-Transmission-Session-Id": `GEARBOX`,
     },
     body: JSON.stringify({
       method: `torrent-remove`,
