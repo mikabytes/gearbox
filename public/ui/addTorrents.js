@@ -159,7 +159,7 @@ component(
       >
         <select slot="buttons">
           <option value="">Auto</option>
-          ${(config?.backends || []).map(
+          ${(config?.clients || []).map(
             (client) =>
               html` <option value="${client.id}">${client.id}</option>`
           )}
