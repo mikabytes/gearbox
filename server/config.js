@@ -32,6 +32,7 @@ export async function loadConfig(configFileUrl, absolutePath) {
   ip: "127.0.0.1",
   port: 2112,
   addTorrentStrategy: "least-count",
+  logLevel: "warn",
 }`
     )
   }
@@ -79,6 +80,10 @@ export async function loadConfig(configFileUrl, absolutePath) {
 
   if (!config.port) {
     config.port = 2112
+  }
+
+  if (!config.logLevel) {
+    config.logLevel = `warn`
   }
 
   return config

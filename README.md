@@ -71,6 +71,7 @@ export default {
   addTorrentStrategy: "least-count", // or "round-robin", "first-found",
   ip: "127.0.0.1",
   port: 2112,
+  logLevel: "warn",
 }
 ```
 
@@ -112,6 +113,10 @@ This specifies the IP and port on which the Gearbox server will listen. Defaults
 
 If you want to be able to access Gearbox from outside the local machine, you should set `ip` to `0.0.0.0`.
 
+### logLevel
+
+The logging level. Defaults to `warn`, can be any of `error`, `warn`, or `debug`.
+
 ## Usage
 
 ### Filters & Search
@@ -148,7 +153,7 @@ Gearbox implements the [Transmission RPC protocol](https://github.com/transmissi
 
 There are a few differences. When adding torrents you can specify which torrent client should receive the new torrent using the non-standard `clientId` field. If this field is omitted, the `addTorrentStrategy` together with `maxCount` will be used to pick a client.
 
-When using `session-get`, a reasonable hard-coded default is returned, along with a version that corresponds to Gearbox. `session-set` is not supported.
+When using `session-get`, a reasonable hard-coded default is returned. `session-set` is not supported.
 
 ## Roadmap
 

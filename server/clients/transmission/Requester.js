@@ -1,3 +1,5 @@
+import logger from "../../logger.js"
+
 export default function Requester(host, { user, password } = {}) {
   let header = ``
   const base64Credentials = btoa(`${user}:${password}`)
@@ -27,8 +29,7 @@ export default function Requester(host, { user, password } = {}) {
     }
 
     if (log) {
-      console.log()
-      console.log(`${method} ${JSON.stringify(args)}`)
+      logger.debug(`Subrequest to ${host}: ${method} ${JSON.stringify(args)}`)
     }
 
     if (!response.ok) {
@@ -39,11 +40,12 @@ export default function Requester(host, { user, password } = {}) {
     const json = await response.json()
 
     if (!json.result === `success`) {
+      logger.error(`Transmission error: ${json.result}`)
       throw new Error(`Transmission error: ${json.result}`)
     }
 
     if (log) {
-      console.log(json)
+      logger.debug(`Subrequest response: ${JSON.stringify(json)}`)
     }
 
     return json

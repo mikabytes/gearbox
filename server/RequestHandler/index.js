@@ -1,8 +1,9 @@
-import torrentGet from "./torrentGet.js"
-import torrentAdd from "./torrentAdd.js"
 import generic from "./generic.js"
-import sessionSet from "./sessionSet.js"
+import logger from "../logger.js"
 import sessionGet from "./sessionGet.js"
+import sessionSet from "./sessionSet.js"
+import torrentAdd from "./torrentAdd.js"
+import torrentGet from "./torrentGet.js"
 
 const mapper = {
   "torrent-get": torrentGet,
@@ -24,7 +25,9 @@ const mapper = {
 export default function RequestHandler({ clients, config }) {
   async function request(method, args = {}) {
     if (mapper[method]) {
-      return mapper[method](clients, args, method)
+      const ret = await mapper[method](clients, args, method)
+
+      return ret
     } else {
       throw new Error(`Invalid method: ${method}`)
     }

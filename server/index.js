@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 
+import "es-iterator-helpers/auto"
+
 import { join, relative } from "path"
 import { pathToFileURL, fileURLToPath } from "url"
 
+import { loadConfig } from "./config.js"
 import RequestHandler from "./RequestHandler/index.js"
 import clientImplementations from "./clients/index.js"
+import { setLevels as loggerSetLevels } from "./logger.js"
 import start from "./server.js"
-
-import { loadConfig } from "./config.js"
-
-import "es-iterator-helpers/auto"
 
 let cb
 let initialized
@@ -25,6 +25,7 @@ const configAbsolutePath = join(workdir, configPath)
 const configFileURL = pathToFileURL(configAbsolutePath).href
 
 const config = await loadConfig(configFileURL, configAbsolutePath)
+loggerSetLevels(config.logLevel)
 
 const clients = new Map()
 

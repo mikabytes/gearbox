@@ -22,7 +22,9 @@
     "es-iterator-helpers": "^1.0.18",
     "express": "^4.19.1",
     "express-rate-limit": "^7.2.0",
-    "hotserve": "2.0.0-alpha.1"
+    "hotserve": "2.0.0-alpha.1",
+    "morgan": "^1.10.0",
+    "winston": "^3.13.0"
   },
   "devDependencies": {
     "mocha": "^10.3.0",

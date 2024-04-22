@@ -1,4 +1,5 @@
 import fields from "../clients/transmission/fields.js"
+import logger from "../logger.js"
 import lookup from "../lookup.js"
 
 export default async function torrentGet(clients, args) {
@@ -8,7 +9,12 @@ export default async function torrentGet(clients, args) {
 
   for (const field of args.fields) {
     if (!fields.includes(field)) {
-      throw new Error(`Invalid field: ${field}`)
+      logger.debug(
+        `An invalid field "${field}" was requested, it will be ignored`
+      )
+
+      // remove it from fields
+      args.fields.splice(args.fields.indexOf(field), 1)
     }
   }
 

@@ -78,5 +78,5 @@ const defaults = {
     "speed-units": ["kB/s", "MB/s", "GB/s", "TB/s"],
   },
   "utp-enabled": false,
-  version: `${process.env.npm_package_version} (Gearbox)`,
+  version: `5.3.0`,
 }

@@ -121,7 +121,7 @@ export default async function Transmission({
       )
 
       if (old()) {
-        console.log(`Reloading all torrents`)
+        logger.debug(`Reloading all torrents`)
         await reloadAll()
         return
       }
@@ -136,7 +136,7 @@ export default async function Transmission({
         processChangedTorrent(t)
       }
     } catch (e) {
-      console.log(e)
+      logger.error(e)
     } finally {
       setTimeout(streamingUpdates, 1000)
     }
