@@ -2,7 +2,6 @@ import compression from "compression"
 import express, { request } from "express"
 
 import all from "./all.js"
-import limiter from "./rateLimiter.js"
 import logger from "../logger.js"
 import loggerMiddleware from "./loggerMiddleware.js"
 import rpc from "./rpc.js"
@@ -14,7 +13,6 @@ export default function makeApi({ stream, getAll, request, count, config }) {
   const app = express.Router()
 
   app.use(loggerMiddleware)
-  app.use(limiter)
   app.use(
     express.json({
       limit: `10mb`,
