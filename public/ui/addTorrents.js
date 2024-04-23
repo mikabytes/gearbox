@@ -170,7 +170,7 @@ component(
           ?disabled=${!!uploadText}
           slot="buttons"
         >
-          ${uploadText ? uploadText : `Upload`}
+          ${uploadText ? uploadText : `Add`}
         </button>
         ${torrentsToAdd.map(
           (it, index) => html`
