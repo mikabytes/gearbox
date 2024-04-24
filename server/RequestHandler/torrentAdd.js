@@ -40,7 +40,7 @@ export default async function torrentAdd(clients, args) {
     throw new Error(`Strategy ${strategy} not implemented.`)
   }
 
-  await client.request(`torrent-add`, args)
+  const response = await client.request(`torrent-add`, args)
 
-  return {}
+  return response
 }
