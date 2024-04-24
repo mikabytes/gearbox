@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.16.0](https://github.com/mikabytes/gearbox/compare/v0.15.2...v0.16.0) (2024-04-24)
+
+
+### Features
+
+* Add total upload/download speed. Fixes [#25](https://github.com/mikabytes/gearbox/issues/25) ([2a08140](https://github.com/mikabytes/gearbox/commit/2a081400f106c4e4b7aa145b2f25dc045a04ef28))
+* Include link to changelog when announcing new version ([0dcc102](https://github.com/mikabytes/gearbox/commit/0dcc1026b09e600325a634836457ce54980fafb5))
+* Prettier upload/download symbols. Fixes [#28](https://github.com/mikabytes/gearbox/issues/28) ([979d8c3](https://github.com/mikabytes/gearbox/commit/979d8c313c8a84a194ea6aa53774227f9cd85e3a))
+
+
+### Bug Fixes
+
+* Gearbox to return download-dir of first client, fixes [#29](https://github.com/mikabytes/gearbox/issues/29) ([e0e582a](https://github.com/mikabytes/gearbox/commit/e0e582a20c1b2825b65802af9c78314b9e0caa7e))
+* Renamed button on upload torrent to 'Add'. Some users were confused by this ([b878dbf](https://github.com/mikabytes/gearbox/commit/b878dbfbe10ebd2cd89b9e8615d914d5e58a4201))
+* RPC now supports Int64 tags, which should make Autobrr happy. ([4bab579](https://github.com/mikabytes/gearbox/commit/4bab579f08a3f4e21e46ea780bddd16bfc8c45ea))
+
 ## [0.15.2](https://github.com/mikabytes/gearbox/compare/v0.15.1...v0.15.2) (2024-04-22)
 
 
