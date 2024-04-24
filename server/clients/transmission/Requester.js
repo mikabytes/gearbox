@@ -4,7 +4,7 @@ export default function Requester(host, { user, password } = {}) {
   let header = ``
   const base64Credentials = btoa(`${user}:${password}`)
 
-  return async function request(method, args, log = true) {
+  return async function request(method, args = {}, log = true) {
     const url = `http://${host}/transmission/rpc`
 
     const body = { method, arguments: args }

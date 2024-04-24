@@ -1,6 +1,6 @@
-export default function sessionGet(clients, args) {
+export default async function sessionGet(clients, args) {
   if (!args.fields) {
-    return defaults
+    args.fields = Object.keys(defaults)
   }
 
   if (!Array.isArray(args.fields)) {
@@ -12,6 +12,15 @@ export default function sessionGet(clients, args) {
   for (const field of args.fields) {
     ret[field] = defaults[field]
   }
+
+  if (args.fields.includes(`download-dir`)) {
+    const firstClient = clients.values().next().value
+    const session = (
+      await firstClient.request(`session-get`, { fields: [`download-dir`] })
+    ).arguments
+    ret[`download-dir`] = session[`download-dir`]
+  }
+
   return ret
 }
 
