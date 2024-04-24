@@ -174,7 +174,7 @@ function makeProgress(torrent) {
         .map((peer) => peer.rateToPeer)
         .reduce((a, b) => a + b, 0)
       if (speed > 0) {
-        text += ` ${formatSize(speed)}/s`
+        text = `▲ ${formatSize(speed)}/s`
       }
 
       break
@@ -188,7 +188,7 @@ function makeProgress(torrent) {
             .reduce((a, b) => a + b, 0)
         ) + `/s`
 
-      text = `DL ${progress}% ${speed}`
+      text = `▼ ${speed} ${progress}%`
       break
     }
     case enums.CHECK:
