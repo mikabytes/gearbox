@@ -4,8 +4,9 @@
     "announcer announcer announcer" min-content
     "header header header" 50px
     "sidebar drag-hor torrents" auto
-    "drag-ver drag-ver drag-ver" 3px
-    "footer footer footer" min-content;
+    "drag-ver drag-ver drag-ver" 2px
+    "footer footer footer" min-content
+    "status status status" min-content;
   grid-template-columns: auto 3px 1fr;
   height: 100%;
   width: 100%;
@@ -46,6 +47,10 @@ x-header {
   grid-area: header;
 }
 
+x-status {
+  grid-area: status;
+}
+
 #sidebar {
   grid-area: sidebar;
 }
@@ -75,7 +80,6 @@ x-header {
 
 #drag-ver {
   grid-area: drag-ver;
-  height: 3px;
   background-color: #ccc;
 }
 

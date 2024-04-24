@@ -1,0 +1,24 @@
+:host {
+  display: flex;
+  justify-content: flex-end;
+  background-color: var(--lightgray);
+  height: 30px;
+  color: var(--darkgray);
+}
+
+div {
+  display: flex;
+  align-items: center;
+  width: 80px;
+  height: 30px;
+}
+
+#rateDownload:before {
+  display: block;
+  content: "▼ ";
+}
+
+#rateUpload:before {
+  display: block;
+  content: "▲ ";
+}

@@ -168,14 +168,14 @@
 }
 
 .status-downloading {
-  --color: blue;
+  --color: var(--downloading);
 }
 
 .status-seeding {
-  --color: orange;
+  --color: var(--seeding);
 }
 
 .status-checking {
-  --color: darkgray;
+  --color: var(--checking);
 }
 }

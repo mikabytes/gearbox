@@ -1,3 +1,4 @@
+import "./status.js"
 import "./header.js"
 import "./sidebar.js"
 import "./torrents.js"
@@ -219,6 +220,7 @@ component(
             ></x-object-explorer>`}
         <button @click=${() => setShowDetails(false)}>✕</button>
       </div>
+      <x-status .torrents=${allTorrents}></x-status>
       ${!dragging
         ? ``
         : html`<div id="dragging"><div>Drop files here</div></div>`}
