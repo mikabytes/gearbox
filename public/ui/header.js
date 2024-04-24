@@ -1,11 +1,12 @@
 import { component, html, css } from "../../component.js"
 import { filtersToStr, strToFilters } from "../../filterStrLib.js"
 import fileToTorrent from "../fileToTorrent.js"
+import filterIcon from "../icons/filter.js"
 
 component(
   `x-header`,
   await css(import.meta.resolve(`./header.css`)),
-  function Header({ filters, setFilters, setTorrentsToAdd }) {
+  function Header({ filters, setFilters, setTorrentsToAdd, toggleSidebar }) {
     this.generatedSearch = filtersToStr(filters)
 
     // we have to make a little workaround so that filters won't interrupt us writing
@@ -40,6 +41,7 @@ component(
     }
 
     return html`
+      <button id="toggleFilters" @click=${toggleSidebar}>${filterIcon}</button>
       <input
         type="search"
         placeholder="Search Torrents"

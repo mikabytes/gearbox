@@ -51,8 +51,16 @@ x-status {
   grid-area: status;
 }
 
-#sidebar {
-  grid-area: sidebar;
+@media (max-width: 575px) {
+  x-sidebar {
+    background-color: white;
+    position: absolute;
+    top: 50px;
+    left: 10px;
+    bottom: 10px;
+    box-shadow: 0px 0px 15px 0px #333;
+    z-index: 3;
+  }
 }
 
 #footer {

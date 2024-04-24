@@ -29,6 +29,7 @@ component(
   `x-main`,
   await css(import.meta.resolve(`./main.css`)),
   function Main() {
+    const [showSidebar, setShowSidebar] = useState(window.innerWidth > 575)
     const [showTorrentCount, setShowTorrentCount] = useState(100)
     const [showDetails, setShowDetails] = useState(false)
     const [sort, _setSort] = useState(
@@ -190,13 +191,16 @@ component(
         .setFilters=${setFilters}
         .selectedTorrents=${selectedTorrents}
         .setTorrentsToAdd=${setTorrentsToAdd}
+        .toggleSidebar=${() => setShowSidebar(!showSidebar)}
       ></x-header>
-      <x-sidebar
-        .torrents=${allTorrents}
-        .filters=${filters}
-        .setFilters=${setFilters}
-        .selectedTorrents=${selectedTorrents}
-      ></x-sidebar>
+      ${!showSidebar
+        ? ``
+        : html`<x-sidebar
+            .torrents=${allTorrents}
+            .filters=${filters}
+            .setFilters=${setFilters}
+            .selectedTorrents=${selectedTorrents}
+          ></x-sidebar>`}
       <div id="drag-hor"></div>
       <x-torrents
         tabindex="3"

@@ -31,3 +31,8 @@ button {
 input[type="file"] {
   display: none;
 }
+
+#toggleFilters > svg {
+  width: 20px;
+  height: 20px;
+}

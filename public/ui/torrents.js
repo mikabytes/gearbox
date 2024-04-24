@@ -2,7 +2,7 @@ import "./setLocation.js"
 
 import { repeat } from "lit-html/directives/repeat.js"
 
-import { component, html, useState, css } from "../component.js"
+import { component, html, useState, useEffect, css } from "../component.js"
 import ContextMenu from "./torrents/ContextMenu.js"
 import FilterSideEffects from "./torrents/FilterSideEffects.js"
 import RemoveTorrent from "./torrents/RemoveTorrent.js"
@@ -56,6 +56,16 @@ component(
       totalTorrents,
     })
 
+    useEffect(() => {
+      this.addEventListener(
+        "touchmove",
+        (e) => {
+          clearTimeout(this.longPressTimer)
+        },
+        { passive: true }
+      )
+    }, [])
+
     return html`
       <div class="container">
         <div class="row headers">
@@ -98,14 +108,16 @@ component(
                 contextMenu.show(e.pageX, e.pageY)
               }}
               @touchstart=${(e) => {
-                e.preventDefault()
+                if (e.cancelable) {
+                  e.preventDefault()
+                }
                 this.longPressTimer = setTimeout(
-                  () => contextMenu.show(0, 0),
+                  () =>
+                    contextMenu.show(e.touches[0].pageX, e.touches[0].pageY),
                   500
                 )
               }}
               @touchend=${() => clearTimeout(this.longPressTimer)}
-              @touchmove=${() => clearTimeout(this.longPressTimer)}
               @touchcancel=${() => clearTimeout(this.longPressTimer)}
             >
               ${columns.map(
