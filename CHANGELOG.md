@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.16.1](https://github.com/mikabytes/gearbox/compare/v0.16.0...v0.16.1) (2024-04-24)
+
+
+### Bug Fixes
+
+* Bug caused crash on startup ([343e8c0](https://github.com/mikabytes/gearbox/commit/343e8c05b5ac081cc614d92930ba90ed132ce690))
+
 ## [0.16.0](https://github.com/mikabytes/gearbox/compare/v0.15.2...v0.16.0) (2024-04-24)
 
 
