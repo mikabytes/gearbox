@@ -49,7 +49,14 @@ component(
     }
 
     return html`
-      <div>Version ${latestVersion} is now available!</div>
+      <div>
+        Version ${latestVersion} is now available!
+        <a
+          href="https://github.com/mikabytes/gearbox/blob/main/CHANGELOG.md"
+          target="_blank"
+          >What's new?</a
+        >
+      </div>
       <button @click=${dismiss}>✕</button>
     `
   }
