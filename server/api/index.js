@@ -6,6 +6,9 @@ import logger from "../logger.js"
 import loggerMiddleware from "./loggerMiddleware.js"
 import rpc from "./rpc.js"
 import streaming from "./streaming.js"
+import _jsonBigint from "json-bigint"
+
+const jsonBigint = _jsonBigint({ useNativeBigInt: true })
 
 export default function makeApi({ stream, getAll, request, count, config }) {
   const connections = new Map()
@@ -13,20 +16,18 @@ export default function makeApi({ stream, getAll, request, count, config }) {
   const app = express.Router()
 
   app.use(loggerMiddleware)
+  // some clients don't specify its json, and some send int64 tags
   app.use(
-    express.json({
+    express.text({
       limit: `10mb`,
-      type(req) {
-        if (!req.header("content-type")) {
-          return true
-        }
-        if (req.header("content-type").includes(`application/json`)) {
-          return true
-        }
-        return false
-      },
+      type: `*/*`,
     })
   )
+  app.use((req, res, next) => {
+    req.rawBody = req.body
+    req.body = jsonBigint.parse(req.body)
+    next()
+  })
   app.get(`/stream`, streaming({ stream, connections }))
   app.all(`/transmission/rpc`, compression(), rpc({ request, connections }))
   app.get(`/version`, (req, res) => {

@@ -23,6 +23,7 @@
     "express": "^4.19.1",
     "express-rate-limit": "^7.2.0",
     "hotserve": "2.0.0-alpha.1",
+    "json-bigint": "^1.0.0",
     "morgan": "^1.10.0",
     "winston": "^3.13.0"
   },

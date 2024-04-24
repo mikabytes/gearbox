@@ -1,4 +1,7 @@
 import logger from "../logger.js"
+import _jsonBigint from "json-bigint"
+
+const jsonBigint = _jsonBigint({ useNativeBigInt: true })
 
 export default function rpc({ request, connections }) {
   return async (req, res) => {
@@ -20,7 +23,7 @@ export default function rpc({ request, connections }) {
 
     const { method, arguments: args, tag } = req.body
 
-    logger.debug(`RPC: ${JSON.stringify(req.body)}`)
+    logger.debug(`RPC: ${req.rawBody}`)
 
     // strikethrough while they're being removed
     if (method === `torrent-remove`) {
@@ -35,9 +38,11 @@ export default function rpc({ request, connections }) {
       const returnArgs = await request(method, args)
 
       const response = { result: `success`, arguments: returnArgs, tag }
-      logger.debug(`RPC response: ${JSON.stringify(response)}`)
+      logger.debug(`RPC response: ${jsonBigint.stringify(response)}`)
 
-      res.json(response)
+      res.status(200)
+      res.header(`Content-Type`, `application/json`)
+      res.end(jsonBigint.stringify(response))
     } catch (e) {
       logger.error(e)
       // revert strikethrough
@@ -48,7 +53,9 @@ export default function rpc({ request, connections }) {
           })
         })
       }
-      res.status(400).json({ result: `${e.message}`, tag })
+      res.status(400)
+      res.header(`Content-Type`, `application/json`)
+      res.end(jsonBigint.stringify({ result: `${e.message}`, tag }))
     }
   }
 }
