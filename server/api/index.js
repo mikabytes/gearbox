@@ -24,8 +24,14 @@ export default function makeApi({ stream, getAll, request, count, config }) {
     })
   )
   app.use((req, res, next) => {
-    req.rawBody = req.body
-    req.body = jsonBigint.parse(req.body)
+    try {
+      req.rawBody = req.body
+      if (req.method !== `GET` && req.body) {
+        req.body = jsonBigint.parse(req.body)
+      }
+    } catch (e) {
+      logger.error(e)
+    }
     next()
   })
   app.get(`/stream`, streaming({ stream, connections }))
