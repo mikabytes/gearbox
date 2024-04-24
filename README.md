@@ -81,9 +81,7 @@ _Formerly called "backends"_
 
 A list of Transmission torrent clients to connect to.
 
-**id**: Should be at least one character long and no more than six characters. Can only include lowercase letters (a-z) and numbers (0-9).
-
-_Note:_ In the rare case of needing to integrate with a third-party application that only supports 32-bit numbers, the id must be restricted to two characters.
+**id**: An identifier for the client. You can pick any name you want, but it must be unique and at least one character.
 
 **host**: Specifies the address of a Transmission daemon with Web-UI enabled. This can be a local or remote IP address or a DNS name. _Formerly called ip_
 
