@@ -91,6 +91,14 @@ component(
 
     return html`
       ${makeSection(`Status`, `status`, byStatus, filters, setFilters)}
+      ${makeSection(
+        `Error`,
+        `error`,
+        byError,
+        filters,
+        setFilters,
+        enums.ERROR
+      )}
       ${makeSection(`Client`, `clientId`, byClient, filters, setFilters)}
       ${makeSection(
         `Tracker`,
@@ -100,14 +108,6 @@ component(
         setFilters
       )}
       ${makeSection(`Label`, `labels[]`, byLabel, filters, setFilters)}
-      ${makeSection(
-        `Error`,
-        `error`,
-        byError,
-        filters,
-        setFilters,
-        enums.ERROR
-      )}
     `
   }
 )
