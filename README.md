@@ -56,8 +56,8 @@ Example `config.mjs`:
 ```js
 export default {
   clients: [
-    { id: `torr1`, ip: "192.168.0.1", port: 9091, type: "transmission" },
-    { id: `torr2`, ip: "127.0.0.1", port: 9091, type: "transmission" },
+    { id: `torr1`, host: "192.168.0.1", port: 9091, type: "transmission" },
+    { id: `torr2`, host: "127.0.0.1", port: 9091, type: "transmission" },
     {
       id: `torr3`,
       host: "10.0.107.1",
@@ -66,6 +66,7 @@ export default {
       password: "supersecret",
       type: "transmission",
       maxCount: 5000,
+      torrentDir: "/config/torrents",
     },
   ],
   addTorrentStrategy: "least-count", // or "round-robin", "first-found",
@@ -92,6 +93,8 @@ A list of Transmission torrent clients to connect to.
 **type**: The type of torrent client. Defaults to `transmission`. Currently, only `transmission` is supported.
 
 **maxCount**: A client is qualified to accept new torrents only if it has less than this number of existing torrents. Useful not to overload any individual client. I.e, Transmission usually can't handle more than 5-10 thousand torrents. This rule is discarded if omitted or negative. If it is set to zero, it always disqualifies this client from receiving new torrents.
+
+**torrentDir**: The directory where the .torrent files are stored. For transmission, this is the `torrents` folder inside of your Transmission configuration folder. Must be specified to enable moving torrents between clients.
 
 ### addTorrentStrategy
 

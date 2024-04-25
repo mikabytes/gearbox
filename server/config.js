@@ -6,7 +6,7 @@ export default function getConfig() {
   return config
 }
 
-export async function loadConfig(configFileUrl, absolutePath) {
+export async function loadConfig(configFileUrl, absolutePath, workdir) {
   console.log(`Using configuration file at ${absolutePath}`)
 
   let exists
@@ -27,6 +27,7 @@ export async function loadConfig(configFileUrl, absolutePath) {
       port: 9091,
       user: "",
       password: "",
+      //torrentDir: "/config/torrents" // uncomment to enable moving torrents between clients
     }
   ],
   ip: "127.0.0.1",
@@ -38,6 +39,8 @@ export async function loadConfig(configFileUrl, absolutePath) {
   }
 
   config = (await import(configFileUrl)).default
+
+  config.workdir = workdir
 
   // this field used to be called backends, we keep supporting it
   if (!config.clients && config.backends) {
@@ -57,6 +60,29 @@ export async function loadConfig(configFileUrl, absolutePath) {
     // this field used to be called ip, we keep supporting it
     if (!client.host && client.ip) {
       client.host = client.ip
+    }
+
+    // disallow undefined, null, or empty string
+    if (!client.torrentDir) {
+      delete client.torrentDir
+    } else {
+      // sanity check, make sure the path exists
+      try {
+        const s = await fs.stat(client.torrentDir)
+        if (!s.isDirectory()) {
+          throw new Error(
+            `Torrent directory "${client.torrentDir}" is not a directory`
+          )
+        }
+      } catch (e) {
+        throw new Error(
+          `Torrent directory "${client.torrentDir}" does not exist`
+        )
+      }
+    }
+
+    if (!client.type) {
+      client.type = `transmission`
     }
   }
 

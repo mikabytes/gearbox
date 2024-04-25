@@ -1,17 +1,11 @@
+import path from "path"
+import fs from "fs/promises"
+
 import Requester from "./Requester.js"
 import deepEqual from "../../deepEqual.js"
 import fields from "./fields.js"
 import * as guid from "../../guid.js"
-
-function processTorrent(clientId, torrent) {
-  return {
-    ...torrent,
-    clientId,
-    localId: torrent.id,
-    // make id globally unique
-    id: guid.encode({ clientId, torrentId: torrent.id }),
-  }
-}
+import logger from "../../logger.js"
 
 export default async function Transmission({
   id: clientId,
@@ -20,16 +14,26 @@ export default async function Transmission({
   user,
   password,
   changes: changesCb,
+  workdir,
+  torrentDir,
 }) {
   if (!host || !port || !clientId) {
     throw new Error("host, id and port are required")
   }
 
-  // we allow only a-z and 0-9 in id
-  if (clientId.length > 6 || !clientId.match(/^[a-z0-9]+$/)) {
+  if (!clientId.match(/^[a-z0-9]+$/)) {
     throw new Error(
       `ID must be 1 to 6 characters long and contain only a-z and 0-9`
     )
+  }
+
+  // make sure torrents folder exists
+  const torrentsFolder = path.join(workdir, `torrents`)
+  await fs.mkdir(torrentsFolder).catch((e) => {})
+
+  const gearboxTorrentFiles = new Set()
+  for (const file of await fs.readdir(torrentsFolder)) {
+    gearboxTorrentFiles.add(file)
   }
 
   const request = Requester(`${host}:${port}`, { user, password })
@@ -45,6 +49,42 @@ export default async function Transmission({
 
   // recently changed objects, key is guid, value is date
   const recent = new Map()
+
+  async function processTorrent(torrent) {
+    const filename = `${clientId}_${torrent.hashString}.torrent`
+    const gearboxTorrent = path.join(torrentsFolder, filename)
+
+    if (torrentDir && torrent.hashString) {
+      // new torrent, or this torrent changed hashString
+      const exists = gearboxTorrentFiles.has(filename)
+
+      if (!exists) {
+        const clientTorrent = path.join(
+          torrentDir,
+          `${torrent.hashString}.torrent`
+        )
+
+        try {
+          await fs.copyFile(clientTorrent, gearboxTorrent)
+          gearboxTorrentFiles.add(filename)
+        } catch (e) {
+          logger.error(
+            `Failed to copy torrent from "${clientTorrent}" to "${gearboxTorrent}"`,
+            e
+          )
+        }
+      }
+    }
+    return {
+      ...torrent,
+      clientId,
+      localId: torrent.id,
+      localTorrentFile: torrent.torrentFile,
+      torrentFile: gearboxTorrent,
+      // make id globally unique
+      id: guid.encode({ clientId, torrentId: torrent.id }),
+    }
+  }
 
   function updateRecent(id) {
     recent.set(id, Date.now())
@@ -70,7 +110,7 @@ export default async function Transmission({
     let fictionalId = 10000
 
     for (let t of torrents) {
-      t = processTorrent(clientId, t)
+      t = await processTorrent(t)
       cache.set(t.id, t)
     }
   }
@@ -132,7 +172,7 @@ export default async function Transmission({
       }
 
       for (let t of torrents) {
-        t = processTorrent(clientId, t)
+        t = await processTorrent(t)
         processChangedTorrent(t)
       }
     } catch (e) {

@@ -25,16 +25,16 @@ const configPathRelative = relative(
 const configAbsolutePath = join(workdir, configPath)
 const configFileURL = pathToFileURL(configAbsolutePath).href
 
-const config = await loadConfig(configFileURL, configAbsolutePath)
+const config = await loadConfig(configFileURL, configAbsolutePath, workdir)
 loadState(join(workdir, `state.json`))
 loggerSetLevels(config.logLevel)
 
 const clients = new Map()
 
 await Promise.all(
-  config.clients.map((args) => {
-    const Client = clientImplementations[args.type || "transmission"]
-    return Client({ ...args, changes })
+  config.clients.map((clientConfig) => {
+    const Client = clientImplementations["transmission"]
+    return Client({ ...clientConfig, changes, workdir })
   })
 ).then((_) => {
   for (let client of _) {
