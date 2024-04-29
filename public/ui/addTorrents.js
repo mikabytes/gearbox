@@ -1,44 +1,19 @@
-import { component, css, html, useState, useEffect } from "../component.js"
+import "./popup.js"
+
+import { component, css, html, useState } from "../component.js"
 import formatSize from "../formatSize.js"
 import * as torrentActions from "../torrentActions.js"
-import "./popup.js"
+import useConfig from "../useConfig.js"
 
 component(
   `x-add-torrents`,
   await css(import.meta.resolve(`./addTorrents.css`)),
   function AddTorrents({ torrentsToAdd, setTorrentsToAdd, done }) {
-    const [config, setConfig] = useState(null)
+    const config = useConfig()
     const [uploadText, setUploadText] = useState(null)
     const [fileSelection, setFileSelection] = useState(
       torrentsToAdd.map((it, index) => Array(it.files.length).fill(true))
     )
-
-    useEffect(() => {
-      async function updateConfig() {
-        const res = await fetch(`/config`)
-        if (res.ok) {
-          try {
-            const newConfig = await res.json()
-            setConfig(newConfig)
-          } catch (e) {
-            console.error(e)
-            setTimeout(updateConfig, 3000)
-          }
-        } else {
-          setTimeout(updateConfig, 3000)
-        }
-      }
-      updateConfig()
-
-      this.addEventListener(
-        `click`,
-        (e) => {
-          // we must be able to click within the form
-          e.stopPropagation()
-        },
-        []
-      )
-    }, [])
 
     function renderTorrent(
       index,

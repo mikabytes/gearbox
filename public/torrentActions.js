@@ -12,17 +12,19 @@ export async function add(args) {
   })
 
   if (!res.ok) {
-    console.error(res.status)
-    alert(`Unexpected response: ${res.status}`)
-    return res.status
+    const msg = `${await res.text()} (${res.status})`
+    console.error(msg)
+    alert(msg)
+    return msg
   }
 
   const json = await res.json()
   if (!json.result === `success`) {
     console.error(json.result)
     alert(json.result)
-    return json.result
   }
+
+  return json.result
 }
 
 export async function verify(ids) {
@@ -39,17 +41,19 @@ export async function verify(ids) {
   })
 
   if (!res.ok) {
-    console.error(res.status)
-    alert(`Unexpected response: ${res.status}`)
-    return res.status
+    const msg = `${await res.text()} (${res.status})`
+    console.error(msg)
+    alert(msg)
+    return msg
   }
 
   const json = await res.json()
   if (!json.result === `success`) {
     console.error(json.result)
     alert(json.result)
-    return json.result
   }
+
+  return json.result
 }
 
 export async function set(ids, fields) {
@@ -70,17 +74,19 @@ export async function set(ids, fields) {
   })
 
   if (!res.ok) {
-    console.error(res.status)
-    alert(`Unexpected response: ${res.status}`)
-    return res.status
+    const msg = `${await res.text()} (${res.status})`
+    console.error(msg)
+    alert(msg)
+    return msg
   }
 
   const json = await res.json()
   if (!json.result === `success`) {
     console.error(json.result)
     alert(json.result)
-    return json.result
   }
+
+  return json.result
 }
 
 export async function setLocation(ids, path) {
@@ -97,17 +103,19 @@ export async function setLocation(ids, path) {
   })
 
   if (!res.ok) {
-    console.error(res.status)
-    alert(`Unexpected response: ${res.status}`)
-    return res.status
+    const msg = `${await res.text()} (${res.status})`
+    console.error(msg)
+    alert(msg)
+    return msg
   }
 
   const json = await res.json()
   if (!json.result === `success`) {
     console.error(json.result)
     alert(json.result)
-    return json.result
   }
+
+  return json.result
 }
 
 export async function pause(ids) {
@@ -124,17 +132,19 @@ export async function pause(ids) {
   })
 
   if (!res.ok) {
-    console.error(res.status)
-    alert(`Unexpected response: ${res.status}`)
-    return res.status
+    const msg = `${await res.text()} (${res.status})`
+    console.error(msg)
+    alert(msg)
+    return msg
   }
 
   const json = await res.json()
   if (!json.result === `success`) {
     console.error(json.result)
     alert(json.result)
-    return json.result
   }
+
+  return json.result
 }
 
 export async function resume(ids) {
@@ -151,17 +161,19 @@ export async function resume(ids) {
   })
 
   if (!res.ok) {
-    console.error(res.status)
-    alert(`Unexpected response: ${res.status}`)
-    return res.status
+    const msg = `${await res.text()} (${res.status})`
+    console.error(msg)
+    alert(msg)
+    return msg
   }
 
   const json = await res.json()
   if (!json.result === `success`) {
     console.error(json.result)
     alert(json.result)
-    return json.result
   }
+
+  return json.result
 }
 
 export async function remove(ids, deleteLocalFiles = false) {
@@ -181,9 +193,17 @@ export async function remove(ids, deleteLocalFiles = false) {
   })
 
   if (!res.ok) {
-    const error = await res.text()
-    console.error(error)
-    alert(error)
-    return
+    const msg = `${await res.text()} (${res.status})`
+    console.error(msg)
+    alert(msg)
+    return msg
   }
+
+  const json = await res.json()
+  if (!json.result === `success`) {
+    console.error(json.result)
+    alert(json.result)
+  }
+
+  return json.result
 }

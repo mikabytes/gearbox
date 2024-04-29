@@ -1,4 +1,5 @@
 import "./setLocation.js"
+import "./transfer.js"
 
 import { repeat } from "lit-html/directives/repeat.js"
 
@@ -27,6 +28,7 @@ component(
     selections: _selections,
     setSelections,
   }) {
+    const [transfer, setTransfer] = useState(null)
     const [changeLocation, setChangeLocation] = useState(false)
     const selections = Selections.call(this, {
       torrents,
@@ -40,6 +42,7 @@ component(
       setShowDetails,
       torrents,
       setChangeLocation,
+      setTransfer,
     })
     Shortcuts.call(this, {
       selections,
@@ -134,13 +137,23 @@ component(
         ? ``
         : html`
             <x-set-location
-              .title="Set Location"
               .torrents=${changeLocation.map((id) =>
                 torrents.find((t) => t.id === id)
               )}
               .onDone=${() => setChangeLocation(false)}
             >
             </x-set-location>
+          `}
+      ${!transfer
+        ? ``
+        : html`
+            <x-transfer
+              .torrents=${transfer.map((id) =>
+                torrents.find((t) => t.id === id)
+              )}
+              .onDone=${() => setTransfer(false)}
+            >
+            </x-transfer>
           `}
     `
   }

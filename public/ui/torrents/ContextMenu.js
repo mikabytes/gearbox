@@ -7,6 +7,7 @@ export default function ContextMenu({
   setShowDetails,
   torrents,
   setChangeLocation,
+  setTransfer,
 }) {
   const [position, setPosition] = useState(false)
 
@@ -98,6 +99,14 @@ export default function ContextMenu({
               }}
             >
               Set location
+            </button>
+            <button
+              @click=${() => {
+                setPosition(false)
+                setTransfer(selections.getIds())
+              }}
+            >
+              Transfer
             </button>
             <div class="divider"></div>
             <button

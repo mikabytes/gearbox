@@ -1,7 +1,36 @@
+import fs from "fs/promises"
+import path from "path"
 import getConfig from "../config.js"
 let incr = 0
 
 export default async function torrentAdd(clients, args) {
+  // torrentFile is a local (to gearbox) torrent file. We'll convert it to metainfo,
+  // This handles the case when the remote client is not on the same machine as the local client
+  if (args.torrentFile) {
+    if (args.metainfo) {
+      throw new Error(`Can't specify both 'torrentFile' and 'metainfo'!`)
+    }
+
+    const torrentFilePath = path.resolve(args.torrentFile)
+
+    let exists
+    try {
+      exists = await fs.stat(torrentFilePath)
+    } catch (e) {
+      exists = false
+    }
+
+    if (exists) {
+      const torrentFileData = await fs.readFile(torrentFilePath)
+      args.metainfo = Buffer.from(torrentFileData).toString(`base64`)
+      delete args.torrentFile
+    } else {
+      throw new Error(`File ${args.torrentFile} does not exist`)
+    }
+
+    delete args.torrentFile
+  }
+
   // if client requested a specific client, then let's use that
   // args.clientId is an extension of Transmission RPC
   const specificClientId = args.clientId
@@ -42,5 +71,9 @@ export default async function torrentAdd(clients, args) {
 
   const response = await client.request(`torrent-add`, args)
 
-  return response
+  if (response.result !== `success`) {
+    throw new Error(`Failed to add torrent: ${response.result}`)
+  }
+
+  return response.arguments
 }

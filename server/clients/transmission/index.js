@@ -65,6 +65,9 @@ export default async function Transmission({
         )
 
         try {
+          logger.debug(
+            `Copying torrent from "${clientTorrent}" to "${gearboxTorrent}"`
+          )
           await fs.copyFile(clientTorrent, gearboxTorrent)
           gearboxTorrentFiles.add(filename)
         } catch (e) {

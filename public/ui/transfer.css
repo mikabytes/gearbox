@@ -1,0 +1,64 @@
+:host {
+  max-height: 90%;
+  overflow-y: auto;
+}
+
+button {
+  background-color: var(--secondary);
+  color: #efefef;
+  font-weight: bold;
+}
+
+button:disabled {
+  background-color: var(--gray);
+}
+
+summary {
+  padding: 16px 0;
+}
+
+#status {
+  margin-top: 8px;
+  padding: 8px;
+  border: 1px solid var(--darkgray);
+  background-color: #333;
+  color: var(--lightgray);
+  width: 360px;
+  box-sizing: border-box;
+  padding-right: 15px;
+}
+
+.statusItem {
+  border: 1px solid var(--gray);
+  padding: 8px;
+  margin: 8px 0;
+}
+
+.entries {
+  display: flex;
+}
+
+.name {
+  margin-bottom: 8px;
+}
+
+.entry {
+  margin: 0 5px;
+}
+
+.entry.working:before {
+  content: "� ";
+}
+
+.entry.success:before {
+  content: "✅ ";
+}
+
+.entry.error:before {
+  content: "✗ ";
+  color: red;
+}
+
+.error > .message {
+  color: red;
+}
