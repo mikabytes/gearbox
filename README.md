@@ -4,7 +4,7 @@
 
 # Gearbox
 
-Gearbox is a modern web UI for Transmission, designed to efficiently manage over 300,000 torrents.
+Gearbox is a modern web UI for Transmission, designed to efficiently manage over 300,000 torrents across several torrent clients.
 
 [Try live demo](https://demo-gearbox.xod.se)
 
@@ -155,6 +155,15 @@ Gearbox implements the [Transmission RPC protocol](https://github.com/transmissi
 There are a few differences. When adding torrents you can specify which torrent client should receive the new torrent using the non-standard `clientId` field. If this field is omitted, the `addTorrentStrategy` together with `maxCount` will be used to pick a client.
 
 When using `session-get`, a reasonable hard-coded default is returned. `session-set` is not supported.
+
+## Transfer: Moving torrents between clients
+
+Gearbox supports transferring torrents between clients, with some limitations:
+
+- `torrentDir` must be set on the client transfering _from_.
+- The `torrentDir` must be accessible by Gearbox.
+
+For setups where Gearbox and the torrent clients run on the same machine, compatibility issues are unlikely. However, if they operate on separate machines, ensure that you mount the remote filesystem. Additionally, maintain consistent paths across all systems. For instance, if Transmission uses `/config/torrents`, Gearbox should also also access these files on `/config/torrents`.
 
 ## Roadmap
 
