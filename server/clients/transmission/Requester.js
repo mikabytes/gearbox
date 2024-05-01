@@ -29,7 +29,11 @@ export default function Requester(host, { user, password } = {}) {
     }
 
     if (log) {
-      logger.debug(`Subrequest to ${host}: ${method} ${JSON.stringify(args)}`)
+      const logObj = { ...args }
+      if (logObj.metainfo) {
+        logObj.metainfo = `<base64>`
+      }
+      logger.debug(`Subrequest to ${host}: ${method} ${JSON.stringify(logObj)}`)
     }
 
     if (!response.ok) {

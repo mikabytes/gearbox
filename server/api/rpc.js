@@ -23,7 +23,7 @@ export default function rpc({ request, connections }) {
 
     const { method, arguments: args, tag } = req.body
 
-    logger.debug(`RPC: ${req.rawBody}`)
+    logger.debug(`RPC: ${req.rawBody.slice(0, 1000)}`)
 
     // strikethrough while they're being removed
     if (method === `torrent-remove`) {
