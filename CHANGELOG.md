@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.17.0](https://github.com/mikabytes/gearbox/compare/v0.16.1...v0.17.0) (2024-05-01)
+
+
+### Features
+
+* Added support for transferring torrents (not data) between clients! ([ba319ab](https://github.com/mikabytes/gearbox/commit/ba319ab498e8b3ca1dc9831dd0dd1e3972d558cd))
+* Gearbox now copies the .torrent files into its own .../torrents folder, enabling cross-seed support. 'torrentsDir' must be set to enable this feature ([8fece0a](https://github.com/mikabytes/gearbox/commit/8fece0a9443a1ad602f9b66c6e25468e2da74f2a))
+* Sidebar now togglable. Auto-hides or floats on small screens. ([774addf](https://github.com/mikabytes/gearbox/commit/774addf45ae06e721ea14f546666e8805eb80b92))
+
+
+### Bug Fixes
+
+* Limit debug logging so that base64-encoded files don't overwhelm the console ([ccbe8a0](https://github.com/mikabytes/gearbox/commit/ccbe8a0cb9b409137e5bbf538a2ebe741d8e633a))
+* Move error sidebar filter higher up to draw more attention. Fixes [#30](https://github.com/mikabytes/gearbox/issues/30) ([d082951](https://github.com/mikabytes/gearbox/commit/d08295196ca5d7d15cb0a13f4f971235483cfa4e))
+* Return response from client appropriately. Fixes [#31](https://github.com/mikabytes/gearbox/issues/31) ([3d410d3](https://github.com/mikabytes/gearbox/commit/3d410d3d13adb641c23f8cb0e7bb3241bf664719))
+
 ## [0.16.1](https://github.com/mikabytes/gearbox/compare/v0.16.0...v0.16.1) (2024-04-24)
 
 
