@@ -17,7 +17,7 @@ export default function selectionManager({
       return
     }
 
-    if (e.ctrlKey) {
+    if (e.ctrlKey && !e.shiftKey) {
       if (selections.includes(id)) {
         setSelections(selections.filter((k) => k !== id))
       } else {
@@ -26,7 +26,22 @@ export default function selectionManager({
       return
     }
 
-    if (e.shiftKey) {
+    if (e.shiftKey && !e.ctrlKey) {
+      let startIndex = torrents.findIndex((t) => t.id === id)
+      let stopIndex = torrents.findIndex(
+        (t) => t.id === selections[selections.length - 1]
+      )
+
+      if (startIndex > stopIndex) {
+        ;[startIndex, stopIndex] = [stopIndex, startIndex]
+      }
+
+      setSelections([
+        ...new Set(torrents.slice(startIndex, stopIndex + 1).map((t) => t.id)),
+      ])
+    }
+
+    if (e.shiftKey && e.ctrlKey) {
       let startIndex = torrents.findIndex((t) => t.id === id)
       let stopIndex = torrents.findIndex(
         (t) => t.id === selections[selections.length - 1]
