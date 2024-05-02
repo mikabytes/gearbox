@@ -9,7 +9,11 @@ export default function selectionManager({
     const id = _id || +this.dataset.id
 
     if (!e.shiftKey && !e.ctrlKey) {
-      setSelections([id])
+      if (selections.length === 1 && selections[0] === id) {
+        setSelections([])
+      } else {
+        setSelections([id])
+      }
       return
     }
 
