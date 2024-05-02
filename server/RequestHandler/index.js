@@ -20,6 +20,10 @@ const mapper = {
   "torrent-rename-path": generic,
   "session-set": sessionSet,
   "session-get": sessionGet,
+  "queue-move-top": generic,
+  "queue-move-up": generic,
+  "queue-move-down": generic,
+  "queue-move-bottom": generic,
 }
 
 export default function RequestHandler({ clients, config }) {
