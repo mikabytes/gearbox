@@ -33,7 +33,7 @@ const clients = new Map()
 
 await Promise.all(
   config.clients.map((clientConfig) => {
-    const Client = clientImplementations["transmission"]
+    const Client = clientImplementations[clientConfig.type]
     return Client({ ...clientConfig, changes, workdir })
   })
 ).then((_) => {

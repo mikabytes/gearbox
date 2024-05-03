@@ -7,6 +7,7 @@ export const DOWNLOAD_WAIT = 3
 export const DOWNLOAD = 4
 export const SEED_WAIT = 5
 export const SEED = 6
+export const UNKNOWN = 7
 
 export function friendlyName(status) {
   switch (status) {

@@ -195,9 +195,7 @@ function makeProgress(torrent) {
     case enums.SEED:
       progress = 100
       text = enums.friendlyName(torrent.status)
-      const speed = torrent.peers
-        .map((peer) => peer.rateToPeer)
-        .reduce((a, b) => a + b, 0)
+      const speed = torrent.rateUpload
       if (speed > 0) {
         text = `▲ ${formatSize(speed)}/s`
       }
@@ -206,12 +204,7 @@ function makeProgress(torrent) {
     case enums.DOWNLOAD: {
       progress = Math.floor(torrent.percentDone * 100)
 
-      const speed =
-        formatSize(
-          torrent.peers
-            .map((peer) => peer.rateToClient)
-            .reduce((a, b) => a + b, 0)
-        ) + `/s`
+      const speed = formatSize(torrent.rateDownload) + `/s`
 
       text = `▼ ${speed} ${progress}%`
       break

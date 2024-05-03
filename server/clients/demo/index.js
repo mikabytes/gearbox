@@ -68,7 +68,7 @@ export default function DemoAdapter({ id: clientId, changes: _changes }) {
           sitename: name.slice(0, 1) + `-tracker`,
         },
       ],
-      peers: [],
+      rateDownload: 0,
       trackerStats: [],
       uploadRatio: 0,
       totalSize: Math.floor(Math.random() * 10000000),
@@ -88,12 +88,7 @@ export default function DemoAdapter({ id: clientId, changes: _changes }) {
     if (torrent.percentDone < 1.0) {
       changeSet.percentDone = Math.min(torrent.percentDone + progressRate, 1.0)
       const seederCount = Math.floor(Math.random() * 10)
-      changeSet.peers = [
-        {
-          rateToClient: Math.round(progressRate * 100000),
-          rateToPeer: 0,
-        },
-      ]
+      changeSet.rateDownload = Math.round(progressRate * 100000)
       changeSet.trackerStats = [
         {
           leecherCount: Math.floor(Math.random() * 3),
