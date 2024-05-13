@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.17.1](https://github.com/mikabytes/gearbox/compare/v0.17.0...v0.17.1) (2024-05-13)
+
+
+### Bug Fixes
+
+* Added queue actions, sometimes used by Sonarr ([2d66f53](https://github.com/mikabytes/gearbox/commit/2d66f533b8d759efc54c96322832003f4d286eb6))
+* ctrl+click picks selections, shift+click deselects and selects all from last to pick, ctrl+shift+click combines the two ([85da264](https://github.com/mikabytes/gearbox/commit/85da2640ad15db3b2a0596731c8e8a3eae288ab0))
+* Demo implementation to use same rateUpload/rateDownload as Transmission. Fixes crashed demo ([6abc799](https://github.com/mikabytes/gearbox/commit/6abc799868616f6496b30434c68cc7166153bc96))
+* when only one torrent is selected and clicked again, it is deselected ([6c2c0dc](https://github.com/mikabytes/gearbox/commit/6c2c0dce382eb06b31d6b7359bea1a1e4cd600ef))
+
 ## [0.17.0](https://github.com/mikabytes/gearbox/compare/v0.16.1...v0.17.0) (2024-05-01)
 
 
