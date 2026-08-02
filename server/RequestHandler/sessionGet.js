@@ -14,11 +14,16 @@ export default async function sessionGet(clients, args) {
   }
 
   if (args.fields.includes(`download-dir`)) {
-    const firstClient = clients.values().next().value
-    const session = (
-      await firstClient.request(`session-get`, { fields: [`download-dir`] })
-    ).arguments
-    ret[`download-dir`] = session[`download-dir`]
+    const sessionClient = [...clients.values()].find(
+      (client) =>
+        client.available !== false && client.capabilities.sessionGet
+    )
+    if (sessionClient) {
+      const session = await sessionClient.sessionGet({
+        fields: [`download-dir`],
+      })
+      ret[`download-dir`] = session[`download-dir`]
+    }
   }
 
   return ret

@@ -10,7 +10,13 @@ import _jsonBigint from "json-bigint"
 
 const jsonBigint = _jsonBigint({ useNativeBigInt: true })
 
-export default function makeApi({ stream, getAll, request, count, config }) {
+export default function makeApi({
+  stream,
+  getAll,
+  request,
+  count,
+  publicConfig,
+}) {
   const connections = new Map()
 
   const app = express.Router()
@@ -41,7 +47,7 @@ export default function makeApi({ stream, getAll, request, count, config }) {
   })
   app.get(`/all`, compression(), all({ getAll, count }))
   app.get(`/config`, (req, res) => {
-    res.json(config)
+    res.json(publicConfig())
   })
 
   return app

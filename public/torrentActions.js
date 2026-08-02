@@ -19,12 +19,32 @@ export async function add(args) {
   }
 
   const json = await res.json()
-  if (!json.result === `success`) {
+  if (json.result !== `success`) {
     console.error(json.result)
     alert(json.result)
   }
 
   return json.result
+}
+
+export async function get(ids, fields) {
+  const res = await fetch(`/transmission/rpc`, {
+    method: `POST`,
+    headers: {
+      "Content-Type": `application/json`,
+      "X-Transmission-Session-Id": `GEARBOX`,
+    },
+    body: JSON.stringify({
+      method: `torrent-get`,
+      arguments: { ids, fields },
+    }),
+  })
+
+  const json = await res.json()
+  if (!res.ok || json.result !== `success`) {
+    throw new Error(json.result || `Failed to get torrent (${res.status})`)
+  }
+  return json.arguments.torrents
 }
 
 export async function verify(ids) {
@@ -48,7 +68,7 @@ export async function verify(ids) {
   }
 
   const json = await res.json()
-  if (!json.result === `success`) {
+  if (json.result !== `success`) {
     console.error(json.result)
     alert(json.result)
   }
@@ -81,7 +101,7 @@ export async function set(ids, fields) {
   }
 
   const json = await res.json()
-  if (!json.result === `success`) {
+  if (json.result !== `success`) {
     console.error(json.result)
     alert(json.result)
   }
@@ -110,7 +130,7 @@ export async function setLocation(ids, path) {
   }
 
   const json = await res.json()
-  if (!json.result === `success`) {
+  if (json.result !== `success`) {
     console.error(json.result)
     alert(json.result)
   }
@@ -139,7 +159,7 @@ export async function pause(ids) {
   }
 
   const json = await res.json()
-  if (!json.result === `success`) {
+  if (json.result !== `success`) {
     console.error(json.result)
     alert(json.result)
   }
@@ -168,7 +188,7 @@ export async function resume(ids) {
   }
 
   const json = await res.json()
-  if (!json.result === `success`) {
+  if (json.result !== `success`) {
     console.error(json.result)
     alert(json.result)
   }

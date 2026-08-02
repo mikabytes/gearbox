@@ -4,21 +4,28 @@ export default function useConfig() {
   const [config, setConfig] = useState(null)
 
   useEffect(() => {
+    let active = true
+    let timer
+
     async function updateConfig() {
-      const res = await fetch(`/config`)
-      if (res.ok) {
-        try {
+      try {
+        const res = await fetch(`/config`)
+        if (res.ok) {
           const newConfig = await res.json()
-          setConfig(newConfig)
-        } catch (e) {
-          console.error(e)
-          setTimeout(updateConfig, 3000)
+          if (active) setConfig(newConfig)
         }
-      } else {
-        setTimeout(updateConfig, 3000)
+      } catch (error) {
+        console.error(error)
+      } finally {
+        if (active) timer = setTimeout(updateConfig, 5000)
       }
     }
     updateConfig()
+
+    return () => {
+      active = false
+      clearTimeout(timer)
+    }
   }, [])
 
   return config

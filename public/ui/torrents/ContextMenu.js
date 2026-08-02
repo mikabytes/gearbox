@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo, html } from "../../component.js"
 import * as torrentActions from "../../torrentActions.js"
+import useConfig from "../../useConfig.js"
 
 export default function ContextMenu({
   selections,
@@ -10,6 +11,7 @@ export default function ContextMenu({
   setTransfer,
 }) {
   const [position, setPosition] = useState(false)
+  const config = useConfig()
 
   useEffect(() => {
     function removeContextMenu() {
@@ -45,6 +47,29 @@ export default function ContextMenu({
     return torrents.filter((torrent) => selections.includes(torrent.id))
   }, [selections, torrents])
 
+  function supports(capability) {
+    return (
+      selectedTorrents.length > 0 &&
+      selectedTorrents.every((torrent) =>
+        config?.clients.find(
+          (client) =>
+            client.id === torrent.clientId &&
+            client.state === `online` &&
+            client.capabilities?.[capability]
+        )
+      )
+    )
+  }
+
+  const canTransfer =
+    supports(`transfer`) &&
+    config?.clients.some(
+      (client) =>
+        client.state === `online` &&
+        client.capabilities?.addTorrent &&
+        !selectedTorrents.some((torrent) => torrent.clientId === client.id)
+    )
+
   function pause() {
     const notPaused = selectedTorrents.filter((t) => t.status !== 0)
     torrentActions.pause(notPaused.map((t) => t.id))
@@ -58,6 +83,7 @@ export default function ContextMenu({
   return {
     show,
     hide,
+    supports,
     html: !position
       ? html``
       : html`
@@ -68,6 +94,7 @@ export default function ContextMenu({
             style="left: ${position[0]}px; top: ${position[1]}px;"
           >
             <button
+              ?disabled=${!supports(`stopTorrents`)}
               @click=${() => {
                 setPosition(false)
                 pause()
@@ -76,6 +103,7 @@ export default function ContextMenu({
               Pause
             </button>
             <button
+              ?disabled=${!supports(`startTorrents`)}
               @click=${() => {
                 setPosition(false)
                 resume()
@@ -85,6 +113,7 @@ export default function ContextMenu({
             </button>
             <div class="divider"></div>
             <button
+              ?disabled=${!supports(`verifyTorrents`)}
               @click=${() => {
                 setPosition(false)
                 verify(selections.getIds())
@@ -93,6 +122,7 @@ export default function ContextMenu({
               Verify
             </button>
             <button
+              ?disabled=${!supports(`setLocation`)}
               @click=${() => {
                 setPosition(false)
                 setChangeLocation(selections.getIds())
@@ -101,6 +131,7 @@ export default function ContextMenu({
               Set location
             </button>
             <button
+              ?disabled=${!canTransfer}
               @click=${() => {
                 setPosition(false)
                 setTransfer(selections.getIds())
@@ -110,6 +141,7 @@ export default function ContextMenu({
             </button>
             <div class="divider"></div>
             <button
+              ?disabled=${!supports(`removeTorrents`)}
               @click=${() => {
                 setPosition(false)
                 removeTorrent.remove(selections.getIds())

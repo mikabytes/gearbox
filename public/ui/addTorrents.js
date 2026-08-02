@@ -134,10 +134,15 @@ component(
       >
         <select slot="buttons">
           <option value="">Auto</option>
-          ${(config?.clients || []).map(
-            (client) =>
-              html` <option value="${client.id}">${client.id}</option>`
-          )}
+          ${(config?.clients || [])
+            .filter(
+              (client) =>
+                client.state === `online` && client.capabilities?.addTorrent
+            )
+            .map(
+              (client) =>
+                html` <option value="${client.id}">${client.id}</option>`
+            )}
         </select>
         <button
           id="add"

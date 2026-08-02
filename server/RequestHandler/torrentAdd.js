@@ -38,15 +38,26 @@ export default async function torrentAdd(clients, args) {
 
   if (specificClientId) {
     if (clients.has(specificClientId)) {
-      return await clients.get(specificClientId).request(`torrent-add`, args)
+      const client = clients.get(specificClientId)
+      if (client.available === false) {
+        throw new Error(`Client ${specificClientId} is not available`)
+      }
+      if (!client.capabilities.addTorrent) {
+        throw new Error(
+          `Client ${specificClientId} does not support adding torrents`
+        )
+      }
+      return await client.addTorrent(args)
     } else {
-      throw new Error(`Client ${specificClientId} not found`)
+      throw new Error(`Client ${specificClientId} is not available`)
     }
   }
 
   const config = getConfig()
 
   let available = [...clients.values()].filter((c) => {
+    if (c.available === false) return false
+    if (!c.capabilities.addTorrent) return false
     const clientConfig = config.clients.find((client) => client.id === c.id)
     const maxCount = clientConfig.maxCount
 
@@ -69,11 +80,5 @@ export default async function torrentAdd(clients, args) {
     throw new Error(`Strategy ${strategy} not implemented.`)
   }
 
-  const response = await client.request(`torrent-add`, args)
-
-  if (response.result !== `success`) {
-    throw new Error(`Failed to add torrent: ${response.result}`)
-  }
-
-  return response.arguments
+  return await client.addTorrent(args)
 }

@@ -37,7 +37,9 @@ component(
       entry.count += 1
 
       // Tracker
-      const sitenames = new Set(t.trackers.map((t) => t.sitename))
+      const sitenames = new Set(
+        t.trackers.map((tracker) => tracker.sitename).filter(Boolean)
+      )
       for (const sitename of sitenames) {
         entry = byTracker.get(sitename)
         if (!entry) {
@@ -81,7 +83,8 @@ component(
       byClient.get(torrent.clientId).torrentSelected = true
 
       for (const tracker of torrent.trackers) {
-        byTracker.get(tracker.sitename).torrentSelected = true
+        const entry = byTracker.get(tracker.sitename)
+        if (entry) entry.torrentSelected = true
       }
 
       for (const label of torrent.labels) {

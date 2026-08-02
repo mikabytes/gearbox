@@ -1,6 +1,5 @@
 import { decode } from "./guid.js"
-import { isId, isSHA1Hash } from "./validators.js"
-import logger from './logger.js'
+import { isId, isTorrentHash } from "./validators.js"
 
 // returns an iterator over clients, which in turn returns an iterator over their torrents matching the ids
 //
@@ -35,7 +34,7 @@ function* getTorrents(client, ids) {
   }
 
   if (!Array.isArray(ids)) {
-    if (isId(ids)) {
+    if (isId(ids) || isTorrentHash(ids)) {
       ids = [ids]
     } else {
       throw new Error(`ids must be an array, "recently-active", or omitted`)
@@ -50,11 +49,12 @@ function* getTorrents(client, ids) {
       if (clientId !== client.id) {
         continue
       }
-      yield client.get(id)
-    } else if (isSHA1Hash(id)) {
+      const torrent = client.get(id)
+      if (torrent) yield torrent
+    } else if (isTorrentHash(id)) {
       // inefficient, but using hash is a rare operation
       for (const torrent of client.getAll()) {
-        if (torrent.hashString === id) {
+        if (torrent.hashString.toLowerCase() === id.toLowerCase()) {
           yield torrent
           continue outer
         }

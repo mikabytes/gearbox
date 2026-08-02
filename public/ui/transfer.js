@@ -22,10 +22,14 @@ component(
     const apply = async () => {
       const targetClientId = this.shadowRoot.querySelector(`select`).value
 
-      if (
-        !targetClientId ||
-        !config.clients.find((c) => c.id === targetClientId)
-      ) {
+      const target = config?.clients.find(
+        (client) =>
+          client.id === targetClientId &&
+          client.state === `online` &&
+          client.capabilities?.addTorrent &&
+          !torrents.some((torrent) => torrent.clientId === client.id)
+      )
+      if (!target) {
         alert(`Please select a target client.`)
         return
       }
@@ -37,16 +41,29 @@ component(
         status[index] = statusItem
         setStatus([...status])
 
-        const result = await actions.add({
-          clientId: targetClientId,
-          torrentFile: torrent.torrentFile,
-          "download-dir": torrent.downloadDir,
-        })
+        let result
+        try {
+          result = await actions.add({
+            clientId: targetClientId,
+            torrentFile: torrent.torrentFile,
+            "download-dir": torrent.downloadDir,
+          })
+        } catch (error) {
+          result = error.message
+        }
 
         statusItem.copy = result
         setStatus([...status])
 
         if (result !== `success`) {
+          break
+        }
+
+        try {
+          await waitForTarget(torrent, targetClientId)
+        } catch (error) {
+          statusItem.copy = error.message
+          setStatus([...status])
           break
         }
 
@@ -77,10 +94,17 @@ component(
         <label>What client should be the new owner?</label>
         <select>
           <option value=""></option>
-          ${(config?.clients || []).map(
-            (client) =>
-              html` <option value="${client.id}">${client.id}</option>`
-          )}
+          ${(config?.clients || [])
+            .filter(
+              (client) =>
+                client.state === `online` &&
+                client.capabilities?.addTorrent &&
+                !torrents.some((torrent) => torrent.clientId === client.id)
+            )
+            .map(
+              (client) =>
+                html` <option value="${client.id}">${client.id}</option>`
+            )}
         </select>
         <button ?disabled=${disabled} slot="buttons" @click=${apply}>
           Apply
@@ -125,3 +149,22 @@ component(
     `
   }
 )
+
+async function waitForTarget(torrent, targetClientId) {
+  const startedAt = Date.now()
+  while (Date.now() - startedAt < 30000) {
+    const matches = await actions.get([torrent.hashString], [
+      `clientId`,
+      `hashString`,
+      `downloadDir`,
+    ])
+    const target = matches.find((item) => item.clientId === targetClientId)
+    if (target && samePath(target.downloadDir, torrent.downloadDir)) return
+    await new Promise((resolve) => setTimeout(resolve, 500))
+  }
+  throw new Error(`Destination did not confirm the torrent and path`)
+}
+
+function samePath(left, right) {
+  return `${left}`.replace(/[\\/]+$/, ``) === `${right}`.replace(/[\\/]+$/, ``)
+}

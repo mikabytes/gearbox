@@ -1,4 +1,4 @@
-import fields from "../clients/transmission/fields.js"
+import fields from "../clients/fields.js"
 import logger from "../logger.js"
 import lookup from "../lookup.js"
 
@@ -7,16 +7,15 @@ export default async function torrentGet(clients, args) {
     throw new Error(`fields must be an array`)
   }
 
-  for (const field of args.fields) {
+  const requestedFields = args.fields.filter((field) => {
     if (!fields.includes(field)) {
       logger.debug(
         `An invalid field "${field}" was requested, it will be ignored`
       )
-
-      // remove it from fields
-      args.fields.splice(args.fields.indexOf(field), 1)
+      return false
     }
-  }
+    return true
+  })
 
   // iterator avoids creating an intermediary array
   const all = (function* () {
@@ -28,16 +27,18 @@ export default async function torrentGet(clients, args) {
   let formattedTorrentArray
 
   if (args.format === `table`) {
-    formattedTorrentArray = [args.fields]
+    formattedTorrentArray = [requestedFields]
 
     for (const torrent of all) {
-      formattedTorrentArray.push(args.fields.map((field) => torrent[field]))
+      formattedTorrentArray.push(
+        requestedFields.map((field) => torrent[field])
+      )
     }
   } else {
     formattedTorrentArray = [
       ...all.map((torrent) => {
         const ret = {}
-        for (const field of args.fields) {
+        for (const field of requestedFields) {
           ret[field] = torrent[field]
         }
         return ret

@@ -23,9 +23,9 @@ export async function loadConfig(configFileUrl, absolutePath, workdir) {
   clients: [
     {
       id: "main",
-      host: "127.0.0.1",
-      port: 9091,
-      user: "",
+      type: "transmission",
+      url: "http://127.0.0.1:9091",
+      username: "",
       password: "",
       //torrentDir: "/config/torrents" // uncomment to enable moving torrents between clients
     }
@@ -47,7 +47,32 @@ export async function loadConfig(configFileUrl, absolutePath, workdir) {
     config.clients = config.backends
   }
 
+  if (!Array.isArray(config.clients)) {
+    throw new Error(`Configuration must contain a clients array`)
+  }
+
+  if (config.clients.length > 511) {
+    throw new Error(`Gearbox supports at most 511 configured clients`)
+  }
+
+  const clientIds = new Set()
+
   for (const client of config.clients) {
+    if (!client.id || typeof client.id !== `string`) {
+      throw new Error(`Every client must have a non-empty id`)
+    }
+    if (!/^[a-z0-9]+$/.test(client.id)) {
+      throw new Error(`Client id "${client.id}" must contain only a-z and 0-9`)
+    }
+    if (clientIds.has(client.id)) {
+      throw new Error(`Client id "${client.id}" is configured more than once`)
+    }
+    clientIds.add(client.id)
+
+    if (!client.type) {
+      client.type = `transmission`
+    }
+
     // set defaults
     if (
       client.maxCount === undefined ||
@@ -60,6 +85,21 @@ export async function loadConfig(configFileUrl, absolutePath, workdir) {
     // this field used to be called ip, we keep supporting it
     if (!client.host && client.ip) {
       client.host = client.ip
+    }
+
+    if (!client.username && client.user) {
+      client.username = client.user
+    }
+    if (!client.user && client.username) {
+      client.user = client.username
+    }
+
+    if (client.url) {
+      try {
+        client.url = new URL(client.url).toString().replace(/\/$/, ``)
+      } catch {
+        throw new Error(`Client "${client.id}" has an invalid url`)
+      }
     }
 
     // disallow undefined, null, or empty string
@@ -79,10 +119,6 @@ export async function loadConfig(configFileUrl, absolutePath, workdir) {
           `Torrent directory "${client.torrentDir}" does not exist`
         )
       }
-    }
-
-    if (!client.type) {
-      client.type = `transmission`
     }
   }
 

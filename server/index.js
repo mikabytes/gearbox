@@ -8,6 +8,11 @@ import { pathToFileURL, fileURLToPath } from "url"
 import { loadConfig } from "./config.js"
 import RequestHandler from "./RequestHandler/index.js"
 import clientImplementations from "./clients/index.js"
+import ClientManager from "./clients/ClientManager.js"
+import IdAllocator from "./clients/shared/IdAllocator.js"
+import TorrentStore from "./clients/shared/TorrentStore.js"
+import * as guid from "./guid.js"
+import logger from "./logger.js"
 import { setLevels as loggerSetLevels } from "./logger.js"
 import start from "./server.js"
 import { load as loadState } from "./state.js"
@@ -26,21 +31,35 @@ const configAbsolutePath = join(workdir, configPath)
 const configFileURL = pathToFileURL(configAbsolutePath).href
 
 const config = await loadConfig(configFileURL, configAbsolutePath, workdir)
-loadState(join(workdir, `state.json`))
+await loadState(join(workdir, `state.json`))
 loggerSetLevels(config.logLevel)
 
-const clients = new Map()
-
-await Promise.all(
-  config.clients.map((clientConfig) => {
-    const Client = clientImplementations[clientConfig.type]
-    return Client({ ...clientConfig, changes, workdir })
-  })
-).then((_) => {
-  for (let client of _) {
-    clients.set(client.id, client)
-  }
+const idAllocator = await IdAllocator({
+  filename: join(workdir, `torrent-ids.json`),
+  logger,
 })
+const torrentStore = await TorrentStore({ workdir, logger })
+const clientManager = ClientManager({
+  clientConfigs: config.clients,
+  implementations: clientImplementations,
+  logger,
+  dependencies: {
+    changes,
+    fetch: globalThis.fetch,
+    logger,
+    now: Date.now,
+    schedule: setTimeout,
+    torrentStore,
+    globalId(clientId, nativeId) {
+      return guid.encode({
+        clientId,
+        torrentId: idAllocator.allocate(clientId, nativeId),
+      })
+    },
+  },
+})
+const clients = await clientManager.start()
+await idAllocator.flush()
 
 initialized = true
 
@@ -55,6 +74,7 @@ function changes(entry) {
 }
 
 start({
+  config,
   stream(newCb) {
     cb = newCb
   },
@@ -71,5 +91,10 @@ start({
     return total
   },
   request: RequestHandler({ clients, config }),
-  config,
+  publicConfig() {
+    return {
+      addTorrentStrategy: config.addTorrentStrategy,
+      clients: clientManager.publicClients(),
+    }
+  },
 })

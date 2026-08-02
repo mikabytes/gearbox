@@ -49,6 +49,7 @@ component(
       torrents,
       removeTorrent,
       setChangeLocation,
+      supports: contextMenu.supports,
     })
     ScrollIntoView.call(this, { selections })
     FilterSideEffects.call(this, {

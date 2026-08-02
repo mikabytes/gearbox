@@ -4,7 +4,7 @@
 
 # Gearbox
 
-Gearbox is a modern web UI for Transmission, designed to efficiently manage over 300,000 torrents across several torrent clients.
+Gearbox is a modern federated web UI for Transmission, qBittorrent, and Deluge. It is designed to efficiently manage over 300,000 torrents across many torrent client instances.
 
 [Try live demo](https://demo-gearbox.xod.se)
 
@@ -61,17 +61,28 @@ Example `config.mjs`:
 ```js
 export default {
     clients: [
-        { id: `torr1`, host: "192.168.0.1", port: 9091, type: "transmission" },
-        { id: `torr2`, host: "127.0.0.1", port: 9091, type: "transmission" },
         {
-            id: `torr3`,
-            host: "10.0.107.1",
-            port: 80,
-            user: "admin",
-            password: "supersecret",
+            id: `transmission1`,
             type: "transmission",
+            url: "http://127.0.0.1:9091",
+            username: "admin",
+            password: "supersecret",
             maxCount: 5000,
             torrentDir: "/config/torrents",
+        },
+        {
+            id: `qbit1`,
+            type: "qbittorrent",
+            url: "http://127.0.0.1:8080",
+            username: "admin",
+            password: "supersecret",
+        },
+        {
+            id: `deluge1`,
+            type: "deluge",
+            url: "http://127.0.0.1:8112",
+            password: "deluge-web-password",
+            // daemonId: "...", // optional when the Web UI has one clear daemon
         },
     ],
     addTorrentStrategy: "least-count", // or "round-robin", "first-found",
@@ -83,19 +94,24 @@ export default {
 
 ### Clients
 
-A list of Transmission torrent clients to connect to.
-
-Here is your list converted into a markdown table:
+A list of torrent client instances to connect to. A failed or unavailable instance is isolated: Gearbox starts the other configured clients and keeps retrying the unavailable one.
 
 | **Field**               | **Description**                                                                                                                                                                         |
 | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **id**                  | An identifier for the client. You can pick any name you want, but it must be unique and at least one character.                                                                         |
-| **host**                | Specifies the address of a Transmission daemon with Web-UI enabled. This can be a local or remote IP address or a DNS name.                                                             |
-| **port**                | Designates the port for a Transmission daemon with Web-UI enabled, typically 9091.                                                                                                      |
-| **user** / **password** | Authentication that you want to use with Transmission. Optional                                                                                                                         |
-| **type**                | The type of torrent client. Defaults to `transmission`. Currently, only `transmission` is supported.                                                                                    |
+| **id**                  | A unique client identifier containing one or more lowercase `a-z` or `0-9` characters.                                                                                                  |
+| **type**                | `transmission`, `qbittorrent`, or `deluge`. Defaults to `transmission` for existing configurations.                                                                                     |
+| **url**                 | Base URL of the client's Web/API service, without an RPC suffix.                                                                                                                        |
+| **host** / **port**     | Legacy alternative to `url` for Transmission configurations.                                                                                                                           |
+| **username** / **password** | Optional Transmission or qBittorrent Web UI authentication. The legacy Transmission field `user` is also accepted.                                                                 |
+| **password**            | For Deluge, the Deluge Web UI password.                                                                                                                                                 |
+| **daemonId**            | Optional Deluge daemon ID. Gearbox otherwise uses the connected daemon, the Web UI default daemon, or the only configured daemon. Ambiguous multi-daemon setups require this field.      |
 | **maxCount**            | A client is qualified to accept new torrents only if it has less than this number of existing torrents. Useful not to overload any individual client. Discarded if omitted or negative. |
-| **torrentDir**          | The directory where the client stores its .torrent files. For transmission, this is the `torrents` folder inside of your Transmission configuration folder.                             |
+| **torrentDir**          | Optional Gearbox-accessible directory containing the client's `.torrent` files. This lets Gearbox capture metainfo and enables transfer from that client.                               |
+| **pollInterval**        | Optional qBittorrent/Deluge polling interval in milliseconds. Defaults to 1000 and must be at least 250.                                                                                 |
+
+The supported baseline is qBittorrent 5.x and Deluge 2.x. qBittorrent 4.5/4.6 receive best-effort compatibility through their older pause/resume endpoint names, but they are not the compatibility baseline.
+
+For large qBittorrent instances, `fullSyncInterval` controls periodic full reconciliation (default 300000 ms) and `enrichmentConcurrency` limits concurrent files/tracker metadata requests (default 4). For Deluge, `reconcileInterval` controls full reconciliation including expensive files, peers, and trackers (default 50000 ms).
 
 ### addTorrentStrategy
 
@@ -107,7 +123,7 @@ The configuration for adding new torrents. Deciding which client gets the new to
 | :------------ | :------------------------------------------------------------------- |
 | `least-count` | Add it to the client that has the least number of torrents.          |
 | `round-robin` | Spread new torrents evenly across all clients.                       |
-| `first-found` | Add it to the first client available client (in order of `backends`) |
+| `first-found` | Add it to the first available client (in `clients` order)            |
 
 ### ip / port
 
@@ -128,7 +144,7 @@ The logging level. Defaults to `warn`, can be any of `error`, `warn`, or `debug`
 -   Click on it again to remove it.
 -   Shift-click to to pick the inverse of a filter. For example, if you shift-click on "Everything's fine", all torrents that are **not** fine will be shown.
 
-_Advanced usage:_ [Any field](https://github.com/transmission/transmission/blob/main/libtransmission/transmission.h#L1420) sent from Transmission can be used in the search bar. For example, if you want to list all torrents that haven't downloaded anything, you could type `percentDone:0`. You also have the option to create a `"OR"` filter by putting arguments in parenthesis. Example: `clientId:(trans1 trans2)` will show you any torrents from backends `trans1` OR `trans2`.
+_Advanced usage:_ [Any normalized Transmission-compatible field](https://github.com/transmission/transmission/blob/main/libtransmission/transmission.h#L1420) can be used in the search bar. For example, if you want to list all torrents that haven't downloaded anything, you could type `percentDone:0`. You also have the option to create a `"OR"` filter by putting arguments in parenthesis. Example: `clientId:(trans1 trans2)` will show you any torrents from backends `trans1` OR `trans2`.
 
 ### Sorting
 
@@ -151,7 +167,7 @@ It was also stress-tested at 370,000 torrents on an average PC. While it took a 
 
 ## Protocol
 
-Gearbox implements the [Transmission RPC protocol](https://github.com/transmission/transmission/blob/main/docs/rpc-spec.md). Anywhere you can use Transmission RPC, you can use Gearbox, including \*Arrs, autodl-irssi, etc.
+Gearbox exposes the [Transmission RPC protocol](https://github.com/transmission/transmission/blob/main/docs/rpc-spec.md), regardless of the native protocols used by its configured backends. Anywhere you can use Transmission RPC, you can use Gearbox, including \*Arrs, autodl-irssi, etc.
 
 There are a few differences. When adding torrents you can specify which torrent client should receive the new torrent using the non-standard `clientId` field. If this field is omitted, the `addTorrentStrategy` together with `maxCount` will be used to pick a client.
 
@@ -161,10 +177,11 @@ When using `session-get`, a reasonable hard-coded default is returned. `session-
 
 Gearbox supports transferring torrents between clients, with some limitations:
 
--   `torrentDir` must be set on the client transfering _from_.
--   The `torrentDir` must be accessible by Gearbox.
+-   Gearbox must have the source torrent's metainfo, either captured when it was added or read through `torrentDir`.
+-   The same download path must refer to the same data from both clients' points of view.
+-   Gearbox confirms that the destination reports the same torrent hash and download path before removing it from the source. A failed or timed-out confirmation leaves the source torrent intact.
 
-For setups where Gearbox and the torrent clients run on the same machine, compatibility issues are unlikely. However, if they operate on separate machines, ensure that you mount the remote filesystem. Additionally, maintain consistent paths across all systems. For instance, if Transmission uses `/config/torrents`, Gearbox should also also access these files on `/config/torrents`.
+For setups where Gearbox and the torrent clients run on the same machine, compatibility issues are unlikely. If they operate on separate machines, mount any required metadata directory into Gearbox and maintain consistent data paths across all clients.
 
 ## Roadmap
 

@@ -7,6 +7,7 @@ export default function useShortcuts({
   torrents,
   removeTorrent,
   setChangeLocation,
+  supports,
 }) {
   useEffect(() => {
     const keydown = (e) => {
@@ -48,17 +49,21 @@ export default function useShortcuts({
         e.key === "x" ||
         e.key === "-"
       ) {
-        e.preventDefault()
-        removeTorrent.remove(selections.getIds())
+        if (supports(`removeTorrents`)) {
+          e.preventDefault()
+          removeTorrent.remove(selections.getIds())
+        }
       } else if (e.key === ` `) {
         const selectedTorrents = torrents.filter((t) =>
           selections.includes(t.id)
         )
         const allPaused = selectedTorrents.every((t) => t.status === STOPPED)
 
-        if (allPaused) {
+        if (allPaused && supports(`startTorrents`)) {
+          e.preventDefault()
           torrentActions.resume(selectedTorrents.map((t) => t.id))
-        } else {
+        } else if (!allPaused && supports(`stopTorrents`)) {
+          e.preventDefault()
           torrentActions.pause(
             selectedTorrents
               .filter((t) => t.status !== STOPPED)
@@ -68,13 +73,15 @@ export default function useShortcuts({
       } else if (e.key === `a` && e.ctrlKey) {
         selections.set(torrents.map((t) => t.id))
       } else if (e.key === `l` && e.ctrlKey) {
-        e.preventDefault()
-        setChangeLocation(selections.getIds())
+        if (supports(`setLocation`)) {
+          e.preventDefault()
+          setChangeLocation(selections.getIds())
+        }
       }
     }
     this.addEventListener(`keydown`, keydown)
     return () => {
       this.removeEventListener(`keydown`, keydown)
     }
-  }, [torrents, selections])
+  }, [torrents, selections, supports])
 }

@@ -2,6 +2,8 @@
 import torrentName from "./torrentNames.js"
 import * as guid from "../../guid.js"
 import * as bencode from "../../../public/bencode.js"
+import { capabilities } from "../contract.js"
+import normalizeTorrent from "../shared/normalizeTorrent.js"
 
 export const STOPPED = 0
 export const CHECK_WAIT = 1
@@ -14,7 +16,8 @@ export const SEED = 6
 let labels = `sonarr radarr autobrr lidarr`.split(" ")
 
 // The demo adapter
-export default function DemoAdapter({ id: clientId, changes: _changes }) {
+export default function DemoAdapter({ id: clientId }, dependencies = {}) {
+  const _changes = dependencies.changes
   let buffer = new Map()
   function changes({ id, changeSet, isRemoved }) {
     const entry = buffer.get(id) || {}
@@ -53,10 +56,11 @@ export default function DemoAdapter({ id: clientId, changes: _changes }) {
   function processTorrent(torrent) {
     const name = torrentName()
     const localId = ++torrentIdCounter
-    return {
+    return normalizeTorrent({
       id: guid.encode({ clientId, torrentId: localId }),
       localId,
       clientId,
+      clientType: `demo`,
       status: DOWNLOAD,
       percentDone: 0,
       recheckProgress: 0,
@@ -75,7 +79,7 @@ export default function DemoAdapter({ id: clientId, changes: _changes }) {
       peersGettingFromUs: 0,
       peersSendingToUs: 0,
       ...torrent,
-    }
+    })
   }
 
   function simulateTorrentProgress(torrentId) {
@@ -142,7 +146,7 @@ export default function DemoAdapter({ id: clientId, changes: _changes }) {
         totalSize:
           data.info.length || data.info.files.reduce((a, b) => a + b.length, 0),
       })
-      return
+      return { result: `success`, arguments: {} }
     }
 
     const { ids } = args
@@ -227,6 +231,15 @@ export default function DemoAdapter({ id: clientId, changes: _changes }) {
   console.log(`Starting demo client ${clientId}...`)
   return {
     id: clientId,
+    type: `demo`,
+    capabilities: capabilities({
+      addTorrent: true,
+      removeTorrents: true,
+      startTorrents: true,
+      stopTorrents: true,
+      verifyTorrents: true,
+      sessionGet: true,
+    }),
     request,
     count() {
       return torrents.size
@@ -236,6 +249,32 @@ export default function DemoAdapter({ id: clientId, changes: _changes }) {
     },
     getAll() {
       return Array.from(torrents.values())
+    },
+    getRecent() {
+      return [][Symbol.iterator]()
+    },
+    async addTorrent(args) {
+      request(`torrent-add`, args)
+      return {}
+    },
+    async removeTorrents(ids, args) {
+      request(`torrent-remove`, { ...args, ids })
+      return {}
+    },
+    async startTorrents(ids, args) {
+      request(`torrent-start`, { ...args, ids })
+      return {}
+    },
+    async stopTorrents(ids, args) {
+      request(`torrent-stop`, { ...args, ids })
+      return {}
+    },
+    async verifyTorrents(ids, args) {
+      request(`torrent-verify`, { ...args, ids })
+      return {}
+    },
+    async sessionGet() {
+      return { "download-dir": `/torrents` }
     },
   }
 }
