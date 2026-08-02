@@ -13,6 +13,8 @@ FROM node:20-alpine
 ENV NODE_ENV=production
 WORKDIR /app
 
+RUN chown node:node /app
+
 COPY --from=dependencies --chown=node:node /app/node_modules node_modules
 COPY --chown=node:node package.json ./
 COPY --chown=node:node public public
