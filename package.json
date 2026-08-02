@@ -1,20 +1,35 @@
 {
   "name": "gearbox-torrent",
-  "version": "1.0.0-alpha.2",
+  "version": "1.0.0-alpha.3",
   "description": "A federated web UI for Transmission, qBittorrent, and Deluge built to handle 300,000+ torrents.",
   "main": "server/index.js",
   "bin": {
     "gearbox": "server/index.js"
   },
+  "files": [
+    "CHANGELOG.md",
+    "config-demo.mjs",
+    "public/**/*.css",
+    "public/**/*.html",
+    "public/**/*.js",
+    "public/**/*.json",
+    "public/**/*.png",
+    "!public/**/*.test.js",
+    "server/**/*.js",
+    "!server/**/*.test.js"
+  ],
   "scripts": {
     "watch": "export NODE_ENV=development && nodemon server/index.js -w server",
-    "start": "node server/index.js -w server",
-    "test": "mocha \"public/**/*.test.js\" \"server/**/*.test.js\""
+    "start": "node server/index.js",
+    "test": "npm run test:unit && npm run test:package",
+    "test:unit": "mocha \"public/**/*.test.js\" \"server/**/*.test.js\"",
+    "test:package": "node scripts/package-smoke.mjs"
   },
   "author": "mikabytes",
   "homepage": "https://github.com/mikabytes/gearbox",
   "license": "ISC",
   "type": "module",
+  "packageManager": "pnpm@8.15.9",
   "dependencies": {
     "body-parser": "^1.20.2",
     "compression": "^1.7.4",

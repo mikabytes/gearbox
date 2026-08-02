@@ -73,7 +73,7 @@ function changes(entry) {
   const { id, changeSet, isRemoved } = entry
 }
 
-start({
+const server = start({
   config,
   stream(newCb) {
     cb = newCb
@@ -98,3 +98,15 @@ start({
     }
   },
 })
+
+for (const signal of [`SIGINT`, `SIGTERM`]) {
+  process.once(signal, () => {
+    server.close((error) => {
+      if (error) {
+        logger.error(`Failed to stop Gearbox cleanly: ${error.message}`)
+      }
+      process.exit(error ? 1 : 0)
+    })
+    server.closeAllConnections()
+  })
+}

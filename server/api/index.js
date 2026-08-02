@@ -1,5 +1,6 @@
 import compression from "compression"
 import express, { request } from "express"
+import { readFileSync } from "fs"
 
 import all from "./all.js"
 import logger from "../logger.js"
@@ -9,6 +10,9 @@ import streaming from "./streaming.js"
 import _jsonBigint from "json-bigint"
 
 const jsonBigint = _jsonBigint({ useNativeBigInt: true })
+const { version } = JSON.parse(
+  readFileSync(new URL(`../../package.json`, import.meta.url), `utf8`)
+)
 
 export default function makeApi({
   stream,
@@ -43,7 +47,7 @@ export default function makeApi({
   app.get(`/stream`, streaming({ stream, connections }))
   app.all(`/transmission/rpc`, compression(), rpc({ request, connections }))
   app.get(`/version`, (req, res) => {
-    res.json({ version: process.env.npm_package_version })
+    res.json({ version })
   })
   app.get(`/all`, compression(), all({ getAll, count }))
   app.get(`/config`, (req, res) => {

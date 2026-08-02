@@ -1,0 +1,10 @@
+.git/
+.github/
+node_modules/
+*.log
+/config.mjs
+/state.json
+/torrent-ids.json
+/torrents/
+**/*.test.js
+public/icon_full.xcf

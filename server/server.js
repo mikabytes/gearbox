@@ -20,7 +20,8 @@ export default function start(args) {
   app.use(express.static(path.join(__dirname, `..`, `public`)))
   app.use(api(args))
 
-  app.listen(args.config.port, args.config.ip)
+  const server = app.listen(args.config.port, args.config.ip)
 
   console.log(`Gearbox started on http://${args.config.ip}:${args.config.port}`)
+  return server
 }

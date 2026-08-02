@@ -1,20 +1,25 @@
-FROM node:20-alpine
+FROM node:20-alpine AS dependencies
 
-RUN apk update && apk upgrade
-
-RUN mkdir -p /app/node_modules && chown -R node:node /app
+RUN corepack enable && corepack prepare pnpm@8.15.9 --activate
 
 WORKDIR /app
 
-COPY --chown=node:node package*.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml ./
 
-USER node
+RUN pnpm install --frozen-lockfile --prod
 
-RUN npm install
+FROM node:20-alpine
 
+ENV NODE_ENV=production
+WORKDIR /app
+
+COPY --from=dependencies --chown=node:node /app/node_modules node_modules
+COPY --chown=node:node package.json ./
 COPY --chown=node:node public public
 COPY --chown=node:node server server
 
-EXPOSE 3000
+USER node
 
-CMD ["/bin/sh", "-c", "npm start 2>&1 | tee log.txt"]
+EXPOSE 2112
+
+CMD ["node", "server/index.js"]

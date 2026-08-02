@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.0.0-alpha.3](https://github.com/mikabytes/gearbox/compare/v1.0.0-alpha.2...v1.0.0-alpha.3) (2026-08-02)
+
+
+### Features
+
+* Publish container images for linux/amd64, linux/arm64, and linux/arm/v7
+
+
+### Bug Fixes
+
+* Include every required runtime module in the npm package and validate the installed artifact
+* Install only locked production dependencies in the container image
+* Shut containers down cleanly, including when SSE clients are connected
+* Expose Gearbox's default port 2112 from the container image
+
 ## [1.0.0-alpha.2](https://github.com/mikabytes/gearbox/compare/v1.0.0-alpha.1...v1.0.0-alpha.2) (2026-08-02)
 
 
