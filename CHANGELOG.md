@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.0.0-alpha.4](https://github.com/mikabytes/gearbox/compare/v1.0.0-alpha.3...v1.0.0-alpha.4) (2026-08-02)
+
+
+### Bug Fixes
+
+* Keep the container work directory writable so first-run configuration succeeds
+
 ## [1.0.0-alpha.3](https://github.com/mikabytes/gearbox/compare/v1.0.0-alpha.2...v1.0.0-alpha.3) (2026-08-02)
 
 

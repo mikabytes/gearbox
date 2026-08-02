@@ -1,6 +1,6 @@
 {
   "name": "gearbox-torrent",
-  "version": "1.0.0-alpha.3",
+  "version": "1.0.0-alpha.4",
   "description": "A federated web UI for Transmission, qBittorrent, and Deluge built to handle 300,000+ torrents.",
   "main": "server/index.js",
   "bin": {
