@@ -26,7 +26,9 @@ export default function Requester(
         body,
       })
       const text = await response.text()
-      if (!response.ok || text.trim() !== `Ok.`) {
+      const authenticated = response.status === 200 && text.trim() === `Ok.`
+      const authenticationBypassed = response.status === 204
+      if (!response.ok || (!authenticated && !authenticationBypassed)) {
         throw new Error(
           `qBittorrent login failed (${response.status}): ${text.trim() || `empty response`}`
         )

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.0.0-alpha.2](https://github.com/mikabytes/gearbox/compare/v1.0.0-alpha.1...v1.0.0-alpha.2) (2026-08-02)
+
+
+### Bug Fixes
+
+* Accept qBittorrent's 204 login response when subnet authentication bypass is enabled. Fixes [#38](https://github.com/mikabytes/gearbox/issues/38)
+
 ## [0.17.1](https://github.com/mikabytes/gearbox/compare/v0.17.0...v0.17.1) (2024-05-13)
 
 
