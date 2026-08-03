@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.0.0-alpha.5](https://github.com/mikabytes/gearbox/compare/v1.0.0-alpha.4...v1.0.0-alpha.5) (2026-08-03)
+
+
+### Bug Fixes
+
+* Create missing Deluge labels before assigning them to torrents
+* Confirm qBittorrent additions, tolerate delayed visibility, and normalize tracker statistics
+
 ## [1.0.0-alpha.4](https://github.com/mikabytes/gearbox/compare/v1.0.0-alpha.3...v1.0.0-alpha.4) (2026-08-02)
 
 
