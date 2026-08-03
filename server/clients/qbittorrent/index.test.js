@@ -37,6 +37,7 @@ describe(`qBittorrent connector`, () => {
     assert.equal(torrent.trackers[0].sitename, `tracker.example`)
     assert.deepEqual(torrent.files, [])
     assert.deepEqual(torrent.trackerStats[0].seederCount, 12)
+    assert.equal(torrent.trackerStats[0].lastScrapeTimedOut, false)
 
     for (const call of fixture.calls) {
       assert.equal(call.options.headers.Origin, `http://qbt.test:8080`)
@@ -295,6 +296,115 @@ describe(`qBittorrent connector`, () => {
     )
     assert(add.options.body.get(`torrents`) instanceof Blob)
   })
+
+  it(`waits for an accepted torrent to become visible`, async () => {
+    let infoCalls = 0
+    const fixture = mockQbittorrent({
+      sync: [fullSync({})],
+      route(call) {
+        if (call.url.pathname.endsWith(`/torrents/info`)) {
+          infoCalls++
+          return response(
+            infoCalls < 3 ? [] : [torrentFixture({ hash: HASH_A, name: `visible` })]
+          )
+        }
+      },
+    })
+    const connector = await makeConnector(fixture)
+
+    const result = await connector.addTorrent({
+      filename: `magnet:?xt=urn:btih:${HASH_A}&dn=eventual`,
+    })
+
+    assert.equal(result[`torrent-added`].hashString, HASH_A)
+    assert.equal(result[`torrent-added`].name, `visible`)
+    assert.equal(infoCalls, 3)
+    assert.equal(connector.count(), 1)
+  })
+
+  it(`fails when an accepted torrent remains unavailable`, async () => {
+    const waits = []
+    const fixture = mockQbittorrent({
+      version: `v5.2.3`,
+      sync: [fullSync({})],
+      info: [],
+      addResult: {
+        success_count: 1,
+        failure_count: 0,
+        pending_count: 0,
+        added_torrent_ids: [HASH_A],
+      },
+    })
+    const connector = await makeConnector(fixture, {
+      wait: (milliseconds) => waits.push(milliseconds),
+    })
+
+    await assert.rejects(
+      connector.addTorrent({
+        filename: `magnet:?xt=urn:btih:${HASH_A}&dn=unavailable`,
+      }),
+      /accepted the torrent add, but it was not visible within 30 seconds/
+    )
+
+    assert.equal(connector.count(), 0)
+    assert.deepEqual(waits, Array(30).fill(1000))
+  })
+
+  it(`rejects qBittorrent's legacy failure response`, async () => {
+    const fixture = mockQbittorrent({
+      sync: [fullSync({})],
+      addResult: `Fails.`,
+    })
+    const connector = await makeConnector(fixture)
+
+    await assert.rejects(
+      connector.addTorrent({ filename: `magnet:?xt=urn:btih:${HASH_A}` }),
+      /rejected the torrent add request/
+    )
+    assert.equal(connector.count(), 0)
+  })
+
+  it(`returns a cached torrent as a duplicate without adding it again`, async () => {
+    const fixture = mockQbittorrent({
+      version: `v5.2.3`,
+      sync: [fullSync({ [HASH_A]: torrentFixture({ hash: HASH_A }) })],
+    })
+    const connector = await makeConnector(fixture)
+
+    const result = await connector.addTorrent({
+      filename: `magnet:?xt=urn:btih:${HASH_A}`,
+    })
+
+    assert.equal(result[`torrent-duplicate`].hashString, HASH_A)
+    assert(
+      !fixture.calls.some((call) => call.url.pathname.endsWith(`/torrents/add`))
+    )
+  })
+
+  it(`reports success when post-add bookkeeping fails`, async () => {
+    const metainfo = Buffer.from(
+      `d4:infod6:lengthi2e4:name4:test12:piece lengthi16384e6:pieces20:abcdefghijklmnopqrstee`
+    ).toString(`base64`)
+    const hash = metainfoHashes(metainfo)[0]
+    const errors = []
+    const fixture = mockQbittorrent({
+      sync: [fullSync({})],
+      info: [torrentFixture({ hash, name: `test` })],
+    })
+    const connector = await makeConnector(fixture, {
+      logger: { debug() {}, error: (message) => errors.push(message) },
+      torrentStore: {
+        async save() {
+          throw new Error(`disk unavailable`)
+        },
+      },
+    })
+
+    const result = await connector.addTorrent({ metainfo })
+
+    assert.equal(result[`torrent-added`].hashString, hash)
+    assert.match(errors[0], /saving metainfo failed: disk unavailable/)
+  })
 })
 
 async function makeConnector(fixture, overrides = {}) {
@@ -310,6 +420,7 @@ async function makeConnector(fixture, overrides = {}) {
       logger: { debug() {}, error() {} },
       now: () => 100000,
       schedule() {},
+      wait() {},
       reportStatus() {},
       torrentStore: {},
       globalId(clientId, nativeId) {
@@ -325,6 +436,7 @@ function mockQbittorrent({
   version = `v5.1.2`,
   sync = [],
   info = [],
+  addResult = `Ok.`,
   files = [],
   trackers = [],
   defaultSavePath = `/downloads`,
@@ -349,6 +461,7 @@ function mockQbittorrent({
         return response(sync.shift() || { rid: 999, full_update: false })
       }
       if (pathname.endsWith(`/torrents/info`)) return response(info)
+      if (pathname.endsWith(`/torrents/add`)) return response(addResult)
       if (pathname.endsWith(`/torrents/files`)) return response(files)
       if (pathname.endsWith(`/torrents/trackers`)) return response(trackers)
       if (pathname.endsWith(`/app/defaultSavePath`)) return response(defaultSavePath)

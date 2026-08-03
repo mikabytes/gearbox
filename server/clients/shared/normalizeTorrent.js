@@ -166,10 +166,36 @@ function normalizeTracker(tracker) {
 }
 
 function normalizeTrackerStats(stats) {
+  const announce = `${stats?.announce || stats?.url || ``}`
   return {
     ...stats,
+    announce,
+    announceState: finite(stats?.announceState),
+    downloadCount: finite(stats?.downloadCount, -1),
+    hasAnnounced: boolean(stats?.hasAnnounced),
+    hasScraped: boolean(stats?.hasScraped),
+    host: `${stats?.host || trackerSite(announce)}`,
+    id: finite(stats?.id),
+    isBackup: boolean(stats?.isBackup),
+    lastAnnouncePeerCount: finite(stats?.lastAnnouncePeerCount, -1),
+    lastAnnounceResult: `${stats?.lastAnnounceResult || ``}`,
+    lastAnnounceStartTime: finite(stats?.lastAnnounceStartTime),
+    lastAnnounceSucceeded: boolean(stats?.lastAnnounceSucceeded),
+    lastAnnounceTime: finite(stats?.lastAnnounceTime),
+    lastAnnounceTimedOut: boolean(stats?.lastAnnounceTimedOut),
+    lastScrapeResult: `${stats?.lastScrapeResult || ``}`,
+    lastScrapeStartTime: finite(stats?.lastScrapeStartTime),
+    lastScrapeSucceeded: boolean(stats?.lastScrapeSucceeded),
+    lastScrapeTime: finite(stats?.lastScrapeTime),
+    lastScrapeTimedOut: boolean(stats?.lastScrapeTimedOut),
     leecherCount: finite(stats?.leecherCount ?? stats?.num_leeches, -1),
+    nextAnnounceTime: finite(stats?.nextAnnounceTime),
+    nextScrapeTime: finite(stats?.nextScrapeTime),
+    scrape: `${stats?.scrape || ``}`,
+    scrapeState: finite(stats?.scrapeState),
     seederCount: finite(stats?.seederCount ?? stats?.num_seeds, -1),
+    sitename: `${stats?.sitename || trackerSite(announce)}`,
+    tier: finite(stats?.tier),
   }
 }
 
@@ -186,4 +212,8 @@ export function trackerSite(url) {
 
 function finite(value, fallback = 0) {
   return Number.isFinite(value) ? value : fallback
+}
+
+function boolean(value) {
+  return value === true || value === 1
 }

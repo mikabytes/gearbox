@@ -7,6 +7,9 @@ import { magnetHashes, metainfoHashes } from "./metainfo.js"
 import { mapFiles, mapTorrent, mapTrackers } from "./normalize.js"
 
 const HASH = /^[a-f0-9]{40}$|^[a-f0-9]{64}$/i
+// Check immediately, then allow the qBittorrent torrent list 30 seconds to catch up.
+const ADD_VISIBILITY_ATTEMPTS = 31
+const ADD_VISIBILITY_INTERVAL = 1000
 
 export default async function Qbittorrent(config, dependencies = {}) {
   const {
@@ -28,6 +31,7 @@ export default async function Qbittorrent(config, dependencies = {}) {
     reportStatus,
     schedule = setTimeout,
     torrentStore,
+    wait = sleep,
   } = dependencies
 
   validateConfig({
@@ -295,8 +299,10 @@ export default async function Qbittorrent(config, dependencies = {}) {
       ? metainfoHashes(normalized.metainfo)
       : magnetHashes(normalized.filename)
     const duplicate = candidates.map((hash) => cache.getByLocalId(hash)).find(Boolean)
+    if (duplicate) return torrentAddResult(duplicate, true)
+
     const deferredStart =
-      !duplicate && normalized.paused !== true && hasFilePriorityArguments(normalized)
+      normalized.paused !== true && hasFilePriorityArguments(normalized)
     const form = new FormData()
 
     if (normalized.metainfo) {
@@ -315,18 +321,20 @@ export default async function Qbittorrent(config, dependencies = {}) {
       majorVersion
     )
 
-    await api.request(`torrents/add`, {
+    const addResponse = await api.request(`torrents/add`, {
       method: `POST`,
       body: form,
-      responseType: `none`,
+      responseType: `text`,
     })
+    const addedHashes = parseAddResponse(addResponse)
+    const confirmationHashes = [...new Set([...addedHashes, ...candidates])]
 
-    const found = await fetchTorrentInfo(candidates)
-    const actualHash = normalizeHash(found[0]?.hash || duplicate?.localId || candidates[0])
+    const found = await waitForTorrentInfo(confirmationHashes)
+    const actualHash = normalizeHash(found[0].hash)
     const torrent = cache.getByLocalId(actualHash)
     if (!torrent) {
       throw new Error(
-        `qBittorrent accepted the add request but the torrent could not be confirmed`
+        `qBittorrent returned torrent details that Gearbox could not cache`
       )
     }
 
@@ -341,33 +349,50 @@ export default async function Qbittorrent(config, dependencies = {}) {
         detailsByHash.set(actualHash, details)
         cache.upsert(actualHash, mapTorrent(nativeByHash.get(actualHash), details))
       } catch (error) {
-        throw partialAddError(actualHash, `saving metainfo`, error)
+        logPartialAddError(actualHash, `saving metainfo`, error)
       }
     }
 
-    if (!duplicate) {
-      try {
-        await applyFilePriorities(actualHash, normalized)
-        if (hasShareArguments(normalized)) {
-          await applyShareLimits(actualHash, normalized)
-        }
-        if (deferredStart) {
-          await action(majorVersion >= 5 ? `start` : `resume`, [actualHash])
-        }
-      } catch (error) {
-        throw partialAddError(actualHash, `applying torrent options`, error)
+    try {
+      await applyFilePriorities(actualHash, normalized)
+      if (hasShareArguments(normalized)) {
+        await applyShareLimits(actualHash, normalized)
       }
+      if (deferredStart) {
+        await action(majorVersion >= 5 ? `start` : `resume`, [actualHash])
+      }
+    } catch (error) {
+      logPartialAddError(actualHash, `applying torrent options`, error)
     }
 
     const resultTorrent = cache.getByLocalId(actualHash)
-    const key = duplicate ? `torrent-duplicate` : `torrent-added`
-    return {
-      [key]: {
-        id: resultTorrent.id,
-        name: resultTorrent.name,
-        hashString: resultTorrent.hashString,
-      },
+    return torrentAddResult(resultTorrent, false)
+  }
+
+  async function waitForTorrentInfo(hashes) {
+    let lastError
+    for (let attempt = 0; attempt < ADD_VISIBILITY_ATTEMPTS; attempt++) {
+      try {
+        const found = await fetchTorrentInfo(hashes)
+        if (found.length) return found
+      } catch (error) {
+        lastError = error
+      }
+      if (attempt + 1 < ADD_VISIBILITY_ATTEMPTS) {
+        await wait(ADD_VISIBILITY_INTERVAL)
+      }
     }
+
+    const detail = lastError ? `: ${lastError.message}` : ``
+    throw new Error(
+      `qBittorrent accepted the torrent add, but it was not visible within 30 seconds${detail}`
+    )
+  }
+
+  function logPartialAddError(hash, phase, error) {
+    logger?.error?.(
+      `qBittorrent added torrent ${hash}, but ${phase} failed: ${error.message}. The torrent was left in place.`
+    )
   }
 
   async function setTorrents(ids, args = {}) {
@@ -708,6 +733,45 @@ function validateConfig({
   }
   if (!Number.isFinite(fullSyncInterval) || fullSyncInterval < pollInterval) {
     throw new Error(`qBittorrent fullSyncInterval must be at least pollInterval`)
+  }
+}
+
+function parseAddResponse(value) {
+  const text = `${value ?? ``}`.trim()
+  if (text === `Ok.`) return []
+  if (text === `Fails.`) {
+    throw new Error(`qBittorrent rejected the torrent add request`)
+  }
+
+  let result
+  try {
+    result = JSON.parse(text)
+  } catch {
+    throw new Error(`qBittorrent returned an invalid torrent add response`)
+  }
+
+  const success = result?.success_count
+  const pending = result?.pending_count
+  if (!Number.isInteger(success) || !Number.isInteger(pending)) {
+    throw new Error(`qBittorrent returned an invalid torrent add response`)
+  }
+  if (success < 1 && pending < 1) {
+    throw new Error(`qBittorrent rejected the torrent add request`)
+  }
+  if (!Array.isArray(result.added_torrent_ids)) {
+    throw new Error(`qBittorrent returned an invalid torrent add response`)
+  }
+  return result.added_torrent_ids.map(normalizeHash)
+}
+
+function torrentAddResult(torrent, duplicate) {
+  const key = duplicate ? `torrent-duplicate` : `torrent-added`
+  return {
+    [key]: {
+      id: torrent.id,
+      name: torrent.name,
+      hashString: torrent.hashString,
+    },
   }
 }
 
@@ -1070,12 +1134,6 @@ function nativeLimitMinutes(value) {
   return Math.round(value / 60)
 }
 
-function partialAddError(hash, phase, error) {
-  return new Error(
-    `qBittorrent added torrent ${hash}, but ${phase} failed: ${error.message}. The torrent was left in place.`
-  )
-}
-
 async function fetchMetainfo(values, fetchImpl) {
   const headers = {}
   if (values.cookies) headers.Cookie = values.cookies
@@ -1101,6 +1159,10 @@ async function fetchMetainfo(values, fetchImpl) {
     cookies: undefined,
     metainfo: data.toString(`base64`),
   }
+}
+
+function sleep(milliseconds) {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds))
 }
 
 function assertArguments(args, allowed, operation) {
