@@ -204,6 +204,56 @@ describe(`Deluge connector`, () => {
       /does not support.*seedIdleLimit/
     )
   })
+
+  it(`creates missing labels before assigning them to added torrents`, async () => {
+    const fixture = apiFixture()
+    const connector = await Deluge(config(), dependencies(fixture))
+    const metainfo = Buffer.from(`d4:infod4:name7:Labeledee`).toString(`base64`)
+    const addedHash = metainfoHashes(metainfo)[0]
+    fixture.addResult = addedHash
+    fixture.statuses[addedHash] = torrentStatus({
+      hash: addedHash,
+      name: `Labeled`,
+    })
+
+    const added = await connector.addTorrent({
+      metainfo,
+      labels: [`TV-Sonarr`],
+    })
+
+    assert.equal(added[`torrent-added`].hashString, addedHash)
+    assert.deepEqual(call(fixture, `label.get_labels`).params, [])
+    assert.deepEqual(call(fixture, `label.add`).params, [`tv-sonarr`])
+    assert.deepEqual(call(fixture, `label.set_torrent`).params, [
+      addedHash,
+      `tv-sonarr`,
+    ])
+    assert.deepEqual(fixture.labels, [`tv-sonarr`])
+  })
+
+  it(`does not recreate existing labels and coalesces concurrent creation`, async () => {
+    const fixture = apiFixture()
+    fixture.labels.push(`existing`)
+    const connector = await Deluge(config(), dependencies(fixture))
+
+    await connector.setTorrents([HASH], { labels: [`existing`] })
+    assert.equal(
+      fixture.calls.filter((entry) => entry.method === `label.add`).length,
+      0
+    )
+
+    await Promise.all([
+      connector.setTorrents([HASH], { labels: [`sonarr`] }),
+      connector.setTorrents([HASH], { labels: [`sonarr`] }),
+    ])
+    assert.equal(
+      fixture.calls.filter(
+        (entry) =>
+          entry.method === `label.add` && entry.params[0] === `sonarr`
+      ).length,
+      1
+    )
+  })
 })
 
 function config(overrides = {}) {
@@ -253,6 +303,7 @@ function apiFixture({
     connectedDaemon,
     defaultDaemon,
     hosts,
+    labels: [],
     statuses: {},
     torrents: { [HASH]: torrentStatus() },
   }
@@ -309,6 +360,13 @@ function apiFixture({
       case `core.get_config_values`:
         result = { download_location: `/data` }
         break
+      case `label.get_labels`:
+        result = [...fixture.labels]
+        break
+      case `label.add`:
+        fixture.labels.push(`${request.params[0]}`.toLowerCase())
+        result = null
+        break
       default:
         result = null
     }
@@ -342,6 +400,8 @@ function methods() {
     `core.add_torrent_file`,
     `core.get_torrent_status`,
     `core.set_torrent_options`,
+    `label.add`,
+    `label.get_labels`,
     `label.set_torrent`,
   ]
 }

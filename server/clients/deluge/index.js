@@ -75,6 +75,7 @@ export default async function Deluge(config, dependencies) {
   const captureQueue = []
   const capturePending = new Set()
   const captureRetryAt = new Map()
+  const labelCreations = new Map()
   let activeCaptures = 0
 
   const rpc = Requester(url, {
@@ -737,9 +738,39 @@ export default async function Deluge(config, dependencies) {
     if (!remoteMethods.has(`label.set_torrent`)) {
       throw new Error(`Deluge Label plugin is not enabled`)
     }
+    const label = labels[0] ? await ensureLabel(labels[0]) : ``
     for (const id of ids) {
-      await daemonRequest(`label.set_torrent`, [id, `${labels[0] || ``}`])
+      await daemonRequest(`label.set_torrent`, [id, label])
     }
+  }
+
+  async function ensureLabel(label) {
+    let creation = labelCreations.get(label)
+    if (!creation) {
+      creation = (async () => {
+        const existing = await getLabels()
+        if (existing.has(label)) return
+
+        try {
+          await daemonRequest(`label.add`, [label])
+        } catch (error) {
+          // Another Deluge/Gearbox client may have created the label after our
+          // lookup. Only suppress the error when Deluge now confirms it exists.
+          if (!(await getLabels()).has(label)) throw error
+        }
+      })().finally(() => labelCreations.delete(label))
+      labelCreations.set(label, creation)
+    }
+    await creation
+    return label
+  }
+
+  async function getLabels() {
+    const labels = await daemonRequest(`label.get_labels`)
+    if (!Array.isArray(labels)) {
+      throw new Error(`Deluge Label plugin returned an invalid label list`)
+    }
+    return new Set(labels.map((label) => `${label}`.toLowerCase()))
   }
 
   async function setTrackers(ids, args) {
@@ -988,12 +1019,20 @@ function delugeLabels(args, remoteMethods) {
   if (values.some((label) => typeof label !== `string`)) {
     throw new Error(`labels must contain only strings`)
   }
-  const labels = [...new Set(values.filter(Boolean))]
+  const labels = [
+    ...new Set(values.filter(Boolean).map((label) => label.toLowerCase())),
+  ]
   if (labels.length > 1) {
     throw new Error(`Deluge Label supports at most one label per torrent`)
   }
   if (!remoteMethods.has(`label.set_torrent`)) {
     throw new Error(`Deluge Label plugin is not enabled`)
+  }
+  if (
+    labels.length &&
+    (!remoteMethods.has(`label.get_labels`) || !remoteMethods.has(`label.add`))
+  ) {
+    throw new Error(`Deluge Label plugin does not support creating labels`)
   }
   return labels
 }
