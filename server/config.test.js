@@ -75,4 +75,54 @@ describe(`configuration`, () => {
       await fs.rm(root, { recursive: true })
     }
   })
+
+  it(`accepts optional web UI credentials`, async () => {
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), `gearbox-config-`))
+    try {
+      const filename = path.join(root, `config.mjs`)
+      await fs.writeFile(
+        filename,
+        `export default {
+          clients: [{ id: "one" }],
+          auth: { username: "admin", password: "secret" },
+        }`
+      )
+
+      const config = await loadConfig(
+        `${pathToFileURL(filename).href}?test=${Date.now()}`,
+        filename,
+        root
+      )
+
+      assert.equal(config.auth.username, `admin`)
+      assert.equal(config.auth.password, `secret`)
+    } finally {
+      await fs.rm(root, { recursive: true })
+    }
+  })
+
+  it(`rejects web UI credentials without a password`, async () => {
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), `gearbox-config-`))
+    try {
+      const filename = path.join(root, `config.mjs`)
+      await fs.writeFile(
+        filename,
+        `export default {
+          clients: [{ id: "one" }],
+          auth: { username: "admin" },
+        }`
+      )
+
+      await assert.rejects(
+        loadConfig(
+          `${pathToFileURL(filename).href}?test=${Date.now()}`,
+          filename,
+          root
+        ),
+        /'auth' must contain a non-empty password/
+      )
+    } finally {
+      await fs.rm(root, { recursive: true })
+    }
+  })
 })

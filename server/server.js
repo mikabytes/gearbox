@@ -5,6 +5,7 @@ import { fileURLToPath } from "url"
 import path from "path"
 
 import api from "./api/index.js"
+import basicAuth from "./basicAuth.js"
 
 // Convert the URL of the current module to a file path
 const __filename = fileURLToPath(import.meta.url)
@@ -15,6 +16,10 @@ export default function start(args) {
   const app = express()
   if (process.env.NODE_ENV === `development`) {
     hotserve({ dir: `.`, pattern: `*.{js,css,html}`, app })
+  }
+
+  if (args.config.auth) {
+    app.use(basicAuth(args.config.auth))
   }
 
   app.use(express.static(path.join(__dirname, `..`, `public`)))
