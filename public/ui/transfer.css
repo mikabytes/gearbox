@@ -5,7 +5,7 @@
 
 button {
   background-color: var(--secondary);
-  color: #efefef;
+  color: var(--terminal-text);
   font-weight: bold;
 }
 
@@ -21,7 +21,7 @@ summary {
   margin-top: 8px;
   padding: 8px;
   border: 1px solid var(--darkgray);
-  background-color: #333;
+  background-color: var(--terminal-bg);
   color: var(--lightgray);
   width: 360px;
   box-sizing: border-box;
@@ -56,9 +56,9 @@ summary {
 
 .entry.error:before {
   content: "✗ ";
-  color: red;
+  color: var(--error);
 }
 
 .error > .message {
-  color: red;
+  color: var(--error);
 }

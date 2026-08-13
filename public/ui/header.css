@@ -26,6 +26,7 @@ button {
   margin: 0;
   background-color: transparent;
   border: none;
+  color: var(--darkgray);
 }
 
 input[type="file"] {

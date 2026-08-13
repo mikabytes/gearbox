@@ -7,7 +7,7 @@
 .grayout {
   position: absolute;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: var(--overlay);
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -16,11 +16,11 @@
 }
 
 .dialog {
-  background-color: white;
+  background-color: var(--menu-bg);
   color: var(--darkgray);
-  border: 1px solid var(--gray);
-  border-radius: 5px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--lightergray);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
   width: 100%;
   max-width: 420px;
   max-height: calc(100vh - 90px);
@@ -96,7 +96,7 @@ label {
   font: inherit;
   font-size: 12px;
   border: 1px solid var(--lightergray);
-  border-radius: 4px;
+  border-radius: var(--radius-s);
   background-color: var(--lightgray);
   color: var(--darkgray);
   cursor: pointer;
@@ -105,4 +105,165 @@ label {
 .minor:disabled {
   opacity: 0.5;
   cursor: default;
+}
+
+.themes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 8px;
+}
+
+.theme-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 2px solid var(--lightergray);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 13px;
+  /* each card previews its own theme's tokens */
+  background-color: var(--bg);
+  color: var(--darkgray);
+}
+
+.theme-card input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.theme-card.active {
+  border-color: var(--primary);
+}
+
+.preview {
+  display: flex;
+  gap: 4px;
+}
+
+.swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid var(--lightergray);
+}
+
+.swatch.bg {
+  background-color: var(--lightgray);
+}
+
+.swatch.accent {
+  background-color: var(--primary);
+}
+
+.swatch.complete {
+  background-color: var(--seeding);
+}
+
+.swatch.downloading {
+  background-color: var(--downloading);
+}
+
+.slider,
+.select {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.slider input {
+  flex: 1;
+  accent-color: var(--primary);
+}
+
+.slider .value {
+  min-width: 92px;
+  text-align: right;
+  color: var(--gray);
+  font-variant-numeric: tabular-nums;
+}
+
+.select select {
+  flex: 1;
+  font: inherit;
+  padding: 4px 8px;
+  border: 1px solid var(--lightergray);
+  border-radius: var(--radius-s);
+  background-color: var(--surface-raised);
+  color: var(--darkgray);
+}
+
+/* Preview swatches per card: theme tokens live on :root, which a shadow
+ * stylesheet cannot re-scope per element, so the handful of preview values
+ * are repeated here. Keep in sync with themes.css. */
+.theme-card[data-theme="classic"] {
+  background-color: white;
+  color: #333;
+}
+
+.theme-card[data-theme="classic"] .swatch.bg {
+  background-color: #efefef;
+}
+
+.theme-card[data-theme="classic"] .swatch.accent {
+  background-color: #e95420;
+}
+
+.theme-card[data-theme="classic"] .swatch.complete {
+  background-color: orange;
+}
+
+.theme-card[data-theme="classic"] .swatch.downloading {
+  background-color: blue;
+}
+
+.theme-card[data-theme="gearbox-dark"] {
+  background-color: oklch(0.17 0.01 80);
+  color: oklch(0.9 0.012 85);
+  border-color: oklch(0.33 0.014 80);
+}
+
+.theme-card[data-theme="gearbox-dark"] .swatch.bg {
+  background-color: oklch(0.23 0.012 80);
+}
+
+.theme-card[data-theme="gearbox-dark"] .swatch.accent {
+  background-color: oklch(0.66 0.16 45);
+}
+
+.theme-card[data-theme="gearbox-dark"] .swatch.complete {
+  background-color: oklch(0.68 0.13 150);
+}
+
+.theme-card[data-theme="gearbox-dark"] .swatch.downloading {
+  background-color: oklch(0.6 0.13 245);
+}
+
+.theme-card[data-theme="gearbox-light"] {
+  background-color: oklch(0.985 0.005 85);
+  color: oklch(0.28 0.012 75);
+  border-color: oklch(0.88 0.008 85);
+}
+
+.theme-card[data-theme="gearbox-light"] .swatch.bg {
+  background-color: oklch(0.945 0.007 85);
+}
+
+.theme-card[data-theme="gearbox-light"] .swatch.accent {
+  background-color: oklch(0.58 0.17 45);
+}
+
+.theme-card[data-theme="gearbox-light"] .swatch.complete {
+  background-color: oklch(0.62 0.14 150);
+}
+
+.theme-card[data-theme="gearbox-light"] .swatch.downloading {
+  background-color: oklch(0.55 0.13 245);
+}
+
+.theme-card.active {
+  border-color: var(--primary);
 }

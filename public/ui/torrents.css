@@ -20,7 +20,7 @@
 }
 
 .row.error > * {
-  color: red;
+  color: var(--error);
 }
 
 .row.isRemoving > * {
@@ -30,14 +30,14 @@
 
 .row.selected > * {
   background-color: var(--primary);
-  color: white;
+  color: var(--selection-text);
 }
 
 /* we have quite a mix of colors for the status/progress item,
  * with this much specificity we ensure it remains white when
  * selected */
 .row.selected > .status > .progress > .layer:first-child {
-  color: white;
+  color: var(--selection-text);
 }
 
 .row > * {
@@ -96,11 +96,11 @@
 
 #context-menu {
   position: absolute;
-  background: #efefef;
-  border: 1px solid var(--gray);
+  background: var(--menu-bg);
+  border: 1px solid var(--lightergray);
   padding: 0;
-  border-radius: 5px;
-  box-shadow: 0 0 5px var(--gray);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
   outline: none;
   display: flex;
   flex-direction: column;
@@ -136,15 +136,15 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: var(--overlay);
   z-index: 2;
 }
 
 #delete-confirm, #change-location {
   font-size: 16px;
-  background-color: #efefef;
-  border: 1px solid var(--gray);
-  border-radius: 3px;
+  background-color: var(--menu-bg);
+  border: 1px solid var(--lightergray);
+  border-radius: var(--radius);
   padding: 20px 30px;
   display: flex;
   flex-direction: column;
@@ -174,11 +174,11 @@
 }
 
 .layer:nth-child(1) {
-  color: black;
+  color: var(--darkgray);
 }
 
 .layer:nth-child(3) {
-  color: white;
+  color: var(--progress-text);
 }
 
 .progress .loadbar {

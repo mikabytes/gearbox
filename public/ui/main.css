@@ -20,7 +20,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: var(--overlay-light);
 }
 
 #dragging > div {
@@ -53,12 +53,12 @@ x-status {
 
 @media (max-width: 575px) {
   x-sidebar {
-    background-color: white;
+    background-color: var(--surface-raised);
     position: absolute;
     top: 50px;
     left: 10px;
     bottom: 10px;
-    box-shadow: 0px 0px 15px 0px #333;
+    box-shadow: var(--shadow);
     z-index: 3;
   }
 }
@@ -88,13 +88,13 @@ x-status {
 
 #drag-ver {
   grid-area: drag-ver;
-  background-color: #ccc;
+  background-color: var(--lightergray);
 }
 
 #drag-hor {
   grid-area: drag-hor;
   width: 3px;
-  background-color: #ccc;
+  background-color: var(--lightergray);
 }
 
 .curtain {
@@ -110,7 +110,7 @@ x-status {
 }
 
 .message {
-  background-color: white;
+  background-color: var(--surface-raised);
   padding: 20px;
 }
 
@@ -125,7 +125,7 @@ x-status {
     position: absolute;
     text-align: center;
     font-size: 1.5em;
-    color: darkslategray;
+    color: var(--darkgray);
 }
 
 .progress-ring__circle {
@@ -142,6 +142,6 @@ x-status {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: var(--overlay);
   z-index: 3;
 }

@@ -1,7 +1,7 @@
 
 button {
   background-color: var(--secondary);
-  color: #efefef;
+  color: var(--terminal-text);
   font-weight: bold;
 }
 

@@ -63,8 +63,16 @@ function renderTab(tab, torrent) {
 function overview(torrent) {
   const percent = Math.round((torrent.percentDone ?? 0) * 100)
   const isComplete = (torrent.percentDone ?? 0) >= 1
-  const have = (torrent.haveValid ?? 0) + (torrent.haveUnchecked ?? 0)
-  const eta = formatEta(torrent.eta)
+  const have =
+    (torrent.haveValid ?? 0) + (torrent.haveUnchecked ?? 0) ||
+    Math.floor(
+      (torrent.percentDone ?? 0) *
+        (torrent.sizeWhenDone || torrent.totalSize || 0)
+    )
+  const eta =
+    torrent.status === enums.DOWNLOAD && torrent.eta > 0
+      ? formatEta(torrent.eta)
+      : ``
   const date = (seconds) =>
     seconds ? new Date(seconds * 1000).toLocaleString() : ``
 
