@@ -52,10 +52,32 @@ export default function DemoAdapter({ id: clientId }, dependencies = {}) {
   const torrents = new Map()
   const updateIntervals = new Map()
 
+  function makeFiles(name, totalSize) {
+    const count = 1 + Math.floor(Math.random() * 4)
+    const base = name.replace(/\.[a-z0-9]+$/i, ``)
+    const files = []
+    let remaining = totalSize
+    for (let i = 0; i < count; i++) {
+      const last = i === count - 1
+      const length = last
+        ? remaining
+        : Math.max(1, Math.floor((remaining / (count - i)) * (0.5 + Math.random())))
+      remaining = Math.max(0, remaining - length)
+      files.push({
+        name: count === 1 ? name : `${base}/part-${i + 1}.bin`,
+        length,
+        bytesCompleted: 0,
+      })
+    }
+    return files
+  }
+
   // Helper function to process torrents
   function processTorrent(torrent) {
     const name = torrentName()
     const localId = ++torrentIdCounter
+    const totalSize = torrent.totalSize ?? Math.floor(Math.random() * 10000000)
+    const files = torrent.files ?? makeFiles(torrent.name ?? name, totalSize)
     return normalizeTorrent({
       id: guid.encode({ clientId, torrentId: localId }),
       localId,
@@ -75,7 +97,13 @@ export default function DemoAdapter({ id: clientId }, dependencies = {}) {
       rateDownload: 0,
       trackerStats: [],
       uploadRatio: 0,
-      totalSize: Math.floor(Math.random() * 10000000),
+      totalSize,
+      files,
+      fileStats: files.map((file) => ({
+        bytesCompleted: file.bytesCompleted,
+        priority: 0,
+        wanted: true,
+      })),
       peersGettingFromUs: 0,
       peersSendingToUs: 0,
       ...torrent,
@@ -217,6 +245,27 @@ export default function DemoAdapter({ id: clientId }, dependencies = {}) {
           torrent.status = STOPPED
           changes?.({ id: torrent.id, changeSet: { status: STOPPED } })
           break
+        case "torrent-set": {
+          const stats = torrent.fileStats ?? []
+          const applyTo = (indices, change) => {
+            for (const index of indices ?? []) {
+              if (stats[index]) {
+                change(stats[index])
+              }
+            }
+          }
+          applyTo(args[`files-wanted`], (stat) => (stat.wanted = true))
+          applyTo(args[`files-unwanted`], (stat) => (stat.wanted = false))
+          applyTo(args[`priority-low`], (stat) => (stat.priority = -1))
+          applyTo(args[`priority-normal`], (stat) => (stat.priority = 0))
+          applyTo(args[`priority-high`], (stat) => (stat.priority = 1))
+          torrent.fileStats = stats.map((stat) => ({ ...stat }))
+          changes?.({
+            id: torrent.id,
+            changeSet: { fileStats: torrent.fileStats },
+          })
+          break
+        }
         default:
           console.log(`Method ${method} is not supported.`)
       }
@@ -235,6 +284,7 @@ export default function DemoAdapter({ id: clientId }, dependencies = {}) {
     capabilities: capabilities({
       addTorrent: true,
       removeTorrents: true,
+      setTorrents: true,
       startTorrents: true,
       stopTorrents: true,
       verifyTorrents: true,
@@ -255,6 +305,10 @@ export default function DemoAdapter({ id: clientId }, dependencies = {}) {
     },
     async addTorrent(args) {
       request(`torrent-add`, args)
+      return {}
+    },
+    async setTorrents(ids, args) {
+      request(`torrent-set`, { ids, ...args })
       return {}
     },
     async removeTorrents(ids, args) {

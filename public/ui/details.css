@@ -166,3 +166,25 @@ tr.skipped td {
 td.announce-error {
   color: var(--error);
 }
+
+td.priority {
+  padding: 2px 10px 2px 0;
+}
+
+td.priority select {
+  font: inherit;
+  font-size: 12px;
+  padding: 2px 6px;
+  border: 1px solid var(--lightergray);
+  border-radius: var(--radius-s);
+  background-color: var(--surface-raised);
+  color: var(--darkgray);
+}
+
+td.priority select:disabled {
+  opacity: 0.6;
+}
+
+tr.skipped td.priority select {
+  text-decoration: none;
+}
