@@ -210,3 +210,73 @@
 .progress.status-checking {
   --color: var(--checking);
 }
+
+/* Selection action bar: the touch-friendly path to pause/resume/details.
+ * Hidden on fine-pointer desktop, where the context menu covers this. */
+.action-bar {
+  display: none;
+}
+
+@media (max-width: 760px), (pointer: coarse) {
+  .action-bar {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    background-color: var(--menu-bg);
+    border: 1px solid var(--lightergray);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 6px;
+    z-index: 4;
+  }
+
+  .action-bar button {
+    flex: 1;
+    min-height: 44px;
+    border: none;
+    background: transparent;
+    font: inherit;
+    font-size: 13px;
+    color: var(--darkgray);
+    border-radius: var(--radius-s);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .action-bar button:active {
+    background-color: var(--lightgray);
+  }
+
+  .action-bar .count {
+    flex: none;
+    min-width: 28px;
+    text-align: center;
+    color: var(--selection-text);
+    background-color: var(--primary);
+    border-radius: var(--radius-s);
+    padding: 4px 0;
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  .action-bar .danger {
+    color: var(--error);
+  }
+
+  .action-bar .clear {
+    flex: 0 0 44px;
+  }
+
+  /* bigger touch targets, and room for the action bar over the last rows */
+  .row > * {
+    padding: 9px 6px;
+  }
+
+  .container {
+    padding-bottom: 76px;
+  }
+}

@@ -11,6 +11,7 @@ import RemoveTorrent from "./torrents/RemoveTorrent.js"
 import ScrollIntoView from "./torrents/ScrollIntoView.js"
 import Selections from "./torrents/Selections.js"
 import Shortcuts from "./torrents/Shortcuts.js"
+import * as torrentActions from "../torrentActions.js"
 import useSettings from "../useSettings.js"
 
 component(
@@ -94,6 +95,17 @@ component(
       totalTorrents,
     })
 
+    const selectedIds = selections.getIds()
+    const selectedTorrents = torrents.filter((t) => selectedIds.includes(t.id))
+    const pauseSelected = () =>
+      torrentActions.pause(
+        selectedTorrents.filter((t) => t.status !== 0).map((t) => t.id)
+      )
+    const resumeSelected = () =>
+      torrentActions.resume(
+        selectedTorrents.filter((t) => t.status === 0).map((t) => t.id)
+      )
+
     useEffect(() => {
       this.addEventListener(
         "touchmove",
@@ -175,6 +187,29 @@ component(
             </div>`
         )}
       </div>
+      ${!selectedIds.length
+        ? ``
+        : html`
+            <div class="action-bar">
+              <span class="count">${selectedIds.length}</span>
+              <button @click=${resumeSelected}>▶ Resume</button>
+              <button @click=${pauseSelected}>⏸ Pause</button>
+              <button @click=${() => setShowDetails(true)}>Details</button>
+              <button
+                class="danger"
+                @click=${() => removeTorrent.remove(selectedIds)}
+              >
+                Remove
+              </button>
+              <button
+                class="clear"
+                aria-label="Clear selection"
+                @click=${() => selections.reset()}
+              >
+                ✕
+              </button>
+            </div>
+          `}
       ${contextMenu.html} ${removeTorrent.html}
       ${!changeLocation
         ? ``
