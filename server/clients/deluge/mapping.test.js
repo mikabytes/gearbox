@@ -62,6 +62,30 @@ describe(`Deluge torrent mapping`, () => {
     assert.equal(torrent.peers[0].progress, 0.5)
   })
 
+  it(`keeps tracker announce failures out of the torrent error state`, () => {
+    const torrent = mapTorrent(`B`.repeat(40), {
+      state: `Downloading`,
+      progress: 10,
+      trackers: [{ url: `udp://tracker.example/announce`, tier: 0 }],
+      tracker_status: `Error: timed out`,
+    })
+
+    assert.equal(torrent.error, 0)
+    assert.equal(torrent.errorString, ``)
+    assert.equal(torrent.trackerStats[0].lastAnnounceResult, `Error: timed out`)
+    assert.equal(torrent.trackerStats[0].announceState, 4)
+  })
+
+  it(`maps the Deluge Error state to a local error`, () => {
+    const torrent = mapTorrent(`C`.repeat(40), {
+      state: `Error`,
+      message: `disk full`,
+    })
+
+    assert.equal(torrent.error, 3)
+    assert.equal(torrent.errorString, `disk full`)
+  })
+
   it(`maps queued checking and v2 hashes`, () => {
     assert.equal(mapStatus(`Checking`), CHECK)
     assert.equal(mapStatus(`Queued`, 0.2), DOWNLOAD_WAIT)
