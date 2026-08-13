@@ -2,7 +2,7 @@ import "./status.js"
 import "./header.js"
 import "./sidebar.js"
 import "./torrents.js"
-import "./objectExplorer.js"
+import "./details.js"
 import "./addTorrents.js"
 import "./announcer.js"
 import fileToTorrent from "../fileToTorrent.js"
@@ -219,9 +219,9 @@ component(
       <div id="footer" class="${showDetails ? `show` : `hide`}">
         ${!showDetails
           ? ``
-          : html`<x-object-explorer
+          : html`<x-details
               .selectedTorrents=${selectedTorrents}
-            ></x-object-explorer>`}
+            ></x-details>`}
         <button @click=${() => setShowDetails(false)}>✕</button>
       </div>
       <x-status .torrents=${allTorrents}></x-status>
