@@ -6,7 +6,7 @@ import filterIcon from "../icons/filter.js"
 component(
   `x-header`,
   await css(import.meta.resolve(`./header.css`)),
-  function Header({ filters, setFilters, setTorrentsToAdd, toggleSidebar }) {
+  function Header({ filters, setFilters, setTorrentsToAdd, toggleSidebar, openSettings }) {
     this.generatedSearch = filtersToStr(filters)
 
     // we have to make a little workaround so that filters won't interrupt us writing
@@ -58,6 +58,9 @@ component(
         @change=${filesPicked}
       />
       <button id="upload" @click=${pickFile}>➕</button>
+      <button id="settings" aria-label="Settings" @click=${openSettings}>
+        ⚙️
+      </button>
     `
   }
 )
