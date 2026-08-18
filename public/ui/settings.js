@@ -1,4 +1,5 @@
 import { component, html, css, useEffect } from "../component.js"
+import { themes } from "../applyTheme.js"
 import { columns } from "./torrents/columns.js"
 import useSettings from "../useSettings.js"
 
@@ -21,6 +22,9 @@ component(
     const toggleColumn = (key) => (e) => {
       updateSettings({ columns: { [key]: e.target.checked } })
     }
+
+    const theme = settings.theme ?? `classic`
+    const appearance = settings.appearance ?? {}
 
     return html`
       <div class="grayout" @click=${onClose}>
@@ -65,6 +69,83 @@ component(
               @click=${() => updateSettings({ columnWidths: null })}
             >
               Reset column widths
+            </button>
+          </section>
+
+          <section>
+            <h3>Theme</h3>
+            <div class="themes">
+              ${themes.map(
+                (option) => html`
+                  <label
+                    class="theme-card ${theme === option.id ? `active` : ``}"
+                    data-theme=${option.id}
+                  >
+                    <input
+                      type="radio"
+                      name="theme"
+                      .checked=${theme === option.id}
+                      @change=${() => updateSettings({ theme: option.id })}
+                    />
+                    <span class="preview">
+                      <span class="swatch bg"></span>
+                      <span class="swatch accent"></span>
+                      <span class="swatch complete"></span>
+                      <span class="swatch downloading"></span>
+                    </span>
+                    ${option.name}
+                  </label>
+                `
+              )}
+            </div>
+          </section>
+
+          <section>
+            <h3>Appearance</h3>
+            <label class="slider">
+              Corner radius
+              <input
+                type="range"
+                min="0"
+                max="14"
+                step="1"
+                .value=${appearance.radius ?? ``}
+                @input=${(e) =>
+                  updateSettings({
+                    appearance: { radius: Number(e.target.value) },
+                  })}
+              />
+              <span class="value">
+                ${appearance.radius != null
+                  ? `${appearance.radius}px`
+                  : `theme default`}
+              </span>
+            </label>
+            <label class="select">
+              Scrollbars
+              <select
+                @change=${(e) =>
+                  updateSettings({
+                    appearance: { scrollbar: e.target.value || null },
+                  })}
+              >
+                <option value="" ?selected=${!appearance.scrollbar}>
+                  Theme default
+                </option>
+                <option value="thin" ?selected=${appearance.scrollbar === `thin`}>
+                  Thin
+                </option>
+                <option value="none" ?selected=${appearance.scrollbar === `none`}>
+                  Hidden
+                </option>
+              </select>
+            </label>
+            <button
+              class="minor"
+              ?disabled=${appearance.radius == null && !appearance.scrollbar}
+              @click=${() => updateSettings({ appearance: null })}
+            >
+              Reset appearance
             </button>
           </section>
         </div>

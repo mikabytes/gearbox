@@ -1,0 +1,128 @@
+/* Theme tokens. Custom properties inherit through shadow DOM, so everything
+ * defined here reaches every component. `classic` reproduces the original
+ * Gearbox look exactly; the two `gearbox-*` themes are a deeper restyle
+ * sharing one semantic scale (OKLCH, warm-metal neutrals + amber accent).
+ *
+ * Progress semantics everywhere: --seeding is the "complete" color,
+ * --downloading the "incomplete/active" color (see torrents.css). */
+
+:root,
+:root[data-theme="classic"] {
+  /* core palette (legacy names, used throughout the components) */
+  --darkgray: #333;
+  --gray: #999;
+  --primary: #e95420;
+  --secondary: #00cd4a;
+  --lightergray: #ccc;
+  --lightgray: #efefef;
+  --seeding: orange;
+  --downloading: blue;
+  --checking: var(--darkgray);
+
+  /* surfaces & text */
+  --bg: white;
+  --menu-bg: #efefef;
+  --surface-raised: white;
+  --overlay: rgba(0, 0, 0, 0.5);
+  --overlay-light: rgba(255, 255, 255, 0.8);
+  --selection-text: white;
+  --progress-text: white;
+
+  /* feedback */
+  --error: red;
+  --error-bg: #fdeaea;
+  --error-border: #f0b9be;
+
+  /* shape & chrome */
+  --radius: 5px;
+  --radius-s: 4px;
+  --shadow: 0 0 5px var(--gray);
+  --terminal-bg: #333;
+  --terminal-text: #efefef;
+  --scrollbar-width: auto;
+  --scrollbar-thumb: auto;
+  --scrollbar-track: auto;
+}
+
+:root[data-theme="gearbox-dark"] {
+  --darkgray: oklch(0.9 0.012 85);
+  --gray: oklch(0.62 0.02 80);
+  --primary: oklch(0.66 0.16 45);
+  --secondary: oklch(0.7 0.15 150);
+  --lightergray: oklch(0.33 0.014 80);
+  --lightgray: oklch(0.23 0.012 80);
+  --seeding: oklch(0.68 0.13 150);
+  --downloading: oklch(0.6 0.13 245);
+  --checking: oklch(0.62 0.1 300);
+
+  --bg: oklch(0.17 0.01 80);
+  --menu-bg: oklch(0.26 0.014 80);
+  --surface-raised: oklch(0.24 0.014 80);
+  --overlay: rgba(0, 0, 0, 0.6);
+  --overlay-light: oklch(0.17 0.01 80 / 0.85);
+  --selection-text: oklch(0.97 0.01 85);
+  --progress-text: oklch(0.97 0.01 85);
+
+  --error: oklch(0.68 0.18 25);
+  --error-bg: oklch(0.28 0.06 25);
+  --error-border: oklch(0.4 0.09 25);
+
+  --radius: 8px;
+  --radius-s: 6px;
+  --shadow: 0 6px 28px rgba(0, 0, 0, 0.55);
+  --terminal-bg: oklch(0.14 0.01 80);
+  --terminal-text: oklch(0.85 0.02 85);
+  --scrollbar-width: thin;
+  --scrollbar-thumb: oklch(0.38 0.015 80);
+  --scrollbar-track: transparent;
+
+  color-scheme: dark;
+}
+
+:root[data-theme="gearbox-light"] {
+  --darkgray: oklch(0.28 0.012 75);
+  --gray: oklch(0.55 0.015 80);
+  --primary: oklch(0.58 0.17 45);
+  --secondary: oklch(0.55 0.15 150);
+  --lightergray: oklch(0.88 0.008 85);
+  --lightgray: oklch(0.945 0.007 85);
+  --seeding: oklch(0.62 0.14 150);
+  --downloading: oklch(0.55 0.13 245);
+  --checking: oklch(0.55 0.09 300);
+
+  --bg: oklch(0.985 0.005 85);
+  --menu-bg: oklch(0.985 0.004 85);
+  --surface-raised: white;
+  --overlay: rgba(35, 28, 16, 0.4);
+  --overlay-light: oklch(0.985 0.005 85 / 0.85);
+  --selection-text: white;
+  --progress-text: white;
+
+  --error: oklch(0.55 0.19 25);
+  --error-bg: oklch(0.95 0.03 25);
+  --error-border: oklch(0.85 0.06 25);
+
+  --radius: 8px;
+  --radius-s: 6px;
+  --shadow: 0 4px 20px rgba(60, 48, 30, 0.18);
+  --terminal-bg: oklch(0.24 0.012 75);
+  --terminal-text: oklch(0.93 0.008 85);
+  --scrollbar-width: thin;
+  --scrollbar-thumb: oklch(0.8 0.01 85);
+  --scrollbar-track: transparent;
+
+  color-scheme: light;
+}
+
+/* Scrollbars: standard properties inherit into every scroll container,
+ * including ones inside shadow roots. */
+:root {
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  scrollbar-width: var(--scrollbar-width);
+}
+
+html,
+body {
+  background-color: var(--bg);
+  color: var(--darkgray);
+}

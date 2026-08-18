@@ -27,7 +27,7 @@ section {
 
 .selected > * {
   background-color: var(--primary);
-  color: white;
+  color: var(--selection-text);
 }
 
 .torrentSelected > .name::before {
