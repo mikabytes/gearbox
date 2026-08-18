@@ -2,6 +2,7 @@ import "./status.js"
 import "./header.js"
 import "./sidebar.js"
 import "./torrents.js"
+import "./settings.js"
 import "./details.js"
 import "./addTorrents.js"
 import "./announcer.js"
@@ -32,6 +33,7 @@ component(
     const [showSidebar, setShowSidebar] = useState(window.innerWidth > 575)
     const [showTorrentCount, setShowTorrentCount] = useState(100)
     const [showDetails, setShowDetails] = useState(false)
+    const [showSettings, setShowSettings] = useState(false)
     const [sort, _setSort] = useState(
       initialSort || { key: `addedDate`, reverse: true }
     )
@@ -192,6 +194,7 @@ component(
         .selectedTorrents=${selectedTorrents}
         .setTorrentsToAdd=${setTorrentsToAdd}
         .toggleSidebar=${() => setShowSidebar(!showSidebar)}
+        .openSettings=${() => setShowSettings(true)}
       ></x-header>
       ${!showSidebar
         ? ``
@@ -225,6 +228,11 @@ component(
         <button @click=${() => setShowDetails(false)}>✕</button>
       </div>
       <x-status .torrents=${allTorrents}></x-status>
+      ${!showSettings
+        ? ``
+        : html`<x-settings
+            .onClose=${() => setShowSettings(false)}
+          ></x-settings>`}
       ${!dragging
         ? ``
         : html`<div id="dragging"><div>Drop files here</div></div>`}

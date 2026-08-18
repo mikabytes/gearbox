@@ -5,14 +5,13 @@ import { repeat } from "lit-html/directives/repeat.js"
 
 import { component, html, useState, useEffect, css } from "../component.js"
 import ContextMenu from "./torrents/ContextMenu.js"
+import { columns, gridTemplate, visibleColumns } from "./torrents/columns.js"
 import FilterSideEffects from "./torrents/FilterSideEffects.js"
 import RemoveTorrent from "./torrents/RemoveTorrent.js"
 import ScrollIntoView from "./torrents/ScrollIntoView.js"
 import Selections from "./torrents/Selections.js"
 import Shortcuts from "./torrents/Shortcuts.js"
-import * as enums from "../enums.js"
-import formatEta from "../formatEta.js"
-import formatSize from "../formatSize.js"
+import useSettings from "../useSettings.js"
 
 component(
   `x-torrents`,
@@ -31,6 +30,40 @@ component(
   }) {
     const [transfer, setTransfer] = useState(null)
     const [changeLocation, setChangeLocation] = useState(false)
+    const [settings, updateSettings] = useSettings()
+    const [liveWidths, setLiveWidths] = useState(null)
+    const visible = visibleColumns(columns, settings)
+    const widths = liveWidths ?? settings.columnWidths ?? {}
+
+    const startResize = (e, column) => {
+      e.preventDefault()
+      e.stopPropagation()
+      const handle = e.currentTarget
+      const startX = e.clientX
+      const base = Math.max(
+        45,
+        (settings.columnWidths ?? {})[column.key] ?? column.width
+      )
+      let last = base
+      const move = (ev) => {
+        last = Math.max(45, base + ev.clientX - startX)
+        setLiveWidths({ ...(settings.columnWidths ?? {}), [column.key]: last })
+      }
+      const up = () => {
+        window.removeEventListener(`pointermove`, move)
+        window.removeEventListener(`pointerup`, up)
+        setLiveWidths(null)
+        updateSettings({ columnWidths: { [column.key]: last } })
+      }
+      try {
+        handle.setPointerCapture(e.pointerId)
+      } catch (err) {
+        // synthetic pointers can't always be captured; window listeners
+        // below track the drag either way
+      }
+      window.addEventListener(`pointermove`, move)
+      window.addEventListener(`pointerup`, up)
+    }
     const selections = Selections.call(this, {
       torrents,
       selections: _selections,
@@ -72,21 +105,29 @@ component(
     }, [])
 
     return html`
-      <div class="container">
+      <div
+        class="container"
+        style="grid-template-columns: ${gridTemplate(visible, widths)}"
+      >
         <div class="row headers">
-          ${columns.map(
-            ({ key, name }) => html`
+          ${visible.map(
+            (column) => html`
               <div
-                class="header ${key} ${key === sort.key
+                class="header ${column.key} ${column.key === sort.key
                   ? `sorted ${sort.reverse ? `reverse` : ``}`
                   : ``}"
                 @click=${() =>
                   setSort({
-                    key,
-                    reverse: key === sort.key ? !sort.reverse : true,
+                    key: column.key,
+                    reverse: column.key === sort.key ? !sort.reverse : true,
                   })}
               >
-                ${name}
+                ${column.name}
+                <div
+                  class="resize-handle"
+                  @pointerdown=${(e) => startResize(e, column)}
+                  @click=${(e) => e.stopPropagation()}
+                ></div>
               </div>
             `
           )}
@@ -125,8 +166,8 @@ component(
               @touchend=${() => clearTimeout(this.longPressTimer)}
               @touchcancel=${() => clearTimeout(this.longPressTimer)}
             >
-              ${columns.map(
-                ({ key, name, format }) =>
+              ${visible.map(
+                ({ key, format }) =>
                   html`<div class="${key}">
                     ${format(torrent[key], torrent)}
                   </div>`
@@ -160,122 +201,3 @@ component(
     `
   }
 )
-
-const columns = [
-  {
-    key: `addedDate`,
-    name: `Added`,
-    format: (date) => new Date(date * 1000).toISOString().split(`T`)[0],
-  },
-  { key: `name`, name: `Name`, format: (name) => name },
-  { key: `totalSize`, name: `Size`, format: (size) => formatSize(size) },
-  {
-    key: `haveValid`,
-    name: `Have`,
-    format: (haveValid, torrent) => {
-      // some clients don't report verified bytes; fall back to progress
-      const have =
-        (haveValid ?? 0) + (torrent.haveUnchecked ?? 0) ||
-        Math.floor(
-          (torrent.percentDone ?? 0) *
-            (torrent.sizeWhenDone || torrent.totalSize || 0)
-        )
-      return formatSize(have)
-    },
-  },
-  {
-    key: `status`,
-    name: `Progress`,
-    format: (status, torrent) =>
-      torrent.error ? torrent.errorString : makeProgress(torrent),
-  },
-  {
-    key: `eta`,
-    name: `ETA`,
-    format: (eta, torrent) => {
-      if (torrent.status !== enums.DOWNLOAD) {
-        return ``
-      }
-      if (!(eta > 0) && torrent.rateDownload > 0) {
-        const left =
-          torrent.leftUntilDone > 0
-            ? torrent.leftUntilDone
-            : Math.max(
-                0,
-                (torrent.sizeWhenDone || torrent.totalSize || 0) *
-                  (1 - (torrent.percentDone ?? 0))
-              )
-        if (left > 0) {
-          eta = left / torrent.rateDownload
-        }
-      }
-      return eta > 0 ? formatEta(eta) : ``
-    },
-  },
-  {
-    key: `peersGettingFromUs`,
-    name: `Leech`,
-    format: (peers, torrent) =>
-      `${peers} (${torrent.trackerStats.map((it) => it.leecherCount).reduce((a, b) => Math.max(a, 0) + Math.max(b, 0), 0)})`,
-  },
-  {
-    key: `peersSendingToUs`,
-    name: `Seeds`,
-    format: (peers, torrent) =>
-      `${peers} (${torrent.trackerStats.map((it) => it.seederCount).reduce((a, b) => Math.max(a, 0) + Math.max(b, 0), 0)})`,
-  },
-  { key: `uploadRatio`, name: `Ratio`, format: (ratio) => ratio.toFixed(1) },
-]
-
-function makeProgress(torrent) {
-  // The bar always shows how much of the torrent we have, so completion is
-  // visible at a glance no matter the status. The color says complete vs
-  // incomplete; the text says what the torrent is doing right now.
-  const isComplete = (torrent.percentDone ?? 0) >= 1
-  let progress = Math.floor((torrent.percentDone ?? 0) * 100)
-  let text
-  switch (torrent.status) {
-    case enums.SEED:
-      text = enums.friendlyName(torrent.status)
-      const speed = torrent.rateUpload
-      if (speed > 0) {
-        text = `▲ ${formatSize(speed)}/s`
-      }
-
-      break
-    case enums.DOWNLOAD: {
-      const speed = formatSize(torrent.rateDownload) + `/s`
-
-      text = `▼ ${speed} ${progress}%`
-      break
-    }
-    case enums.CHECK:
-      progress = Math.round(torrent.recheckProgress * 100)
-      text = `Verifying ${progress}%`
-      break
-    case enums.STOPPED:
-      text = isComplete
-        ? enums.friendlyName(torrent.status)
-        : `${enums.friendlyName(torrent.status)} ${progress}%`
-      break
-    default:
-      text = enums.friendlyName(torrent.status)
-      break
-  }
-
-  return html`
-    <div
-      class="progress ${isComplete ? `complete` : `incomplete`} status-${enums
-        .friendlyName(torrent.status)
-        .toLowerCase()}"
-    >
-      <div class="layer">${text}</div>
-      <div class="layer">
-        <div class="loadbar" style="width: ${progress}%"></div>
-      </div>
-      <div class="layer" style="clip-path: inset(0 ${100 - progress}% 0 0)">
-        ${text}
-      </div>
-    </div>
-  `
-}
