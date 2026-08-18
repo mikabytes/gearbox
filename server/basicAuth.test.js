@@ -44,6 +44,25 @@ describe(`basic auth`, () => {
     assert.equal(res.statusCode, null)
   })
 
+  it(`accepts a case-insensitive authentication scheme`, () => {
+    let nextCalled = false
+    const res = makeRes()
+
+    middleware(
+      {
+        headers: {
+          authorization: header(`user`, `secret`).replace(`Basic`, `basic`),
+        },
+      },
+      res,
+      () => {
+        nextCalled = true
+      }
+    )
+
+    assert.equal(nextCalled, true)
+  })
+
   it(`rejects wrong credentials`, () => {
     let nextCalled = false
     const res = makeRes()
@@ -73,12 +92,32 @@ describe(`basic auth`, () => {
     assert.match(res.headers[`WWW-Authenticate`], /^Basic realm=/)
   })
 
-  it(`rejects a malformed authorization header`, () => {
+  it(`rejects an unsupported authorization scheme`, () => {
     let nextCalled = false
     const res = makeRes()
 
     middleware(
       { headers: { authorization: `Bearer some-token` } },
+      res,
+      () => {
+        nextCalled = true
+      }
+    )
+
+    assert.equal(nextCalled, false)
+    assert.equal(res.statusCode, 401)
+  })
+
+  it(`rejects malformed basic credentials`, () => {
+    let nextCalled = false
+    const res = makeRes()
+
+    middleware(
+      {
+        headers: {
+          authorization: `${header(`user`, `secret`)}!!!`,
+        },
+      },
       res,
       () => {
         nextCalled = true

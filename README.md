@@ -147,7 +147,7 @@ export default {
 }
 ```
 
-Both fields are required when `auth` is present. Since the configuration file is JavaScript, secrets can be pulled from the environment as shown above instead of being written to disk.
+Both fields are required when `auth` is present. Neither can contain control characters, and the username cannot contain a colon. Since the configuration file is JavaScript, secrets can be pulled from the environment as shown above instead of being written to disk. Authentication credentials are never included in the configuration sent to the browser.
 
 Note that basic auth sends credentials with every request, so combine it with HTTPS (for example behind a reverse proxy) when exposing Gearbox beyond localhost.
 

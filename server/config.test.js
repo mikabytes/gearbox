@@ -125,4 +125,54 @@ describe(`configuration`, () => {
       await fs.rm(root, { recursive: true })
     }
   })
+
+  it(`rejects a web UI username containing a colon`, async () => {
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), `gearbox-config-`))
+    try {
+      const filename = path.join(root, `config.mjs`)
+      await fs.writeFile(
+        filename,
+        `export default {
+          clients: [{ id: "one" }],
+          auth: { username: "admin:user", password: "secret" },
+        }`
+      )
+
+      await assert.rejects(
+        loadConfig(
+          `${pathToFileURL(filename).href}?test=${Date.now()}`,
+          filename,
+          root
+        ),
+        /username must not contain a colon/
+      )
+    } finally {
+      await fs.rm(root, { recursive: true })
+    }
+  })
+
+  it(`rejects web UI credentials containing control characters`, async () => {
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), `gearbox-config-`))
+    try {
+      const filename = path.join(root, `config.mjs`)
+      await fs.writeFile(
+        filename,
+        `export default {
+          clients: [{ id: "one" }],
+          auth: { username: "admin", password: "secret\\nvalue" },
+        }`
+      )
+
+      await assert.rejects(
+        loadConfig(
+          `${pathToFileURL(filename).href}?test=${Date.now()}`,
+          filename,
+          root
+        ),
+        /password must not contain control characters/
+      )
+    } finally {
+      await fs.rm(root, { recursive: true })
+    }
+  })
 })

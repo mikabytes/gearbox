@@ -4,7 +4,6 @@ import { readFileSync } from "fs"
 
 import all from "./all.js"
 import logger from "../logger.js"
-import loggerMiddleware from "./loggerMiddleware.js"
 import rpc from "./rpc.js"
 import streaming from "./streaming.js"
 import _jsonBigint from "json-bigint"
@@ -25,7 +24,6 @@ export default function makeApi({
 
   const app = express.Router()
 
-  app.use(loggerMiddleware)
   // some clients don't specify its json, and some send int64 tags
   app.use(
     express.text({
@@ -51,7 +49,9 @@ export default function makeApi({
   })
   app.get(`/all`, compression(), all({ getAll, count }))
   app.get(`/config`, (req, res) => {
-    res.json(publicConfig())
+    const config = { ...publicConfig() }
+    delete config.auth
+    res.json(config)
   })
 
   return app
