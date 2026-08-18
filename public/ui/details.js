@@ -2,8 +2,11 @@ import "./objectExplorer.js"
 
 import { component, html, useState, css } from "../component.js"
 import * as enums from "../enums.js"
+import { LEVELS, fileLevel, levelArguments } from "../filePriorities.js"
 import formatEta from "../formatEta.js"
 import formatSize from "../formatSize.js"
+import * as torrentActions from "../torrentActions.js"
+import useConfig from "../useConfig.js"
 
 const TABS = [`Overview`, `Files`, `Trackers`, `Peers`, `Raw`]
 
@@ -12,6 +15,16 @@ component(
   await css(import.meta.resolve(`./details.css`)),
   function Details({ selectedTorrents }) {
     const [tab, setTab] = useState(`Overview`)
+    const [pendingPriorities, setPendingPriorities] = useState({})
+    const config = useConfig()
+
+    const setFilePriority = (torrent, index, level) => {
+      setPendingPriorities((prev) => ({
+        ...prev,
+        [`${torrent.id}:${index}`]: level,
+      }))
+      torrentActions.set([torrent.id], levelArguments(level, index))
+    }
 
     if (!selectedTorrents.length) {
       return html`<div class="empty">Select a torrent to see its details</div>`
@@ -22,6 +35,12 @@ component(
     }
 
     const torrent = selectedTorrents[0]
+    const client = config?.clients?.find((c) => c.id === torrent.clientId)
+    const fileControls = {
+      canSet: client?.state === `online` && client?.capabilities?.setTorrents,
+      pendingPriorities,
+      setFilePriority,
+    }
 
     return html`
       <div class="tabs" role="tablist">
@@ -38,15 +57,15 @@ component(
           `
         )}
       </div>
-      <div class="content">${renderTab(tab, torrent)}</div>
+      <div class="content">${renderTab(tab, torrent, fileControls)}</div>
     `
   }
 )
 
-function renderTab(tab, torrent) {
+function renderTab(tab, torrent, fileControls) {
   switch (tab) {
     case `Files`:
-      return files(torrent)
+      return files(torrent, fileControls)
     case `Trackers`:
       return trackers(torrent)
     case `Peers`:
@@ -129,7 +148,7 @@ function overview(torrent) {
   `
 }
 
-function files(torrent) {
+function files(torrent, { canSet, pendingPriorities, setFilePriority }) {
   const files = torrent.files ?? []
   if (!files.length) {
     return html`<div class="empty">No file information available</div>`
@@ -141,19 +160,43 @@ function files(torrent) {
           <th class="grow">Name</th>
           <th>Size</th>
           <th>Done</th>
+          <th>Priority</th>
         </tr>
       </thead>
       <tbody>
         ${files.map((file, index) => {
-          const wanted = torrent.fileStats?.[index]?.wanted !== false
+          const level =
+            pendingPriorities[`${torrent.id}:${index}`] ??
+            fileLevel(torrent.fileStats?.[index])
           const percent = file.length
             ? Math.floor((file.bytesCompleted / file.length) * 100)
             : 0
           return html`
-            <tr class=${wanted ? `` : `skipped`}>
+            <tr class=${level === `skip` ? `skipped` : ``}>
               <td class="grow" title=${file.name}>${file.name}</td>
               <td>${formatSize(file.length ?? 0)}</td>
-              <td>${wanted ? `${percent}%` : `skip`}</td>
+              <td>${percent}%</td>
+              <td class="priority">
+                <select
+                  ?disabled=${!canSet}
+                  title=${canSet
+                    ? ``
+                    : `This client does not support changing file priorities`}
+                  @change=${(e) =>
+                    setFilePriority(torrent, index, e.target.value)}
+                >
+                  ${LEVELS.map(
+                    (option) => html`
+                      <option
+                        value=${option.id}
+                        ?selected=${option.id === level}
+                      >
+                        ${option.name}
+                      </option>
+                    `
+                  )}
+                </select>
+              </td>
             </tr>
           `
         })}
