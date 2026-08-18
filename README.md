@@ -133,6 +133,24 @@ This specifies the IP and port on which the Gearbox server will listen. Defaults
 
 If you want to be able to access Gearbox from outside the local machine, you should set `ip` to `0.0.0.0`.
 
+### auth
+
+Optional HTTP basic authentication for the entire web UI and API. When omitted, Gearbox is open like before.
+
+```js
+export default {
+  // ...
+  auth: {
+    username: `admin`,
+    password: process.env.GEARBOX_PASSWORD,
+  },
+}
+```
+
+Both fields are required when `auth` is present. Neither can contain control characters, and the username cannot contain a colon. Since the configuration file is JavaScript, secrets can be pulled from the environment as shown above instead of being written to disk. Authentication credentials are never included in the configuration sent to the browser.
+
+Note that basic auth sends credentials with every request, so combine it with HTTPS (for example behind a reverse proxy) when exposing Gearbox beyond localhost.
+
 ### logLevel
 
 The logging level. Defaults to `warn`, can be any of `error`, `warn`, or `debug`.

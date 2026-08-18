@@ -122,6 +122,27 @@ export async function loadConfig(configFileUrl, absolutePath, workdir) {
     }
   }
 
+  if (config.auth !== undefined && config.auth !== null) {
+    if (typeof config.auth !== `object`) {
+      throw new Error(`'auth' must be an object with username and password`)
+    }
+    if (!config.auth.username || typeof config.auth.username !== `string`) {
+      throw new Error(`'auth' must contain a non-empty username`)
+    }
+    if (/[\u0000-\u001f\u007f]/.test(config.auth.username)) {
+      throw new Error(`'auth' username must not contain control characters`)
+    }
+    if (config.auth.username.includes(`:`)) {
+      throw new Error(`'auth' username must not contain a colon`)
+    }
+    if (!config.auth.password || typeof config.auth.password !== `string`) {
+      throw new Error(`'auth' must contain a non-empty password`)
+    }
+    if (/[\u0000-\u001f\u007f]/.test(config.auth.password)) {
+      throw new Error(`'auth' password must not contain control characters`)
+    }
+  }
+
   if (!config.addTorrentStrategy) {
     config.addTorrentStrategy = `least-count`
   }
