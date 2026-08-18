@@ -145,3 +145,10 @@ x-status {
   background-color: var(--overlay);
   z-index: 3;
 }
+
+@media (max-width: 760px) {
+  /* the details footer becomes a bottom sheet on small screens */
+  #footer {
+    height: 55vh;
+  }
+}
