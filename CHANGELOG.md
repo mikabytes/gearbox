@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.0.0-alpha.6](https://github.com/mikabytes/gearbox/compare/v1.0.0-alpha.5...v1.0.0-alpha.6) (2026-08-18)
+
+
+### Features
+
+* Add optional HTTP basic authentication for the web UI and API
+* Replace the raw torrent data footer with structured overview, files, trackers, peers, and raw-data views
+* Show completion clearly for paused torrents and add ETA and Have columns
+* Add persistent settings for column visibility and widths
+* Add Classic, Gearbox Dark, and Gearbox Light themes with appearance controls
+* Add a touch-friendly selection action bar and responsive mobile layout
+* Add per-file download priority controls for Transmission, qBittorrent, and Deluge
+
+
+### Bug Fixes
+
+* Keep Deluge tracker announce failures from incorrectly marking healthy torrents as errored
+
 ## [1.0.0-alpha.5](https://github.com/mikabytes/gearbox/compare/v1.0.0-alpha.4...v1.0.0-alpha.5) (2026-08-03)
 
 
