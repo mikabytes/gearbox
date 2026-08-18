@@ -79,9 +79,14 @@ export function mapTorrent(localId, source = {}, { now = Date.now } = {}) {
   const trackerStatus = `${source.tracker_status || ``}`
   const localError = `${source.message || ``}`
   const stateError = `${source.state || ``}`.toLowerCase() === `error`
+  // Tracker announce failures (timeouts, unreachable trackers) are routine
+  // and don't stop a torrent from transferring via DHT/PEX. Deluge's own UI
+  // treats them as tracker detail and the qBittorrent connector ignores them
+  // too, so they don't become a torrent-level error here either - they stay
+  // visible through trackerStats (announceState/lastAnnounceResult).
   const trackerError = /^error\b/i.test(trackerStatus)
-  const error = stateError ? 3 : trackerError ? 2 : 0
-  const errorString = stateError ? localError || `Deluge reported an error` : trackerError ? trackerStatus : ``
+  const error = stateError ? 3 : 0
+  const errorString = stateError ? localError || `Deluge reported an error` : ``
   const ratio = number(source.ratio, downloaded ? uploaded / downloaded : 0)
   const downloadLimit = number(source.max_download_speed, -1)
   const uploadLimit = number(source.max_upload_speed, -1)
